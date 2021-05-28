@@ -1,0 +1,19 @@
+FIND_PACKAGE(Catch2 REQUIRED)
+
+ADD_EXECUTABLE(Tests)
+TARGET_SOURCES(Tests
+  PRIVATE
+    main.test.cpp
+    ${CMAKE_SOURCE_DIR}/src/Interpreter.cpp
+)
+TARGET_LINK_LIBRARIES(Tests
+  PRIVATE
+    Catch2::Catch2
+)
+TARGET_INCLUDE_DIRECTORIES(Tests
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+INCLUDE(Catch)
+CATCH_DISCOVER_TESTS(Tests)
