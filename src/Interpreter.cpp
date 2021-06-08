@@ -116,3 +116,28 @@ std::ostream& operator<<(std::ostream& outstream, const Token& token)
   outstream << token.toString();
   return outstream;
 }
+
+std::string join(const std::vector<std::string>& input)
+{
+  std::string output;
+  for (auto& each : input)
+  {
+    if (!output.empty())
+    {
+      output += " ";
+    }
+    output += each;
+  }
+  return output;
+}
+
+#include <opencv2/objdetect.hpp>
+
+std::optional<std::string> decodeAndInterpret(const cv::Mat& image)
+{
+  cv::QRCodeDetector qrDecoder = cv::QRCodeDetector::QRCodeDetector();
+  std::vector<cv::String> decodedStrings;
+  bool qrCodesFound = qrDecoder.detectAndDecodeMulti(image, decodedStrings);
+  if (!qrCodesFound) return {};
+  return interpret(join(decodedStrings));
+}

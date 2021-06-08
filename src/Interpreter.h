@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <ostream>
+#include <optional>
+#include <opencv2/core.hpp>
 
 class Token {
 public:
@@ -31,3 +33,7 @@ public:
 Token* lex(const std::string& tokenString);
 
 std::string interpret(const std::string& code);
+
+std::string join(const std::vector<std::string>& input);
+
+std::optional<std::string> decodeAndInterpret(const cv::Mat& image);
