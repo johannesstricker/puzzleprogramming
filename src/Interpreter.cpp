@@ -72,10 +72,8 @@ std::string interpret(const std::string& code)
     if (token == nullptr) {
       throw std::runtime_error("Unexpected token: " + each);
     }
-    std::cout << *token;
     tokens.push_back(token);
   }
-  std::cout << std::endl;
 
   // 3) build a syntax tree from the tokens
   // consume tokens one by one
@@ -138,6 +136,7 @@ std::optional<std::string> decodeAndInterpret(const cv::Mat& image)
   cv::QRCodeDetector qrDecoder = cv::QRCodeDetector::QRCodeDetector();
   std::vector<cv::String> decodedStrings;
   bool qrCodesFound = qrDecoder.detectAndDecodeMulti(image, decodedStrings);
+  // TODO: sort LTR
   if (!qrCodesFound) return {};
   return interpret(join(decodedStrings));
 }

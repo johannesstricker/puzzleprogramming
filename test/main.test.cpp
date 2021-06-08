@@ -30,8 +30,17 @@ TEST_CASE("interpret QR codes") {
     WHEN("the image is decoded") {
       THEN("it outputs the result of the mathematical expression") {
         auto result = decodeAndInterpret(image);
-        REQUIRE(result.has_value());
+        REQUIRE(result.has_value() == true);
         REQUIRE(result.value() == "14");
+      }
+    }
+  }
+
+  GIVEN("an image without any QR codes") {
+    cv::Mat image = cv::imread("data/QRCodes/empty.png", cv::IMREAD_COLOR);
+    WHEN("the image is decoded") {
+      THEN("it returns an empty optional") {
+        REQUIRE(decodeAndInterpret(image).has_value() == false);
       }
     }
   }
