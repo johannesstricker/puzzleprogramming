@@ -130,13 +130,27 @@ std::string join(const std::vector<std::string>& input)
 }
 
 #include <opencv2/objdetect.hpp>
+#include <numeric>
 
 std::optional<std::string> decodeAndInterpret(const cv::Mat& image)
 {
   cv::QRCodeDetector qrDecoder = cv::QRCodeDetector::QRCodeDetector();
   std::vector<cv::String> decodedStrings;
-  bool qrCodesFound = qrDecoder.detectAndDecodeMulti(image, decodedStrings);
-  // TODO: sort LTR
+  cv::Mat points;
+  bool qrCodesFound = qrDecoder.detectAndDecodeMulti(image, decodedStrings, points);
   if (!qrCodesFound) return {};
-  return interpret(join(decodedStrings));
+
+  // sort QR codes left to right
+  std::vector<int> indices(decodedStrings.size());
+  std::iota(indices.begin(), indices.end(), 0);
+  std::sort(indices.begin(), indices.end(), [&](int a, int b) {
+    return points.at<float>(a, 0) < points.at<float>(b, 0);
+  });
+  std::vector<cv::String> stringsSortedLTR(decodedStrings.size());
+  int destIdx = 0;
+  for (auto sourceIdx : indices)
+  {
+    stringsSortedLTR[destIdx++] = decodedStrings[sourceIdx];
+  }
+  return interpret(join(stringsSortedLTR));
 }
