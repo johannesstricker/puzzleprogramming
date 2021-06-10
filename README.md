@@ -1,6 +1,6 @@
-# cpp-project-template
+# PuzzleProgramming
 
-[![build](https://github.com/johannesstricker/cpp-project-template/workflows/build/badge.svg)](https://github.com/johannesstricker/cpp-project-template/actions)
+[![build](https://github.com/johannesstricker/puzzleprogramming/workflows/build/badge.svg)](https://github.com/johannesstricker/puzzleprogramming/actions)
 
 C++ project template using [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg).
 
