@@ -45,3 +45,25 @@ TEST_CASE("interpret QR codes") {
     }
   }
 }
+
+#include <opencv2/aruco.hpp>
+
+TEST_CASE("interpret ArUco codes") {
+  GIVEN("an image with an ArUco code") {
+    cv::Mat markerImage;
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+    cv::aruco::drawMarker(dictionary, 23, 100, markerImage, 1);
+
+    cv::Scalar color(255, 0, 0);
+    cv::copyMakeBorder(markerImage, markerImage, 10, 10, 10, 10, cv::BORDER_CONSTANT, color);
+
+    THEN("it correctly detects and decodes the ArUco marker") {
+      std::vector<int> markerIds;
+      std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+      cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+      cv::aruco::detectMarkers(markerImage, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+      REQUIRE(markerIds.size() == 1);
+      REQUIRE(markerIds.front() == 23);
+    }
+  }
+}

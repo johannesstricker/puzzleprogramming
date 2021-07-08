@@ -12,6 +12,7 @@ TARGET_LINK_LIBRARIES(Tests
   PRIVATE
     Catch2::Catch2
     ${OpenCV_LIBS}
+    opencv_aruco
 
 )
 TARGET_INCLUDE_DIRECTORIES(Tests
