@@ -49,9 +49,10 @@ TEST_CASE("interpret QR codes") {
 #include <opencv2/aruco.hpp>
 
 TEST_CASE("interpret ArUco codes") {
-  GIVEN("an image with an ArUco code") {
+  cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+
+  GIVEN("an image with an ArUco marker") {
     cv::Mat markerImage;
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
     cv::aruco::drawMarker(dictionary, 23, 100, markerImage, 1);
 
     cv::Scalar color(255, 0, 0);
@@ -64,6 +65,30 @@ TEST_CASE("interpret ArUco codes") {
       cv::aruco::detectMarkers(markerImage, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
       REQUIRE(markerIds.size() == 1);
       REQUIRE(markerIds.front() == 23);
+    }
+  }
+
+  GIVEN("an image with multiple ArUco markers") {
+    std::vector<int> codes = { 1, 7, 11 };
+    cv::Mat imageWithMultipleMarkers;
+    cv::Scalar backgroundColor(255, 0, 0);
+    for (auto code : codes) {
+      cv::Mat image;
+      cv::aruco::drawMarker(dictionary, code, 100, image, 1);
+      cv::copyMakeBorder(image, image, 10, 10, 10, 10, cv::BORDER_CONSTANT, backgroundColor);
+      if (imageWithMultipleMarkers.empty()) {
+        imageWithMultipleMarkers = image.clone();
+      } else {
+        cv::hconcat(imageWithMultipleMarkers, image, imageWithMultipleMarkers);
+      }
+    }
+
+    THEN("it correctly detects and decodes all of the ArUco markers") {
+      std::vector<int> markerIds;
+      std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+      cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+      cv::aruco::detectMarkers(imageWithMultipleMarkers, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+      REQUIRE_THAT(markerIds, Catch::Matchers::UnorderedEquals(codes));
     }
   }
 }
