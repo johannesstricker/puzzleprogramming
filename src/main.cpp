@@ -1,7 +1,7 @@
-#include <iostream>
+#include <stdio.h>
 
-int main(int argc, char** argv)
+int main()
 {
-  std::cout << "Hello cpp_project_template" << std::endl;
+  printf("Hello world from C++");
   return 0;
 }

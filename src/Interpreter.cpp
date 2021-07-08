@@ -134,7 +134,7 @@ std::string join(const std::vector<std::string>& input)
 
 std::optional<std::string> decodeAndInterpret(const cv::Mat& image)
 {
-  cv::QRCodeDetector qrDecoder = cv::QRCodeDetector::QRCodeDetector();
+  cv::QRCodeDetector qrDecoder;
   std::vector<cv::String> decodedStrings;
   cv::Mat points;
   bool qrCodesFound = qrDecoder.detectAndDecodeMulti(image, decodedStrings, points);
