@@ -31,4 +31,30 @@ TEST_CASE("parse math equations") {
     auto ast = parseASTFromMarkers(equation);
     REQUIRE(ast->value() == 87);
   }
+
+  SECTION("multiplication") {
+    std::list<Marker> equation = {
+      Marker::Digit_2,
+      Marker::OperatorAdd,
+      Marker::Digit_7,
+      Marker::OperatorMultiply,
+      Marker::Digit_3,
+      Marker::OperatorSubtract,
+      Marker::Digit_1,
+      Marker::Digit_0
+    };
+    auto ast = parseASTFromMarkers(equation);
+    REQUIRE(ast->value() == 13);
+  }
+
+  SECTION("division") {
+    std::list<Marker> equation = {
+      Marker::Digit_2,
+      Marker::Digit_2,
+      Marker::OperatorDivide,
+      Marker::Digit_7
+    };
+    auto ast = parseASTFromMarkers(equation);
+    REQUIRE(ast->value() == 3);
+  }
 }

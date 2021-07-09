@@ -16,9 +16,9 @@ enum class Marker {
   Digit_8,
   Digit_9,
   OperatorAdd,
-  OperatorSubtract
-  // OperatorDivide,
-  // OperatorMultiply,
+  OperatorSubtract,
+  OperatorMultiply,
+  OperatorDivide
   // Bracket,
 };
 
@@ -27,6 +27,8 @@ struct Token {
     Number,
     OperatorAdd,
     OperatorSubtract,
+    OperatorMultiply,
+    OperatorDivide,
   };
 
   Token(Token::ID id, int value = 0);
@@ -57,6 +59,22 @@ private:
   std::unique_ptr<ASTNode> m_leftOperand, m_rightOperand;
 };
 
+class ASTOperatorMultiply : public ASTNode {
+public:
+  ASTOperatorMultiply(std::unique_ptr<ASTNode> leftOperand, std::unique_ptr<ASTNode> rightOperand);
+  virtual int value() const override;
+private:
+  std::unique_ptr<ASTNode> m_leftOperand, m_rightOperand;
+};
+
+class ASTOperatorDivide : public ASTNode {
+public:
+  ASTOperatorDivide(std::unique_ptr<ASTNode> leftOperand, std::unique_ptr<ASTNode> rightOperand);
+  virtual int value() const override;
+private:
+  std::unique_ptr<ASTNode> m_leftOperand, m_rightOperand;
+};
+
 class ASTNumber : public ASTNode {
 public:
   ASTNumber(int value);
@@ -80,6 +98,8 @@ Token consumeOperator(std::list<Marker>& markers);
 std::list<Token> parseTokens(std::list<Marker> markers);
 
 void resolveOperatorPrecedence(const Token& nextToken, std::list<Token>& outputQueue, std::list<Token>& operatorStack);
+
+bool isOperatorToken(const Token& token);
 
 std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens);
 

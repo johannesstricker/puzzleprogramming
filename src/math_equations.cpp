@@ -10,6 +10,7 @@ Token::Token(Token::ID id, int value)
 
 int Token::precedence() const {
   if (id == ID::OperatorAdd || id == ID::OperatorSubtract) return 2;
+  if (id == ID::OperatorMultiply || id == ID::OperatorDivide) return 3;
   return 0;
 }
 
@@ -22,7 +23,7 @@ ASTOperatorAdd::ASTOperatorAdd(std::unique_ptr<ASTNode> leftOperand, std::unique
 }
 
 int ASTOperatorAdd::value() const {
-  return m_leftOperand->value() + m_rightOperand->value();
+  return m_rightOperand->value() + m_leftOperand->value();
 }
 
 
@@ -35,6 +36,30 @@ ASTOperatorSubtract::ASTOperatorSubtract(std::unique_ptr<ASTNode> leftOperand, s
 
 int ASTOperatorSubtract::value() const {
   return m_rightOperand->value() - m_leftOperand->value();
+}
+
+
+ASTOperatorMultiply::ASTOperatorMultiply(std::unique_ptr<ASTNode> leftOperand, std::unique_ptr<ASTNode> rightOperand)
+: m_leftOperand(std::move(leftOperand)),
+  m_rightOperand(std::move(rightOperand))
+{
+  // empty
+}
+
+int ASTOperatorMultiply::value() const {
+  return m_leftOperand->value() * m_rightOperand->value();
+}
+
+
+ASTOperatorDivide::ASTOperatorDivide(std::unique_ptr<ASTNode> leftOperand, std::unique_ptr<ASTNode> rightOperand)
+: m_leftOperand(std::move(leftOperand)),
+  m_rightOperand(std::move(rightOperand))
+{
+  // empty
+}
+
+int ASTOperatorDivide::value() const {
+  return m_rightOperand->value() / m_leftOperand->value();
 }
 
 
@@ -73,7 +98,7 @@ Token consumeNumber(std::list<Marker>& markers) {
 }
 
 bool isOperatorMarker(Marker marker) {
-  return marker >= Marker::OperatorAdd && marker <= Marker::OperatorSubtract;
+  return marker >= Marker::OperatorAdd && marker <= Marker::OperatorDivide;
 }
 
 Token consumeOperator(std::list<Marker>& markers) {
@@ -82,6 +107,8 @@ Token consumeOperator(std::list<Marker>& markers) {
   switch (nextMarker) {
     case Marker::OperatorAdd: return Token(Token::ID::OperatorAdd);
     case Marker::OperatorSubtract: return Token(Token::ID::OperatorSubtract);
+    case Marker::OperatorMultiply: return Token(Token::ID::OperatorMultiply);
+    case Marker::OperatorDivide: return Token(Token::ID::OperatorDivide);
     default: throw std::runtime_error("Failed to consume operator: unknown operator type.");
   }
 }
@@ -110,6 +137,10 @@ void resolveOperatorPrecedence(const Token& nextToken, std::list<Token>& outputQ
   }
 }
 
+bool isOperatorToken(const Token& token) {
+  return token.id >= Token::ID::OperatorAdd && token.id <= Token::ID::OperatorDivide;
+}
+
 std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens) {
   // Shunting-yard algorithm: convert infix notation to reverse polish notation
   std::list<Token> outputQueue;
@@ -119,7 +150,7 @@ std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens) {
     tokens.pop_front();
     if (nextToken.id == Token::ID::Number) {
       outputQueue.push_back(nextToken);
-    } else if (nextToken.id >= Token::ID::OperatorAdd && nextToken.id <= Token::ID::OperatorSubtract) {
+    } else if (isOperatorToken(nextToken)) {
       resolveOperatorPrecedence(nextToken, outputQueue, operatorStack);
       operatorStack.push_front(nextToken);
     } else {
@@ -151,6 +182,14 @@ std::unique_ptr<ASTNode> parseAST(std::list<Token>& tokens) {
   }
   if (nextToken.id == Token::ID::OperatorSubtract) {
     return std::make_unique<ASTOperatorSubtract>(std::move(parseAST(tokens)),
+      std::move(parseAST(tokens)));
+  }
+  if (nextToken.id == Token::ID::OperatorMultiply) {
+    return std::make_unique<ASTOperatorMultiply>(std::move(parseAST(tokens)),
+      std::move(parseAST(tokens)));
+  }
+  if (nextToken.id == Token::ID::OperatorDivide) {
+    return std::make_unique<ASTOperatorDivide>(std::move(parseAST(tokens)),
       std::move(parseAST(tokens)));
   }
   throw std::runtime_error("Failed to parse AST: unknown token encountered.");
