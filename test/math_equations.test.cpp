@@ -6,6 +6,23 @@ TEST_CASE("Marker") {
 }
 
 TEST_CASE("parse math equations") {
+  SECTION("convert to string") {
+    std::list<Marker> equation = {
+      Marker::Digit_1,
+      Marker::Digit_0,
+      Marker::OperatorAdd,
+      Marker::Digit_7,
+      Marker::OperatorMultiply,
+      Marker::Digit_1,
+      Marker::OperatorSubtract,
+      Marker::Digit_8,
+      Marker::OperatorDivide,
+      Marker::Digit_3
+    };
+    auto tokens = parseTokens(equation);
+    REQUIRE(toString(tokens) == "10 + 7 * 1 - 8 / 3");
+  }
+
   SECTION("addition") {
     std::list<Marker> equation = {
       Marker::Digit_1,

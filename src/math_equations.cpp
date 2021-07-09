@@ -14,6 +14,16 @@ int Token::precedence() const {
   return 0;
 }
 
+std::string Token::toString() const {
+  switch (id) {
+    case ID::OperatorAdd: return "+";
+    case ID::OperatorSubtract: return "-";
+    case ID::OperatorMultiply: return "*";
+    case ID::OperatorDivide: return "/";
+    default: return std::to_string(value);
+  }
+}
+
 
 ASTOperatorAdd::ASTOperatorAdd(std::unique_ptr<ASTNode> leftOperand, std::unique_ptr<ASTNode> rightOperand)
 : m_leftOperand(std::move(leftOperand)),
@@ -201,3 +211,12 @@ std::unique_ptr<ASTNode> parseASTFromMarkers(std::list<Marker> markers) {
   auto tokens = toReversePolishNotation(parseTokens(markers));
   return parseAST(tokens);
 };
+
+std::string toString(const std::list<Token>& tokens) {
+  std::ostringstream buffer;
+  for (auto token : tokens) {
+    buffer << token.toString() << " ";
+  }
+  std::string output = buffer.str();
+  return output.substr(0, output.size() - 1);
+}

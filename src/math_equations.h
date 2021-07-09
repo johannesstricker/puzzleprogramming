@@ -33,6 +33,7 @@ struct Token {
 
   Token(Token::ID id, int value = 0);
   int precedence() const;
+  std::string toString() const;
 
   ID id;
   int value;
@@ -108,3 +109,5 @@ std::list<Token> toReversePolishNotation(std::list<Token> tokens);
 std::unique_ptr<ASTNode> parseAST(std::list<Token>& tokens);
 
 std::unique_ptr<ASTNode> parseASTFromMarkers(std::list<Marker> markers);
+
+std::string toString(const std::list<Token>& tokens);
