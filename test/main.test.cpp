@@ -66,7 +66,7 @@ void requireDetectedMarkersMatch(const cv::Mat& image, const std::vector<int>& e
   std::vector<int> markerIds;
   std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
   cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
-  cv::aruco::detectMarkers(markerImage, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+  cv::aruco::detectMarkers(image, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
   REQUIRE_THAT(markerIds, Catch::Matchers::UnorderedEquals(expectedMarkers));
 }
 
@@ -116,7 +116,7 @@ TEST_CASE("detect and decode ArUco codes") {
       addBorderAroundImage(markerImage, 10);
 
       THEN("it correctly detects and decodes all of the ArUco markers") {
-        requireDetectedMarkersMatch(markers, codes);
+        requireDetectedMarkersMatch(markerImage, codes);
       }
     }
   }

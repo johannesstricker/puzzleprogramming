@@ -6,7 +6,9 @@ ADD_EXECUTABLE(Tests)
 TARGET_SOURCES(Tests
   PRIVATE
     main.test.cpp
+    math_equations.test.cpp
     ${CMAKE_SOURCE_DIR}/src/Interpreter.cpp
+    ${CMAKE_SOURCE_DIR}/src/math_equations.cpp
 )
 TARGET_LINK_LIBRARIES(Tests
   PRIVATE
