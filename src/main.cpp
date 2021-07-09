@@ -3,15 +3,11 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco.hpp>
+#include "math_equations.h"
 
 int main()
 {
-  cv::Mat markerImage;
-  cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-  cv::aruco::drawMarker(dictionary, 23, 100, markerImage, 1);
-  cv::imshow("ArUco", markerImage);
-  cv::waitKey(1);
-  cv::imwrite("./aruco.png", markerImage);
-  printf("Hello world from C++");
+  createArUcoMarkers("./math_equations");
+  printf("ArUco markers created.");
   return 0;
 }

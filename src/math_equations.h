@@ -3,8 +3,12 @@
 #include <sstream>
 #include <memory>
 #include <list>
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/aruco.hpp>
 
-enum class Marker {
+enum class Marker : int {
   Digit_0,
   Digit_1,
   Digit_2,
@@ -22,8 +26,12 @@ enum class Marker {
   // Bracket,
 };
 
+std::string toString(Marker marker);
+std::list<Marker> detectAndDecodeArUco(const cv::Mat& image);
+void createArUcoMarkers(const std::string& outputFolder, int size = 100);
+
 struct Token {
-  enum class ID {
+  enum class ID : int {
     Number,
     OperatorAdd,
     OperatorSubtract,

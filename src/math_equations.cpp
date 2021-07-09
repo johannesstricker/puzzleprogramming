@@ -1,6 +1,45 @@
 #include "math_equations.h"
 #include <stdexcept>
 
+std::string toString(Marker marker) {
+  if (isDigitMarker(marker)) return std::to_string(digitValue(marker));
+  switch (marker) {
+    case Marker::OperatorAdd: return "PLUS";
+    case Marker::OperatorSubtract: return "SUBTRACT";
+    case Marker::OperatorMultiply: return "MULTIPLY";
+    case Marker::OperatorDivide: return "DIVIDE";
+    default: throw std::runtime_error("Failed to convert marker to string: unknown marker type.");
+  }
+}
+
+std::list<Marker> detectAndDecodeArUco(const cv::Mat& image) {
+  cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+  std::vector<int> markerIds;
+  std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+  cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+  cv::aruco::detectMarkers(image, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+
+  std::list<Marker> output;
+  for (auto id : markerIds) {
+    // TODO: sanitize
+    output.push_back(static_cast<Marker>(id));
+  }
+  return output;
+}
+
+void createArUcoMarkers(const std::string& outputFolder, int size) {
+  cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+  for (int code = static_cast<int>(Marker::Digit_0); code <= static_cast<int>(Marker::OperatorDivide); code++) {
+    cv::Mat image;
+    cv::aruco::drawMarker(dictionary, code, size, image, 1);
+
+    Marker marker = static_cast<Marker>(code);
+    std::string fileName = toString(marker) + ".png";
+    std::string filePath = fileName;
+    cv::imwrite(filePath, image);
+  }
+}
+
 Token::Token(Token::ID id, int value)
 : id(id),
   value(value)
