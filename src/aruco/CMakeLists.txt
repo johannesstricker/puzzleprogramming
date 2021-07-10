@@ -21,3 +21,25 @@ TARGET_INCLUDE_DIRECTORIES(opencv_aruco
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${OpenCV_INCLUDE_DIRS}
 )
+
+
+ADD_LIBRARY(opencv_aruco_static STATIC)
+TARGET_SOURCES(opencv_aruco_static
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/apriltag_quad_thresh.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/aruco.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/charuco.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dictionary.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/zmaxheap.cpp
+)
+TARGET_LINK_LIBRARIES(opencv_aruco_static
+  PRIVATE
+    ${OpenCV_LIBS}
+)
+TARGET_INCLUDE_DIRECTORIES(opencv_aruco_static
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${OpenCV_INCLUDE_DIRS}
+)

@@ -1,5 +1,7 @@
 #include "static_lib.h"
 #include <string.h>
+#include <memory>
+#include <sstream>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -21,13 +23,26 @@ char* detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int 
     return strdup(error.c_str());
   }
 
+  std::ostringstream buffer;
   try {
-    auto markers = detectAndDecodeArUco(src);
+    auto markers = detectAndDecodeArUco(mat);
     auto tokens = parseTokens(markers);
-    return strdup(toString(tokens).c_str());
+    if (tokens.size() == 0) {
+      std::string empty = "";
+      return strdup(empty.c_str());
+    }
+    buffer << toString(tokens);
+    auto tokensRPN = toReversePolishNotation(tokens);
+    auto ast = parseAST(tokensRPN);
+    if (ast == nullptr) {
+      buffer << " = ?";
+    } else {
+      buffer << " = " << ast->value();
+    }
+    return strdup(buffer.str().c_str());
+    // return strdup(toString(tokens).c_str());
   } catch(const std::exception& error) {
     std::string errorString(error.what());
     return strdup(errorString.c_str());
   }
-
 }
