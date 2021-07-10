@@ -1,5 +1,7 @@
 #include "math_equations.h"
 #include <stdexcept>
+#include <numeric>
+#include <algorithm>
 
 std::string toString(Marker marker) {
   if (isDigitMarker(marker)) return std::to_string(digitValue(marker));
@@ -12,6 +14,21 @@ std::string toString(Marker marker) {
   }
 }
 
+std::vector<int> sortMarkersLTR(const std::vector<int>& markers, const std::vector<std::vector<cv::Point2f>>& corners) {
+  std::vector<int> indices(markers.size());
+  std::iota(indices.begin(), indices.end(), 0);
+  std::sort(indices.begin(), indices.end(), [&](int a, int b) {
+    return corners[a][0].x < corners[b][0].x;
+  });
+  std::vector<int> markersSortedLTR(markers.size());
+  int destIdx = 0;
+  for (auto sourceIdx : indices)
+  {
+    markersSortedLTR[destIdx++] = markers[sourceIdx];
+  }
+  return markersSortedLTR;
+}
+
 std::list<Marker> detectAndDecodeArUco(const cv::Mat& image) {
   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
   std::vector<int> markerIds;
@@ -19,8 +36,9 @@ std::list<Marker> detectAndDecodeArUco(const cv::Mat& image) {
   cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
   cv::aruco::detectMarkers(image, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 
+  auto markerIdsSortedLTR = sortMarkersLTR(markerIds, markerCorners);
   std::list<Marker> output;
-  for (auto id : markerIds) {
+  for (auto id : markerIdsSortedLTR) {
     // TODO: sanitize
     output.push_back(static_cast<Marker>(id));
   }
@@ -217,32 +235,31 @@ std::list<Token> toReversePolishNotation(std::list<Token> tokens) {
   return shuntingYardAlgorithm(tokens);
 }
 
-std::unique_ptr<ASTNode> parseAST(std::list<Token>& tokens) {
-  if (tokens.empty()) return nullptr;
-
+std::unique_ptr<ASTNode> consumeToken(std::list<Token>& tokens) {
+  if (tokens.empty()) throw std::runtime_error("Failed to consume token.");
   auto nextToken = tokens.back();
   tokens.pop_back();
   if (nextToken.id == Token::ID::Number) {
     return std::make_unique<ASTNumber>(nextToken.value);
   }
   if (nextToken.id == Token::ID::OperatorAdd) {
-    return std::make_unique<ASTOperatorAdd>(std::move(parseAST(tokens)),
-      std::move(parseAST(tokens)));
+    return std::make_unique<ASTOperatorAdd>(consumeToken(tokens), consumeToken(tokens));
   }
   if (nextToken.id == Token::ID::OperatorSubtract) {
-    return std::make_unique<ASTOperatorSubtract>(std::move(parseAST(tokens)),
-      std::move(parseAST(tokens)));
+    return std::make_unique<ASTOperatorSubtract>(consumeToken(tokens), consumeToken(tokens));
   }
   if (nextToken.id == Token::ID::OperatorMultiply) {
-    return std::make_unique<ASTOperatorMultiply>(std::move(parseAST(tokens)),
-      std::move(parseAST(tokens)));
+    return std::make_unique<ASTOperatorMultiply>(consumeToken(tokens), consumeToken(tokens));
   }
   if (nextToken.id == Token::ID::OperatorDivide) {
-    return std::make_unique<ASTOperatorDivide>(std::move(parseAST(tokens)),
-      std::move(parseAST(tokens)));
+    return std::make_unique<ASTOperatorDivide>(consumeToken(tokens), consumeToken(tokens));
   }
   throw std::runtime_error("Failed to parse AST: unknown token encountered.");
-  return nullptr;
+}
+
+std::unique_ptr<ASTNode> parseAST(std::list<Token>& tokens) {
+  if (tokens.empty()) return nullptr;
+  return consumeToken(tokens);
 }
 
 std::unique_ptr<ASTNode> parseASTFromMarkers(std::list<Marker> markers) {

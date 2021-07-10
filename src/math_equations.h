@@ -27,6 +27,7 @@ enum class Marker : int {
 };
 
 std::string toString(Marker marker);
+std::vector<int> sortMarkersLTR(const std::vector<int>& markers, const std::vector<std::vector<cv::Point2f>>& corners);
 std::list<Marker> detectAndDecodeArUco(const cv::Mat& image);
 void createArUcoMarkers(const std::string& outputFolder, int size = 100);
 
@@ -113,6 +114,8 @@ bool isOperatorToken(const Token& token);
 std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens);
 
 std::list<Token> toReversePolishNotation(std::list<Token> tokens);
+
+std::unique_ptr<ASTNode> consumeToken(std::list<Token>& tokens);
 
 std::unique_ptr<ASTNode> parseAST(std::list<Token>& tokens);
 
