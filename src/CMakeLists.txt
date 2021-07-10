@@ -20,3 +20,22 @@ TARGET_INCLUDE_DIRECTORIES(puzzleprogramming
     ${CMAKE_SOURCE_DIR}/src
     ${OpenCV_INCLUDE_DIRS}
 )
+
+
+ADD_LIBRARY(puzzle STATIC)
+TARGET_SOURCES(puzzle
+  PRIVATE
+    static_lib.cpp
+    math_equations.cpp
+)
+TARGET_LINK_LIBRARIES(puzzle
+  PRIVATE
+    opencv_aruco
+  PUBLIC
+    ${OpenCV_LIBS}
+)
+TARGET_INCLUDE_DIRECTORIES(puzzle
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+    ${OpenCV_INCLUDE_DIRS}
+)
