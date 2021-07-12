@@ -68,10 +68,12 @@ TEST_CASE("parse math equations") {
     std::list<Marker> equation = {
       Marker::Digit_2,
       Marker::Digit_2,
+      Marker::OperatorMultiply,
+      Marker::Digit_2,
       Marker::OperatorDivide,
       Marker::Digit_7
     };
     auto ast = parseASTFromMarkers(equation);
-    REQUIRE(ast->value() == 3);
+    REQUIRE(ast->value() == 6);
   }
 }
