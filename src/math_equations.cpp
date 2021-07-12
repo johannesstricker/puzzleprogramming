@@ -198,7 +198,7 @@ std::list<Token> parseTokens(std::list<Marker> markers) {
 }
 
 void resolveOperatorPrecedence(const Token& nextToken, std::list<Token>& outputQueue, std::list<Token>& operatorStack) {
-  while (!operatorStack.empty() && nextToken.precedence() < operatorStack.front().precedence()) {
+  while (!operatorStack.empty() && nextToken.precedence() <= operatorStack.front().precedence()) {
     outputQueue.push_back(operatorStack.front());
     operatorStack.pop_front();
   }
