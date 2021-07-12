@@ -4,11 +4,15 @@ mkdir -p build/arm64-ios
 pushd build/arm64-ios
 cmake -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
       -DVCPKG_DEFAULT_TRIPLET="arm64-ios" \
-      -GXcode \
       -DCMAKE_SYSTEM_NAME=iOS \
       -DCMAKE_OSX_SYSROOT=iphoneos \
-      -DCMAKE_OSX_ARCHITECTURES=arm64 \
+      -DCMAKE_OSX_ARCHITECTURES="arm64" \
+      -DVCPKG_CMAKE_OSX_DEPLOYMENT_TARGET=9.0 \
       -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=84HDLC6NX8 \
+      -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
+      -DCMAKE_INSTALL_PREFIX=install \
+      -DBUILD_SHARED_LIBS=off \
+      -G Xcode \
       ../..
 cmake --build . --target install
 popd
