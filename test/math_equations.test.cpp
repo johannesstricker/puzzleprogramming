@@ -5,6 +5,27 @@ TEST_CASE("Marker") {
   REQUIRE(Marker::Digit_0 < Marker::Digit_1);
 }
 
+TEST_CASE("stringToMarkers") {
+  std::list<Marker> expectedEquation = {
+    Marker::Digit_0,
+    Marker::Digit_1,
+    Marker::Digit_2,
+    Marker::Digit_3,
+    Marker::Digit_4,
+    Marker::Digit_5,
+    Marker::Digit_6,
+    Marker::Digit_7,
+    Marker::Digit_8,
+    Marker::Digit_9,
+    Marker::OperatorAdd,
+    Marker::OperatorSubtract,
+    Marker::OperatorMultiply,
+    Marker::OperatorDivide
+  };
+  std::string input = "012345 6789+-*/";
+  REQUIRE(stringToMarkers(input) == expectedEquation);
+}
+
 TEST_CASE("parse math equations") {
   SECTION("convert to string") {
     std::list<Marker> equation = {

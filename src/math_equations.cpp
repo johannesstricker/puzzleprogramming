@@ -2,6 +2,35 @@
 #include <stdexcept>
 #include <numeric>
 #include <algorithm>
+#include <map>
+
+std::list<Marker> stringToMarkers(const std::string& input) {
+  static std::map<char, Marker> Lookup = {
+    { '0', Marker::Digit_0 },
+    { '1', Marker::Digit_1 },
+    { '2', Marker::Digit_2 },
+    { '3', Marker::Digit_3 },
+    { '4', Marker::Digit_4 },
+    { '5', Marker::Digit_5 },
+    { '6', Marker::Digit_6 },
+    { '7', Marker::Digit_7 },
+    { '8', Marker::Digit_8 },
+    { '9', Marker::Digit_9 },
+    { '+', Marker::OperatorAdd },
+    { '-', Marker::OperatorSubtract },
+    { '*', Marker::OperatorMultiply },
+    { '/', Marker::OperatorDivide }
+  };
+
+  std::list<Marker> output;
+  for (std::string::size_type index = 0; index < input.length(); index++)
+  {
+    auto c = input[index];
+    if (c == ' ') continue;
+    output.push_back(Lookup[c]);
+  }
+  return output;
+}
 
 std::string toString(Marker marker) {
   if (isDigitMarker(marker)) return std::to_string(digitValue(marker));

@@ -26,6 +26,8 @@ enum class Marker : int {
   // Bracket,
 };
 
+std::list<Marker> stringToMarkers(const std::string& input);
+
 std::string toString(Marker marker);
 std::vector<int> sortMarkersLTR(const std::vector<int>& markers, const std::vector<std::vector<cv::Point2f>>& corners);
 std::list<Marker> detectAndDecodeArUco(const cv::Mat& image);
