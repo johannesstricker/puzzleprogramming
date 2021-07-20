@@ -6,12 +6,14 @@ ADD_EXECUTABLE(Tests)
 TARGET_SOURCES(Tests
   PRIVATE
     main.test.cpp
-    ${CMAKE_SOURCE_DIR}/src/Interpreter.cpp
+    math_equations.test.cpp
+    ${CMAKE_SOURCE_DIR}/src/math_equations.cpp
 )
 TARGET_LINK_LIBRARIES(Tests
   PRIVATE
     Catch2::Catch2
     ${OpenCV_LIBS}
+    opencv_aruco
 
 )
 TARGET_INCLUDE_DIRECTORIES(Tests
@@ -22,6 +24,8 @@ TARGET_INCLUDE_DIRECTORIES(Tests
 ADD_CUSTOM_COMMAND(TARGET Tests POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/test/data $<TARGET_FILE_DIR:Tests>/data
 )
+
+SET_TARGET_PROPERTIES(Tests PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")
 
 INCLUDE(Catch)
 CATCH_DISCOVER_TESTS(Tests)

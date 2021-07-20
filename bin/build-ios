@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# This is still a work in progress. Building for iOS kind of works, but building
+# a fat library that can also be used on the simulator doesn't.
+
+mkdir -p build/arm64-ios
+pushd build/arm64-ios
+cmake -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+      -DVCPKG_DEFAULT_TRIPLET="arm64-ios" \
+      -DCMAKE_SYSTEM_NAME=iOS \
+      -DCMAKE_OSX_SYSROOT=iphoneos \
+      -DCMAKE_OSX_ARCHITECTURES="arm64" \
+      -DVCPKG_CMAKE_OSX_DEPLOYMENT_TARGET=9.0 \
+      -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=84HDLC6NX8 \
+      -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
+      -DCMAKE_INSTALL_PREFIX=install \
+      -DBUILD_SHARED_LIBS=off \
+      -G Xcode \
+      ../..
+cmake --build . --target install
+popd
+
+# mkdir -p build/ios-arm64
+# pushd build/ios-arm64
+# cmake -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+#       -DVCPKG_DEFAULT_TRIPLET="ios-arm64" \
+#       -DVCPKG_TARGET_TRIPLET="ios-arm64" \
+#       -G Xcode \
+#       ../..
+# cmake --build .
+# popd
+
+# mkdir -p build/ios-x86_64
+# pushd build/ios-x86_64
+# cmake -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+#       -DVCPKG_DEFAULT_TRIPLET="ios-x86_64" \
+#       -DVCPKG_TARGET_TRIPLET="ios-x86_64" \
+#       -G Xcode \
+#       ../..
+# cmake --build .
+# popd
+
+# # this is the command to create a fat library
+# lipo -create build/ios-arm64/src/Debug/
+# lipo -create ./SwifteriOS-sim.framework/SwifteriOS ./SwifteriOS-dev.framework/SwifteriOS -output ./SwifteriOS
