@@ -1,24 +1,23 @@
 FIND_PACKAGE(OpenCV REQUIRED)
-LINK_DIRECTORIES(${OpenCV_LIB_DIR})
 
 ADD_LIBRARY(opencv_aruco OBJECT)
 TARGET_SOURCES(opencv_aruco
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/apriltag_quad_thresh.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/aruco.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/charuco.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/dictionary.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/zmaxheap.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/apriltag_quad_thresh.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/aruco.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/charuco.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/dictionary.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/zmaxheap.cpp
 )
 TARGET_LINK_LIBRARIES(opencv_aruco
-  PRIVATE
+  PUBLIC
     ${OpenCV_LIBS}
 )
 TARGET_INCLUDE_DIRECTORIES(opencv_aruco
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_LIST_DIR}/src
   PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/include
     ${OpenCV_INCLUDE_DIRS}
 )
 
