@@ -1,0 +1,64 @@
+name: build
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+jobs:
+  client:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: [macos-latest]
+            generator: Xcode
+            buildType: Release
+
+    env:
+      VCPKG_COMMIT_ID: b67fab9861239e33b722b9a44f5c96dec6ca807e
+      VCPKG_FEATURE_FLAGS: manifests,binarycaching
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_ARCHIVE_DIR: ${{ github.workspace }}/vcpkg_archives
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v4
+      with:
+        setupOnly: true
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+        vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+        doNotCache: true
+
+    - name: vcpkg
+      uses: actions/cache@main
+      with:
+        path: ${{ env.VCPKG_ARCHIVE_DIR }}
+        key: ${{ matrix.generator }}-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          ${{ matrix.generator }}-
+
+    - name: Build
+      uses: lukka/run-cmake@v2
+      env:
+        CMAKE_TOOLCHAIN_FILE: ${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+        VCPKG_BINARY_SOURCES: "clear;files,${{ env.VCPKG_ARCHIVE_DIR }},readwrite;"
+      with:
+        buildDirectory: '${{ github.workspace }}/build'
+        cmakeListsOrSettingsJson: CMakeListsTxtBasic
+        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        cmakeGenerator: ${{ matrix.generator }}
+        cmakeBuildType: ${{ matrix.buildType }}
+        useVcpkgToolchainFile: true
+
+    - name: Test
+      run: |
+        cd '${{ github.workspace }}/build'
+        ctest -T test
