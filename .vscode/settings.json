@@ -1,7 +1,9 @@
 {
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "cmake.configureSettings": {
-    "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+    "BUILD_JPEG_TURBO_DISABLE": "ON",
+    "BUILD_TESTS": "OFF"
   },
   "files.associations": {
     "vector": "cpp",

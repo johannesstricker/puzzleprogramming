@@ -52,6 +52,7 @@ jobs:
         buildDirectory: ${{ env.BUILD_DIR }}
         useVcpkgToolchainFile: true
         buildWithCMake: true
+        cmakeAppendedArgs: "-DBUILD_JPEG_TURBO_DISABLE=ON -DBUILD_TESTS=OFF"
 
     - name: Test
       run: |
