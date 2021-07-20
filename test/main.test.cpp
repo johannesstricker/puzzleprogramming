@@ -3,7 +3,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/aruco.hpp>
+#include <opencv-contrib/aruco.hpp>
 
 void addBorderAroundImage(cv::Mat& inout, int padding = 10) {
   cv::Scalar color(255, 0, 0);

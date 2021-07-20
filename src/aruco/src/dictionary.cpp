@@ -37,7 +37,7 @@ the use of this software, even if advised of the possibility of such damage.
 */
 
 #include "precomp.hpp"
-#include "opencv2/aruco/dictionary.hpp"
+#include "opencv-contrib/aruco/dictionary.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include "predefined_dictionaries.hpp"

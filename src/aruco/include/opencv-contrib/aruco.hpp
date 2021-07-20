@@ -41,7 +41,7 @@ the use of this software, even if advised of the possibility of such damage.
 
 #include <opencv2/core.hpp>
 #include <vector>
-#include "opencv2/aruco/dictionary.hpp"
+#include "opencv-contrib/aruco/dictionary.hpp"
 
 /**
  * @defgroup aruco ArUco Marker Detection

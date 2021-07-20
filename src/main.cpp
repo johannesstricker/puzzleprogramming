@@ -2,7 +2,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/aruco.hpp>
+#include <opencv-contrib/aruco.hpp>
 #include "math_equations.h"
 
 int main()

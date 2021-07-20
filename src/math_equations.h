@@ -6,7 +6,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/aruco.hpp>
+#include <opencv-contrib/aruco.hpp>
 
 enum class Marker : int {
   Digit_0,
