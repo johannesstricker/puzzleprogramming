@@ -14,6 +14,9 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
+# jpeg lib won't compile on OSX without the following line.
+# See: https://github.com/microsoft/vcpkg/issues/13766#issuecomment-706013096
+SET(JPEG_LIB_VERSION 90)
 FIND_PACKAGE(OpenCV REQUIRED)
 
 # Assume built-in pthreads on MacOS. Required to build for iOS.
