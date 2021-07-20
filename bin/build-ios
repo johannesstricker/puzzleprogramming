@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This is still a work in progress. Building for iOS kind of works, but building
+# a fat library that can also be used on the simulator doesn't.
+
 mkdir -p build/arm64-ios
 pushd build/arm64-ios
 cmake -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
