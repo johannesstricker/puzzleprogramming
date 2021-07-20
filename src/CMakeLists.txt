@@ -9,10 +9,16 @@ TARGET_SOURCES(puzzleprogramming
 TARGET_LINK_LIBRARIES(puzzleprogramming
   PRIVATE
     opencv_aruco
+    ${OpenCV_LIBS}
 )
 TARGET_INCLUDE_DIRECTORIES(puzzleprogramming
   PRIVATE
     ${CMAKE_SOURCE_DIR}/src
+    ${OpenCV_INCLUDE_DIRS}
+)
+TARGET_LINK_DIRECTORIES(puzzleprogramming
+  PRIVATE
+    ${OpenCV_LIB_DIR}
 )
 
 
