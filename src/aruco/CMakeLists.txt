@@ -1,3 +1,4 @@
+FIND_PACKAGE(OpenCV REQUIRED)
 
 ADD_LIBRARY(opencv_aruco OBJECT)
 TARGET_SOURCES(opencv_aruco
@@ -9,18 +10,18 @@ TARGET_SOURCES(opencv_aruco
     ${CMAKE_CURRENT_LIST_DIR}/src/zmaxheap.cpp
 )
 TARGET_LINK_LIBRARIES(opencv_aruco
-  PRIVATE
+  PUBLIC
     ${OpenCV_LIBS}
 )
 TARGET_INCLUDE_DIRECTORIES(opencv_aruco
   PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src
-    ${OpenCV_INCLUDE_DIRS}
   PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
+    ${OpenCV_INCLUDE_DIRS}
 )
 TARGET_LINK_DIRECTORIES(opencv_aruco
-  PRIVATE
+  PUBLIC
     ${OpenCV_LIB_DIR}
 )
 

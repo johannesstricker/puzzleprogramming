@@ -11,18 +11,13 @@ TARGET_LINK_LIBRARIES(Tests
   PRIVATE
     Catch2::Catch2
     opencv_aruco
-    ${OpenCV_LIBS}
 
 )
 TARGET_INCLUDE_DIRECTORIES(Tests
   PRIVATE
     ${CMAKE_SOURCE_DIR}/src
-    ${OpenCV_INCLUDE_DIRS}
 )
-TARGET_LINK_DIRECTORIES(Tests
-  PRIVATE
-    ${OpenCV_LIB_DIR}
-)
+
 ADD_CUSTOM_COMMAND(TARGET Tests POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/test/data $<TARGET_FILE_DIR:Tests>/data
 )
