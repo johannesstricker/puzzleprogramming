@@ -4,6 +4,12 @@
 
 C++ project template using [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg).
 
+## Roadmap
+
+- [ ] Create `puzzlelib.podspec`
+- [ ] Link `puzzle_plugin` to `puzzlelib.podspec` podspec
+- [ ]
+
 ## Building the project
 The project is build with cmake and vcpkg. Make sure that you have [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg) installed and added to your path. Additionally, point the `VCPKG_ROOT` environment variable to the vcpkg root directory. Then you can build by running
 ```
