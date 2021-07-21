@@ -7,7 +7,8 @@ on:
     branches:
       - main
 jobs:
-  client:
+  build_and_test_lib:
+    name: Build and test library
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -19,7 +20,7 @@ jobs:
             triplet: x64-osx
 
     env:
-      BUILD_DIR: '${{ github.workspace }}/build/'
+      BUILD_DIR: '${{ github.workspace }}/lib/build/'
 
     steps:
     - uses: actions/checkout@v2
@@ -48,12 +49,12 @@ jobs:
       uses: lukka/run-cmake@v3
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-        cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+        cmakeListsTxtPath: '${{ github.workspace }}/lib/CMakeLists.txt'
         buildDirectory: ${{ env.BUILD_DIR }}
         useVcpkgToolchainFile: true
         buildWithCMake: true
 
     - name: Test
       run: |
-        cd '${{ github.workspace }}/build'
+        cd '{{ env.BUILD_DIR }}'
         ctest -T test
