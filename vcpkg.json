@@ -3,6 +3,10 @@
   "version-string": "0.0.1",
   "dependencies": [
     "catch2",
-    "opencv4"
+    {
+      "name": "opencv4",
+      "default-features": false,
+      "features": ["png", "dnn"]
+    }
   ]
 }

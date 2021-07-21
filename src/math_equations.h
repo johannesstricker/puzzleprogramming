@@ -52,6 +52,7 @@ struct Token {
 
 class ASTNode {
 public:
+  virtual ~ASTNode() = default;
   virtual int value() const = 0;
 };
 

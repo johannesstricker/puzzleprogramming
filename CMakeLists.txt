@@ -1,5 +1,6 @@
-PROJECT(puzzleprogramming)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
+
+PROJECT(puzzleprogramming)
 
 IF(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   MESSAGE(FATAL_ERROR "CMAKE_TOOLCHAIN_FILE environment variable is undefined. Please set it to '$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake'.")
