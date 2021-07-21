@@ -8,5 +8,7 @@
     "optional": "cpp",
     "regex": "cpp",
     "system_error": "cpp"
-  }
+  },
+  "cmake.sourceDirectory": "${workspaceFolder}/lib",
+  "cmake.buildDirectory": "${workspaceFolder}/lib/build"
 }
