@@ -1,6 +1,6 @@
 # PuzzleProgramming
 
-[![build](https://github.com/johannesstricker/puzzleprogramming/workflows/continuous-integration/badge.svg)](https://github.com/johannesstricker/puzzleprogramming/actions)
+[![build](https://github.com/johannesstricker/puzzleprogramming/workflows/continuous-integration/badge.svg)](https://github.com/johannesstricker/puzzleprogramming/actions/workflows/continuous-integration.yml)
 
 C++ project template using [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg).
 
