@@ -3,14 +3,26 @@ Pod::Spec.new do |spec|
   spec.version      = "0.0.1"
   spec.summary      = "A short description of puzzlelib."
   spec.description  = <<-DESC
+  A library to detect and decode puzzle pieces with math equations.
                    DESC
-
   spec.homepage     = "https://github.com/johannesstricker/puzzleprogramming"
-  spec.license      = "MIT (example)"
+  spec.license      = "MIT"
   spec.author             = { "Johannes Stricker" => "johannesstricker@gmx.net" }
   spec.source       = { :path => '.' }
-  spec.source_files  = "Classes", "Classes/**/*.{h,m}"
-  spec.exclude_files = "Classes/Exclude"
+  spec.source_files  = [
+    "src/puzzlelib.cpp",
+    "src/math_equations.cpp",
+    "src/aruco/src/**/*.{cpp,hpp}",
+    "src/aruco/include/**/*.hpp",
+  ]
+  spec.private_header_files = [
+    "src/aruco/include/**/*.hpp",
+  ]
+  spec.public_header_files = [
+    "include/**/*.{h,hpp}"
+  ]
+  spec.header_mappings_dir = "include/"
+
   spec.dependency 'OpenCV', '~> 4.3'
   spec.xcconfig = {
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
@@ -21,5 +33,6 @@ Pod::Spec.new do |spec|
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
   }
   spec.library = 'c++'
+  spec.platform = :ios, '9.0'
   spec.static_framework = true
 end

@@ -5,7 +5,7 @@ extern "C"
 {
 #endif
 
-int avoid_code_stripping();
+int avoidCodeStripping();
 char* detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
 
 #ifdef __cplusplus
