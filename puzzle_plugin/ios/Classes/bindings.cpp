@@ -2,7 +2,7 @@
 #include "puzzlelib/puzzlelib.h"
 
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
-int avoidCodeStripping() {
+int avoidCodeStripping(void) {
   return 0;
 }
 

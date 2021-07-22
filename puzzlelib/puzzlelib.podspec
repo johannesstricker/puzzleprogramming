@@ -11,12 +11,11 @@ Pod::Spec.new do |spec|
   spec.source       = { :path => '.' }
   spec.source_files  = [
     "src/puzzlelib.cpp",
+    "src/math_equations.h",
     "src/math_equations.cpp",
-    "src/aruco/src/**/*.{cpp,hpp}",
-    "src/aruco/include/**/*.hpp",
   ]
   spec.private_header_files = [
-    "src/aruco/include/**/*.hpp",
+    "src/math_equations.h",
   ]
   spec.public_header_files = [
     "include/**/*.{h,hpp}"
@@ -35,4 +34,11 @@ Pod::Spec.new do |spec|
   spec.library = 'c++'
   spec.platform = :ios, '9.0'
   spec.static_framework = true
+
+  # this needs to be a subspec in order to get the include directories right
+  spec.subspec 'aruco' do |subspec|
+    subspec.source_files  = ["src/aruco/src/**/*.{cpp,hpp}"]
+    subspec.public_header_files = ["src/aruco/include/**/*.hpp"]
+    subspec.header_mappings_dir = "src/aruco/include/"
+  end
 end

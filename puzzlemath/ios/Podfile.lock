@@ -10,6 +10,9 @@ PODS:
     - puzzlelib
   - puzzlelib (0.0.1):
     - OpenCV (~> 4.3)
+    - puzzlelib/aruco (= 0.0.1)
+  - puzzlelib/aruco (0.0.1):
+    - OpenCV (~> 4.3)
 
 DEPENDENCIES:
   - camera (from `.symlinks/plugins/camera/ios`)
@@ -40,8 +43,8 @@ SPEC CHECKSUMS:
   OpenCV: 681e0451c1e54c5930a8922277f817ed5d5ab459
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   puzzle_plugin: 95082b7c562aa646ca4234a9dd303f6b0b340597
-  puzzlelib: 46eb47c583e52a325d67943b77ff79f7543fdc54
+  puzzlelib: 5f5f41081029c63b0dd923b1427c0227c067b5e5
 
-PODFILE CHECKSUM: 0b407bcba79c6a47d4a24c1de220783d87984a14
+PODFILE CHECKSUM: b455d754f564c5d9cbb960999aa683fa5d599d14
 
 COCOAPODS: 1.10.1
