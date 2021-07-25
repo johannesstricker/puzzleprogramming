@@ -98,6 +98,15 @@ Token::Token(Token::ID id, int value)
   // empty
 }
 
+bool Token::operator<(const Token& other) const {
+  if (id == other.id) return value < other.value;
+  return id < other.id;
+}
+
+bool Token::operator==(const Token& other) const {
+  return id == other.id && value == other.value;
+}
+
 int Token::precedence() const {
   if (id == ID::OperatorAdd || id == ID::OperatorSubtract) return 2;
   if (id == ID::OperatorMultiply || id == ID::OperatorDivide) return 3;
@@ -322,7 +331,7 @@ std::list<Token> toReversePolishNotation(std::list<Token> tokens) {
 
 std::unique_ptr<ASTNode> consumeToken(std::list<Token>& tokens) {
   if (tokens.empty()) throw std::runtime_error("Failed to consume token.");
-  auto nextToken = tokens.back();
+  Token nextToken = tokens.back();
   tokens.pop_back();
   if (nextToken.id == Token::ID::Number) {
     return std::make_unique<ASTNumber>(nextToken.value);

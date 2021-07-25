@@ -46,8 +46,11 @@ struct Token {
   };
 
   Token(Token::ID id, int value = 0);
+  bool operator<(const Token& other) const;
+  bool operator==(const Token& other) const;
   int precedence() const;
   std::string toString() const;
+
 
   ID id;
   int value;

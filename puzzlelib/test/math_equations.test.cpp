@@ -28,6 +28,7 @@ TEST_CASE("digitValue") {
 }
 
 TEST_CASE("stringToMarkers") {
+  std::string input = "012345 6789+-*/()";
   std::list<Marker> expectedEquation = {
     Marker::Digit_0,
     Marker::Digit_1,
@@ -46,8 +47,35 @@ TEST_CASE("stringToMarkers") {
     Marker::LeftParenthesis,
     Marker::RightParenthesis
   };
-  std::string input = "012345 6789+-*/()";
   REQUIRE(stringToMarkers(input) == expectedEquation);
+}
+
+TEST_CASE("parse tokens from markers") {
+  std::list<Marker> input = {
+    Marker::Digit_9,
+    Marker::Digit_7,
+    Marker::OperatorAdd,
+    Marker::Digit_5,
+    Marker::OperatorMultiply,
+    Marker::LeftParenthesis,
+    Marker::Digit_2,
+    Marker::OperatorSubtract,
+    Marker::Digit_2,
+    Marker::Digit_3,
+    Marker::RightParenthesis
+  };
+  std::list<Token> expectedOutput = {
+    Token(Token::ID::Number, 97),
+    Token(Token::ID::OperatorAdd),
+    Token(Token::ID::Number, 5),
+    Token(Token::ID::OperatorMultiply),
+    Token(Token::ID::LeftParenthesis),
+    Token(Token::ID::Number, 2),
+    Token(Token::ID::OperatorSubtract),
+    Token(Token::ID::Number, 23),
+    Token(Token::ID::RightParenthesis)
+  };
+  REQUIRE(parseTokens(input) == expectedOutput);
 }
 
 TEST_CASE("convert tokens to string") {
