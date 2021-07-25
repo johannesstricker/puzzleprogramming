@@ -56,6 +56,8 @@ struct Token {
   int value;
 };
 
+std::ostream& operator<<(std::ostream& stream, const Token& token);
+
 class ASTNode {
 public:
   virtual ~ASTNode() = default;

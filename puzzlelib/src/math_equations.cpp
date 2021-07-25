@@ -3,6 +3,7 @@
 #include <numeric>
 #include <algorithm>
 #include <map>
+#include <iostream>
 
 std::list<Marker> stringToMarkers(const std::string& input) {
   static std::map<char, Marker> Lookup = {
@@ -123,6 +124,11 @@ std::string Token::toString() const {
     case ID::RightParenthesis: return ")";
     default: return std::to_string(value);
   }
+}
+
+std::ostream& operator<<(std::ostream& stream, const Token& token) {
+  stream << token.toString();
+  return stream;
 }
 
 
@@ -337,16 +343,24 @@ std::unique_ptr<ASTNode> consumeToken(std::list<Token>& tokens) {
     return std::make_unique<ASTNumber>(nextToken.value);
   }
   if (nextToken.id == Token::ID::OperatorAdd) {
-    return std::make_unique<ASTOperatorAdd>(consumeToken(tokens), consumeToken(tokens));
+    auto rightOperand = consumeToken(tokens);
+    auto leftOperand = consumeToken(tokens);
+    return std::make_unique<ASTOperatorAdd>(std::move(leftOperand), std::move(rightOperand));
   }
   if (nextToken.id == Token::ID::OperatorSubtract) {
-    return std::make_unique<ASTOperatorSubtract>(consumeToken(tokens), consumeToken(tokens));
+    auto rightOperand = consumeToken(tokens);
+    auto leftOperand = consumeToken(tokens);
+    return std::make_unique<ASTOperatorSubtract>(std::move(leftOperand), std::move(rightOperand));
   }
   if (nextToken.id == Token::ID::OperatorMultiply) {
-    return std::make_unique<ASTOperatorMultiply>(consumeToken(tokens), consumeToken(tokens));
+    auto rightOperand = consumeToken(tokens);
+    auto leftOperand = consumeToken(tokens);
+    return std::make_unique<ASTOperatorMultiply>(std::move(leftOperand), std::move(rightOperand));
   }
   if (nextToken.id == Token::ID::OperatorDivide) {
-    return std::make_unique<ASTOperatorDivide>(consumeToken(tokens), consumeToken(tokens));
+    auto rightOperand = consumeToken(tokens);
+    auto leftOperand = consumeToken(tokens);
+    return std::make_unique<ASTOperatorDivide>(std::move(leftOperand), std::move(rightOperand));
   }
   throw std::runtime_error("Failed to parse AST: unknown token encountered.");
 }

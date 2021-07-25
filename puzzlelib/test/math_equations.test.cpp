@@ -95,12 +95,69 @@ TEST_CASE("convert tokens to string") {
   REQUIRE(toString(tokens) == "10 + 7 * 1 - 8 / 3");
 }
 
+TEST_CASE("OperatorAdd") {
+  ASTOperatorAdd node(std::make_unique<ASTNumber>(10), std::make_unique<ASTNumber>(5));
+  REQUIRE(node.value() == 15);
+}
+
+TEST_CASE("OperatorSubtract") {
+  ASTOperatorSubtract node(std::make_unique<ASTNumber>(97), std::make_unique<ASTNumber>(10));
+  REQUIRE(node.value() == 87);
+}
+
+TEST_CASE("OperatorMultiply") {
+  ASTOperatorMultiply node(std::make_unique<ASTNumber>(2), std::make_unique<ASTNumber>(13));
+  REQUIRE(node.value() == 26);
+}
+
+TEST_CASE("OperatorDivide") {
+  ASTOperatorDivide node(std::make_unique<ASTNumber>(99), std::make_unique<ASTNumber>(3));
+  REQUIRE(node.value() == 33);
+}
+
+TEST_CASE("shunting yard algorithm") {
+  SECTION("97-10") {
+    std::list<Token> input = {
+      Token(Token::ID::Number, 97),
+      Token(Token::ID::OperatorSubtract),
+      Token(Token::ID::Number, 10)
+    };
+    std::list<Token> expectedOutput = {
+      Token(Token::ID::Number, 97),
+      Token(Token::ID::Number, 10),
+      Token(Token::ID::OperatorSubtract)
+    };
+    REQUIRE(shuntingYardAlgorithm(input) == expectedOutput);
+  }
+
+  SECTION("(10-1)/3") {
+    std::list<Token> input = {
+      Token(Token::ID::LeftParenthesis),
+      Token(Token::ID::Number, 10),
+      Token(Token::ID::OperatorSubtract),
+      Token(Token::ID::Number, 1),
+      Token(Token::ID::RightParenthesis),
+      Token(Token::ID::OperatorDivide),
+      Token(Token::ID::Number, 3)
+    };
+    std::list<Token> expectedOutput = {
+      Token(Token::ID::Number, 10),
+      Token(Token::ID::Number, 1),
+      Token(Token::ID::OperatorSubtract),
+      Token(Token::ID::Number, 3),
+      Token(Token::ID::OperatorDivide)
+    };
+    REQUIRE(shuntingYardAlgorithm(input) == expectedOutput);
+  }
+}
+
 int solveEquation(const std::string& input) {
   auto ast = parseASTFromMarkers(stringToMarkers(input));
   return ast->value();
 }
 
 TEST_CASE("solve math equations") {
+  REQUIRE(solveEquation("(10-1)/3") == 3);
   REQUIRE(solveEquation("10+9+52") == 71);
   REQUIRE(solveEquation("97-10") == 87);
   REQUIRE(solveEquation("2+7*3-10") == 13);
