@@ -55,6 +55,5 @@ jobs:
         buildWithCMake: true
 
     - name: Test
-      run: |
-        cd '{{ env.BUILD_DIR }}'
-        ctest -T test
+      working-directory: ${{ env.BUILD_DIR }}
+      run: ctest -T test
