@@ -180,7 +180,13 @@ bool isDigitMarker(Marker marker) {
 }
 
 int digitValue(Marker marker) {
-  return static_cast<int>(marker) - static_cast<int>(Marker::Digit_0);
+  constexpr int MinValue = static_cast<int>(Marker::Digit_0);
+  constexpr int MaxValue = static_cast<int>(Marker::Digit_9);
+  int markerValue = static_cast<int>(marker);
+  if (markerValue < MinValue || markerValue > MaxValue) {
+    throw std::runtime_error("Failed to get digit value: marker is not a digit.");
+  }
+  return markerValue - MinValue;
 }
 
 int concatDigits(const std::vector<int>& digits) {
@@ -200,7 +206,10 @@ Token consumeNumber(std::list<Marker>& markers) {
 }
 
 bool isOperatorMarker(Marker marker) {
-  return marker >= Marker::OperatorAdd && marker <= Marker::OperatorDivide;
+  return marker == Marker::OperatorAdd
+    || marker == Marker::OperatorSubtract
+    || marker == Marker::OperatorMultiply
+    || marker == Marker::OperatorDivide;
 }
 
 Token consumeOperator(std::list<Marker>& markers) {
@@ -211,9 +220,17 @@ Token consumeOperator(std::list<Marker>& markers) {
     case Marker::OperatorSubtract: return Token(Token::ID::OperatorSubtract);
     case Marker::OperatorMultiply: return Token(Token::ID::OperatorMultiply);
     case Marker::OperatorDivide: return Token(Token::ID::OperatorDivide);
+    default: throw std::runtime_error("Failed to consume operator: unknown operator type.");
+  }
+}
+
+Token consumeParenthesis(std::list<Marker>& markers) {
+  Marker nextMarker = markers.front();
+  markers.pop_front();
+  switch (nextMarker) {
     case Marker::LeftParenthesis: return Token(Token::ID::LeftParenthesis);
     case Marker::RightParenthesis: return Token(Token::ID::RightParenthesis);
-    default: throw std::runtime_error("Failed to consume operator: unknown operator type.");
+    default: throw std::runtime_error("Failed to consume parenthesis.");
   }
 }
 
@@ -232,7 +249,7 @@ std::list<Token> parseTokens(std::list<Marker> markers) {
     } else if (isOperatorMarker(nextMarker)) {
       tokens.push_back(consumeOperator(markers));
     } else if (isParenthesisMarker(nextMarker)) {
-      tokens.push_back(consumeOperator(markers));
+      tokens.push_back(consumeParenthesis(markers));
     } else {
       throw std::runtime_error("Encountered unknown marker code.");
     }

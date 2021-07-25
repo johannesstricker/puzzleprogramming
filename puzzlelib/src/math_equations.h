@@ -111,11 +111,17 @@ bool isOperatorMarker(Marker code);
 
 Token consumeOperator(std::list<Marker>& markers);
 
+bool isParenthesisMarker(Marker code);
+
+Token consumeParenthesis(std::list<Marker>& markers);
+
 std::list<Token> parseTokens(std::list<Marker> markers);
 
 void resolveOperatorPrecedence(const Token& nextToken, std::list<Token>& outputQueue, std::list<Token>& operatorStack);
 
 bool isOperatorToken(const Token& token);
+
+void resolveRightParenthesis(std::list<Token>& outputQueue, std::list<Token>& operatorStack);
 
 std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens);
 
