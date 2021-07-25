@@ -19,7 +19,9 @@ std::list<Marker> stringToMarkers(const std::string& input) {
     { '+', Marker::OperatorAdd },
     { '-', Marker::OperatorSubtract },
     { '*', Marker::OperatorMultiply },
-    { '/', Marker::OperatorDivide }
+    { '/', Marker::OperatorDivide },
+    { '(', Marker::LeftParenthesis },
+    { ')', Marker::RightParenthesis }
   };
 
   std::list<Marker> output;
@@ -39,6 +41,8 @@ std::string toString(Marker marker) {
     case Marker::OperatorSubtract: return "SUBTRACT";
     case Marker::OperatorMultiply: return "MULTIPLY";
     case Marker::OperatorDivide: return "DIVIDE";
+    case Marker::LeftParenthesis: return "(";
+    case Marker::RightParenthesis: return ")";
     default: throw std::runtime_error("Failed to convert marker to string: unknown marker type.");
   }
 }
@@ -106,6 +110,8 @@ std::string Token::toString() const {
     case ID::OperatorSubtract: return "-";
     case ID::OperatorMultiply: return "*";
     case ID::OperatorDivide: return "/";
+    case ID::LeftParenthesis: return "(";
+    case ID::RightParenthesis: return ")";
     default: return std::to_string(value);
   }
 }
@@ -119,7 +125,7 @@ ASTOperatorAdd::ASTOperatorAdd(std::unique_ptr<ASTNode> leftOperand, std::unique
 }
 
 int ASTOperatorAdd::value() const {
-  return m_rightOperand->value() + m_leftOperand->value();
+  return m_leftOperand->value() + m_rightOperand->value();
 }
 
 
@@ -131,7 +137,7 @@ ASTOperatorSubtract::ASTOperatorSubtract(std::unique_ptr<ASTNode> leftOperand, s
 }
 
 int ASTOperatorSubtract::value() const {
-  return m_rightOperand->value() - m_leftOperand->value();
+  return m_leftOperand->value() - m_rightOperand->value();
 }
 
 
@@ -155,7 +161,7 @@ ASTOperatorDivide::ASTOperatorDivide(std::unique_ptr<ASTNode> leftOperand, std::
 }
 
 int ASTOperatorDivide::value() const {
-  return m_rightOperand->value() / m_leftOperand->value();
+  return m_leftOperand->value() / m_rightOperand->value();
 }
 
 
@@ -205,8 +211,14 @@ Token consumeOperator(std::list<Marker>& markers) {
     case Marker::OperatorSubtract: return Token(Token::ID::OperatorSubtract);
     case Marker::OperatorMultiply: return Token(Token::ID::OperatorMultiply);
     case Marker::OperatorDivide: return Token(Token::ID::OperatorDivide);
+    case Marker::LeftParenthesis: return Token(Token::ID::LeftParenthesis);
+    case Marker::RightParenthesis: return Token(Token::ID::RightParenthesis);
     default: throw std::runtime_error("Failed to consume operator: unknown operator type.");
   }
+}
+
+bool isParenthesisMarker(Marker marker) {
+  return marker == Marker::LeftParenthesis || marker == Marker::RightParenthesis;
 }
 
 std::list<Token> parseTokens(std::list<Marker> markers) {
@@ -219,6 +231,8 @@ std::list<Token> parseTokens(std::list<Marker> markers) {
       tokens.push_back(consumeNumber(markers));
     } else if (isOperatorMarker(nextMarker)) {
       tokens.push_back(consumeOperator(markers));
+    } else if (isParenthesisMarker(nextMarker)) {
+      tokens.push_back(consumeOperator(markers));
     } else {
       throw std::runtime_error("Encountered unknown marker code.");
     }
@@ -226,15 +240,33 @@ std::list<Token> parseTokens(std::list<Marker> markers) {
   return tokens;
 }
 
+bool isOperatorToken(const Token& token) {
+  return token.id >= Token::ID::OperatorAdd && token.id <= Token::ID::OperatorDivide;
+}
+
+bool isParenthesisToken(const Token& token) {
+  return token.id == Token::ID::LeftParenthesis || token.id == Token::ID::RightParenthesis;
+}
+
 void resolveOperatorPrecedence(const Token& nextToken, std::list<Token>& outputQueue, std::list<Token>& operatorStack) {
-  while (!operatorStack.empty() && nextToken.precedence() <= operatorStack.front().precedence()) {
+  while (!operatorStack.empty() && isOperatorToken(nextToken) && nextToken.precedence() <= operatorStack.front().precedence()) {
     outputQueue.push_back(operatorStack.front());
     operatorStack.pop_front();
   }
 }
 
-bool isOperatorToken(const Token& token) {
-  return token.id >= Token::ID::OperatorAdd && token.id <= Token::ID::OperatorDivide;
+void resolveRightParenthesis(std::list<Token>& outputQueue, std::list<Token>& operatorStack) {
+    while (true) {
+    if (operatorStack.empty()) {
+      throw std::runtime_error("Failed to convert to reverse polish notation: missing left parenthesis.");
+    }
+    auto nextToken = operatorStack.front();
+    operatorStack.pop_front();
+    if (nextToken.id == Token::ID::LeftParenthesis) {
+      break;
+    }
+    outputQueue.push_back(nextToken);
+  }
 }
 
 std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens) {
@@ -249,11 +281,18 @@ std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens) {
     } else if (isOperatorToken(nextToken)) {
       resolveOperatorPrecedence(nextToken, outputQueue, operatorStack);
       operatorStack.push_front(nextToken);
+    } else if (nextToken.id == Token::ID::LeftParenthesis) {
+      operatorStack.push_front(nextToken);
+    } else if (nextToken.id == Token::ID::RightParenthesis) {
+      resolveRightParenthesis(outputQueue, operatorStack);
     } else {
       throw std::runtime_error("Failed to convert to reverse polish notation: unknown token encountered.");
     }
   }
   while (!operatorStack.empty()) {
+    if (isParenthesisToken(operatorStack.front())) {
+      throw std::runtime_error("Failed to convert to reverse polish notation: unexpected parenthesis encountered.");
+    }
     outputQueue.push_back(operatorStack.front());
     operatorStack.pop_front();
   }

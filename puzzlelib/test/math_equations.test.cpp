@@ -20,9 +20,11 @@ TEST_CASE("stringToMarkers") {
     Marker::OperatorAdd,
     Marker::OperatorSubtract,
     Marker::OperatorMultiply,
-    Marker::OperatorDivide
+    Marker::OperatorDivide,
+    Marker::LeftParenthesis,
+    Marker::RightParenthesis
   };
-  std::string input = "012345 6789+-*/";
+  std::string input = "012345 6789+-*/()";
   REQUIRE(stringToMarkers(input) == expectedEquation);
 }
 
@@ -53,4 +55,7 @@ TEST_CASE("solve math equations") {
   REQUIRE(solveEquation("97-10") == 87);
   REQUIRE(solveEquation("2+7*3-10") == 13);
   REQUIRE(solveEquation("22*2/7") == 6);
+  REQUIRE(solveEquation("(8+2)/2") == 5);
+  REQUIRE(solveEquation("10*(4/2+8)") == 100);
+  REQUIRE(solveEquation("5*(40/(2+2))") == 50);
 }

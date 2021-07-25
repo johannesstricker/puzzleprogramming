@@ -22,8 +22,9 @@ enum class Marker : int {
   OperatorAdd,
   OperatorSubtract,
   OperatorMultiply,
-  OperatorDivide
-  // Bracket,
+  OperatorDivide,
+  LeftParenthesis,
+  RightParenthesis
 };
 
 std::list<Marker> stringToMarkers(const std::string& input);
@@ -40,6 +41,8 @@ struct Token {
     OperatorSubtract,
     OperatorMultiply,
     OperatorDivide,
+    LeftParenthesis,
+    RightParenthesis
   };
 
   Token(Token::ID id, int value = 0);
