@@ -124,6 +124,8 @@ std::list<Token> parseTokens(std::list<Marker> markers);
 
 void resolveOperatorPrecedence(const Token& nextToken, std::list<Token>& outputQueue, std::list<Token>& operatorStack);
 
+bool isNumberToken(const Token& token);
+
 bool isOperatorToken(const Token& token);
 
 void resolveRightParenthesis(std::list<Token>& outputQueue, std::list<Token>& operatorStack);
@@ -131,6 +133,10 @@ void resolveRightParenthesis(std::list<Token>& outputQueue, std::list<Token>& op
 std::list<Token> shuntingYardAlgorithm(std::list<Token> tokens);
 
 std::list<Token> toReversePolishNotation(std::list<Token> tokens);
+
+std::unique_ptr<ASTNode> createNumberNode(const Token& token);
+
+std::unique_ptr<ASTNode> createOperatorNode(const Token& token, std::list<Token>& remainingTokens);
 
 std::unique_ptr<ASTNode> consumeToken(std::list<Token>& tokens);
 

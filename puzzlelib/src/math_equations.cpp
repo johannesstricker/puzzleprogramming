@@ -272,6 +272,10 @@ std::list<Token> parseTokens(std::list<Marker> markers) {
   return tokens;
 }
 
+bool isNumberToken(const Token& token) {
+  return token.id == Token::ID::Number;
+}
+
 bool isOperatorToken(const Token& token) {
   return token.id >= Token::ID::OperatorAdd && token.id <= Token::ID::OperatorDivide;
 }
@@ -335,32 +339,38 @@ std::list<Token> toReversePolishNotation(std::list<Token> tokens) {
   return shuntingYardAlgorithm(tokens);
 }
 
+std::unique_ptr<ASTNode> createNumberNode(const Token& token) {
+  if (token.id != Token::ID::Number) {
+    throw std::runtime_error("Failed to create number node from non-number token.");
+  }
+  return std::make_unique<ASTNumber>(token.value);
+}
+
+std::unique_ptr<ASTNode> createOperatorNode(const Token& token, std::list<Token>& remainingTokens) {
+  auto rightOperand = consumeToken(remainingTokens);
+  auto leftOperand = consumeToken(remainingTokens);
+  switch (token.id) {
+    case Token::ID::OperatorAdd:
+      return std::make_unique<ASTOperatorAdd>(std::move(leftOperand), std::move(rightOperand));
+    case Token::ID::OperatorSubtract:
+      return std::make_unique<ASTOperatorSubtract>(std::move(leftOperand), std::move(rightOperand));
+    case Token::ID::OperatorMultiply:
+      return std::make_unique<ASTOperatorMultiply>(std::move(leftOperand), std::move(rightOperand));
+    case Token::ID::OperatorDivide:
+      return std::make_unique<ASTOperatorDivide>(std::move(leftOperand), std::move(rightOperand));
+    default: throw std::runtime_error("Failed to create operator node from non-operator token.");
+  }
+}
+
 std::unique_ptr<ASTNode> consumeToken(std::list<Token>& tokens) {
   if (tokens.empty()) throw std::runtime_error("Failed to consume token.");
   Token nextToken = tokens.back();
   tokens.pop_back();
-  if (nextToken.id == Token::ID::Number) {
-    return std::make_unique<ASTNumber>(nextToken.value);
+  if (isNumberToken(nextToken)) {
+    return createNumberNode(nextToken);
   }
-  if (nextToken.id == Token::ID::OperatorAdd) {
-    auto rightOperand = consumeToken(tokens);
-    auto leftOperand = consumeToken(tokens);
-    return std::make_unique<ASTOperatorAdd>(std::move(leftOperand), std::move(rightOperand));
-  }
-  if (nextToken.id == Token::ID::OperatorSubtract) {
-    auto rightOperand = consumeToken(tokens);
-    auto leftOperand = consumeToken(tokens);
-    return std::make_unique<ASTOperatorSubtract>(std::move(leftOperand), std::move(rightOperand));
-  }
-  if (nextToken.id == Token::ID::OperatorMultiply) {
-    auto rightOperand = consumeToken(tokens);
-    auto leftOperand = consumeToken(tokens);
-    return std::make_unique<ASTOperatorMultiply>(std::move(leftOperand), std::move(rightOperand));
-  }
-  if (nextToken.id == Token::ID::OperatorDivide) {
-    auto rightOperand = consumeToken(tokens);
-    auto leftOperand = consumeToken(tokens);
-    return std::make_unique<ASTOperatorDivide>(std::move(leftOperand), std::move(rightOperand));
+  if (isOperatorToken(nextToken)) {
+    return createOperatorNode(nextToken, tokens);
   }
   throw std::runtime_error("Failed to parse AST: unknown token encountered.");
 }
