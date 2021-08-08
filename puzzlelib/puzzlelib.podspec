@@ -18,10 +18,9 @@ Pod::Spec.new do |spec|
     "src/math_equations.h",
   ]
   spec.public_header_files = [
-    # "include/**/*.{h,hpp}"
-    "include/puzzlelib/puzzlelib.h"
+    "include/**/*.{h,hpp}"
   ]
-  spec.header_mappings_dir = "/include"
+  spec.header_mappings_dir = "include/"
 
   spec.dependency 'OpenCV', '~> 4.3'
   spec.xcconfig = {
@@ -40,9 +39,6 @@ Pod::Spec.new do |spec|
   spec.subspec 'aruco' do |subspec|
     subspec.source_files  = ["src/aruco/src/**/*.{cpp,hpp}"]
     subspec.public_header_files = ["src/aruco/include/**/*.hpp"]
-    subspec.header_mappings_dir = "src/aruco/"
-    subspec.pod_target_xcconfig  = {
-      "HEADER_SEARCH_PATHS" => "$(PODS_TARGET_SRCROOT)/src/aruco/include",
-    }
+    subspec.header_mappings_dir = "src/aruco/include/"
   end
 end
