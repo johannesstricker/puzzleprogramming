@@ -40,3 +40,8 @@ char* puzzle::detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWid
     return strdup(errorString.c_str());
   }
 }
+
+char* puzzle::tokenToString(int tokenId, int value) {
+  Token token(static_cast<Token::ID>(tokenId), value);
+  return strdup(token.toString().c_str());
+}

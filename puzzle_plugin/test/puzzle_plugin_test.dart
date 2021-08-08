@@ -20,4 +20,9 @@ void main() {
   test('getPlatformVersion', () async {
     expect(await PuzzlePlugin.platformVersion, '42');
   });
+
+  test('tokenToString', () async {
+    expect(await PuzzlePlugin.tokenToString(0, 3), '3');
+    expect(await PuzzlePlugin.tokenToString(1, 0), '+');
+  });
 }
