@@ -1,10 +1,6 @@
 PODS:
-  - camera (0.0.1):
-    - Flutter
   - Flutter (1.0.0)
   - OpenCV (4.3.0)
-  - path_provider (0.0.1):
-    - Flutter
   - puzzlelib (0.0.1):
     - OpenCV (~> 4.3)
     - puzzlelib/aruco (= 0.0.1)
@@ -15,10 +11,8 @@ PODS:
     - puzzlelib
 
 DEPENDENCIES:
-  - camera (from `.symlinks/plugins/camera/ios`)
   - Flutter (from `Flutter`)
-  - path_provider (from `.symlinks/plugins/path_provider/ios`)
-  - puzzlelib (from `../../puzzlelib`)
+  - puzzlelib (from `../../../puzzlelib`)
   - puzzlemath_plugin (from `.symlinks/plugins/puzzlemath_plugin/ios`)
 
 SPEC REPOS:
@@ -26,25 +20,19 @@ SPEC REPOS:
     - OpenCV
 
 EXTERNAL SOURCES:
-  camera:
-    :path: ".symlinks/plugins/camera/ios"
   Flutter:
     :path: Flutter
-  path_provider:
-    :path: ".symlinks/plugins/path_provider/ios"
   puzzlelib:
-    :path: "../../puzzlelib"
+    :path: "../../../puzzlelib"
   puzzlemath_plugin:
     :path: ".symlinks/plugins/puzzlemath_plugin/ios"
 
 SPEC CHECKSUMS:
-  camera: 3164201dc344383e62282964016528c4f5a9ad50
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   OpenCV: 681e0451c1e54c5930a8922277f817ed5d5ab459
-  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   puzzlelib: 5cad29c2e5ea5043df21c54aec6909572e75d9f7
   puzzlemath_plugin: 505347cb22618d57758e3ef3e2d1d41d8f17e3e5
 
-PODFILE CHECKSUM: ecc9208e307c82100dad720b94d4575190005b34
+PODFILE CHECKSUM: 86a6d9078a7cf8d9e490fc5acbca34257f581f47
 
 COCOAPODS: 1.10.2

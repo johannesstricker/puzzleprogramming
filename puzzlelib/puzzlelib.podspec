@@ -20,7 +20,7 @@ Pod::Spec.new do |spec|
   spec.public_header_files = [
     "include/**/*.{h,hpp}"
   ]
-  spec.header_mappings_dir = "include/"
+  spec.header_mappings_dir = "include/puzzlelib"
 
   spec.dependency 'OpenCV', '~> 4.3'
   spec.xcconfig = {
