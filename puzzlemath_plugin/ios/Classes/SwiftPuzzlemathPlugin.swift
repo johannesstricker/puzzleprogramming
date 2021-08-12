@@ -10,5 +10,8 @@ public class SwiftPuzzlemathPlugin: NSObject, FlutterPlugin {
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     result("iOS " + UIDevice.current.systemVersion)
+    if (call.method == "temp") {
+      avoidCodeStripping();
+    }
   }
 }
