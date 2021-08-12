@@ -1,4 +1,4 @@
-name: build
+name: Continuous Integration
 on:
   pull_request:
     branches:
@@ -8,7 +8,7 @@ on:
       - main
 jobs:
   build_and_test_lib:
-    name: Build and test library
+    name: Build and test puzzlelib
     runs-on: ${{ matrix.os }}
 
     strategy:
