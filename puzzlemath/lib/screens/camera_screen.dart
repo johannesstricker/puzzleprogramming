@@ -5,7 +5,7 @@ import 'package:ffi/ffi.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import 'package:puzzlemath_plugin/puzzlemath_plugin.dart';
+import 'package:puzzle_plugin/puzzle_plugin.dart';
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -67,7 +67,7 @@ class _CameraScreenState extends State<CameraScreen> {
       final width = image.planes[0].width!;
       final height = image.planes[0].height!;
       final bytesPerRow = image.planes[0].bytesPerRow;
-      PuzzlemathPlugin.detectAndDecodeArUco32BGRA(
+      PuzzlePlugin.detectAndDecodeArUco32BGRA(
               imageBytes, width, height, bytesPerRow)
           .then((String content) {
         _currentText = content;
