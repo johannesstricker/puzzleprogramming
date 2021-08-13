@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   build_and_test_lib:
-    name: Build and test puzzlelib
+    name: PuzzleLib
     runs-on: ${{ matrix.os }}
 
     strategy:
