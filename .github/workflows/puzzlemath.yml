@@ -16,7 +16,7 @@ jobs:
             generator: Xcode
             buildType: Release
             triplet: x64-osx
-            device: iPhone 11
+            device: iPhone 11 14.4
 
     steps:
       - uses: actions/checkout@v1
