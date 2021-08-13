@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   build:
-    name: PuzzleApp
+    name: PuzzleMath
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -51,8 +51,4 @@ jobs:
 
       - name: Test
         run: flutter test
-        working-directory: puzzlemath/
-
-      - name: Build
-        run: flutter build ios
         working-directory: puzzlemath/
