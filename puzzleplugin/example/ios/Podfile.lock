@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
   - OpenCV (4.3.0)
   - puzzle_plugin (0.0.1):
     - Flutter
@@ -12,6 +14,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - puzzle_plugin (from `.symlinks/plugins/puzzle_plugin/ios`)
   - puzzlelib (from `../../../puzzlelib`)
 
@@ -22,6 +25,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
   puzzle_plugin:
     :path: ".symlinks/plugins/puzzle_plugin/ios"
   puzzlelib:
@@ -29,6 +34,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  integration_test: 6eb66a19f7104200dcfdd62bc0077e1b09686e4f
   OpenCV: 681e0451c1e54c5930a8922277f817ed5d5ab459
   puzzle_plugin: b89c87e1b7f689e1b99adc89e53dc39191536e6e
   puzzlelib: 5cad29c2e5ea5043df21c54aec6909572e75d9f7
