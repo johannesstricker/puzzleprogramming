@@ -32,7 +32,7 @@ Pod::Spec.new do |spec|
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
   }
   spec.library = 'c++'
-  spec.platform = :ios, '9.0'
+  spec.platform = :ios, '11.0'
   spec.static_framework = true
 
   # this needs to be a subspec in order to get the include directories right
