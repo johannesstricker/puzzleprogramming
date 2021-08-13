@@ -1,33 +1,26 @@
 # PuzzleProgramming
 
-[![Tests](https://github.com/johannesstricker/puzzleprogramming/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/johannesstricker/puzzleprogramming/actions/workflows/continuous-integration.yml)
+![PuzzleMath](https://github.com/johannesstricker/puzzleprogramming/actions/workflows/puzzlemath.yml/badge.svg)
+![PuzzlePlugin](https://github.com/johannesstricker/puzzleprogramming/actions/workflows/puzzleplugin.yml/badge.svg)
+![PuzzleLib](https://github.com/johannesstricker/puzzleprogramming/actions/workflows/puzzlelib.yml/badge.svg)
 
-C++ project template using [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg).
+Flutter app for block-like programming with physical puzzle pieces. Only math expressions are supported at the moment.
 
-## Roadmap
+## Build
 
-- [ ] Create `puzzlelib.podspec`
-- [ ] Link `puzzle_plugin` to `puzzlelib.podspec` podspec
-- [ ]
+### PuzzleMath
 
-## Building the project
-The project is build with cmake and vcpkg. Make sure that you have [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg) installed and added to your path. Additionally, point the `VCPKG_ROOT` environment variable to the vcpkg root directory. Then you can build by running
+Inside the `puzzlemath/` folder you can use
+```
+flutter run
+```
+to build and run the app. Alternatively, use the Flutter extension for vscode and run the app directly from the editor.
+
+### PuzzleLib
+
+You can build the puzzlelib project in isolation with cmake and vcpkg. Make sure that you have [cmake](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg) installed and added to your path. Additionally, point the `VCPKG_ROOT` environment variable to the vcpkg root directory. Then you can build by running
 ```
 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 cmake --build build
 ```
-from the project root. Alternatively, you can build the project from vscode with the [CMake Tools Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools). If cmake cannot find a vcpkg package it might help to delete the `CMakeCache.txt` in the build directory.
-
-## Dependencies
-To add additional project dependencies just add them to the `dependencies` entry in the `vcpkg.json` file.
-```
-{
-  "name": "cpp-project-template",
-  "version-string": "0.0.1",
-  "dependencies": [
-    "catch2",
-    "qt5",
-    "sqlite3"
-  ]
-}
-```
+from the `puzzlelib/` directory. Alternatively, you can build the project from vscode with the [CMake Tools Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools).
