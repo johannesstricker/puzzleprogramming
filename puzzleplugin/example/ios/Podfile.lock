@@ -1,0 +1,44 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - OpenCV (4.3.0)
+  - puzzle_plugin (0.0.1):
+    - Flutter
+    - puzzlelib
+  - puzzlelib (0.0.1):
+    - OpenCV (~> 4.3)
+    - puzzlelib/aruco (= 0.0.1)
+  - puzzlelib/aruco (0.0.1):
+    - OpenCV (~> 4.3)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - puzzle_plugin (from `.symlinks/plugins/puzzle_plugin/ios`)
+  - puzzlelib (from `../../../puzzlelib`)
+
+SPEC REPOS:
+  trunk:
+    - OpenCV
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  puzzle_plugin:
+    :path: ".symlinks/plugins/puzzle_plugin/ios"
+  puzzlelib:
+    :path: "../../../puzzlelib"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  integration_test: 6eb66a19f7104200dcfdd62bc0077e1b09686e4f
+  OpenCV: 681e0451c1e54c5930a8922277f817ed5d5ab459
+  puzzle_plugin: fd191f2de28a97eb4c42ee3bf79b6734df2639c8
+  puzzlelib: aa60ddc5bb8ef7d07775c8a139b7d189fe668927
+
+PODFILE CHECKSUM: a9c459d33836eda1ae9fa29fbfe63d0e56929d6d
+
+COCOAPODS: 1.10.2

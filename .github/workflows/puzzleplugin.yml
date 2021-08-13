@@ -1,0 +1,57 @@
+name: Continuous Integration
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: PuzzlePlugin
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            generator: Xcode
+            buildType: Release
+            triplet: x64-osx
+            device: iPhone 11 (14.4)
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Start iOS Simulator
+        run: |
+          xcrun instruments -s
+          UDID=$(
+            xcrun instruments -s |
+            awk \
+              -F ' *[][]' \
+              -v 'device=${{ matrix.device }}' \
+              '$1 == device { print $2 }'
+          )
+          xcrun simctl boot "${UDID:?No Simulator with this name found}"
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '2.2.x'
+
+      - name: Install
+        run: flutter pub get
+        working-directory: puzzleplugin/
+
+      - name: Format
+        run: flutter format --set-exit-if-changed .
+        working-directory: puzzleplugin/
+
+      - name: Analyze
+        run: flutter analyze .
+        working-directory: puzzleplugin/
+
+      - name: Integration Tests
+        run: |
+          flutter drive -d "${UDID}" \
+            --driver test_driver/integration_test.dart \
+            --target integration_test/*
+        working-directory: puzzleplugin/example

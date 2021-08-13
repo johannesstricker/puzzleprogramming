@@ -8,5 +8,13 @@
     "optional": "cpp",
     "regex": "cpp",
     "system_error": "cpp"
-  }
+  },
+  "cmake.sourceDirectory": "${workspaceFolder}/puzzlelib",
+  "cmake.buildDirectory": "${workspaceFolder}/puzzlelib/build",
+  "ruby.lint": {
+      "rubocop": false
+  },
+  "ruby.useLanguageServer": false,
+  "ruby.rubocop.onSave": false,
+  "ruby.format": false,
 }
