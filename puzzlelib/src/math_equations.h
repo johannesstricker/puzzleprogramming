@@ -24,7 +24,9 @@ enum class Marker : int {
   OperatorMultiply,
   OperatorDivide,
   LeftParenthesis,
-  RightParenthesis
+  RightParenthesis,
+  Start,
+  End
 };
 
 std::list<Marker> stringToMarkers(const std::string& input);

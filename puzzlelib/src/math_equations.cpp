@@ -44,6 +44,8 @@ std::string toString(Marker marker) {
     case Marker::OperatorDivide: return "DIVIDE";
     case Marker::LeftParenthesis: return "(";
     case Marker::RightParenthesis: return ")";
+    case Marker::Start: return "START";
+    case Marker::End: return "END";
     default: throw std::runtime_error("Failed to convert marker to string: unknown marker type.");
   }
 }
@@ -81,7 +83,7 @@ std::list<Marker> detectAndDecodeArUco(const cv::Mat& image) {
 
 void createArUcoMarkers(const std::string& outputFolder, int size) {
   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-  for (int code = static_cast<int>(Marker::Digit_0); code <= static_cast<int>(Marker::OperatorDivide); code++) {
+  for (int code = static_cast<int>(Marker::Digit_0); code <= static_cast<int>(Marker::End); code++) {
     cv::Mat image;
     cv::aruco::drawMarker(dictionary, code, size, image, 1);
 

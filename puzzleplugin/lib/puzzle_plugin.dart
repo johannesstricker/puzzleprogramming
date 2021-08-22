@@ -12,60 +12,60 @@ typedef DetectQrCode32BGRAFunction = Pointer<Utf8> Function(
 typedef TokenToStringFunctionNative = Pointer<Utf8> Function(Int32, Int32);
 typedef TokenToStringFunction = Pointer<Utf8> Function(int, int);
 
-// TODO: can we automatically keep this in sync with C++ enum?
-enum PuzzlePiece {
-  digit0,
-  digit1,
-  digit2,
-  digit3,
-  digit4,
-  digit5,
-  digit6,
-  digit7,
-  digit8,
-  digit9,
-  add,
-  subtract,
-  multiply,
-  divide,
-  leftParenthesis,
-  rightParenthesis
-}
+// // TODO: can we automatically keep this in sync with C++ enum?
+// enum PuzzlePiece {
+//   digit0,
+//   digit1,
+//   digit2,
+//   digit3,
+//   digit4,
+//   digit5,
+//   digit6,
+//   digit7,
+//   digit8,
+//   digit9,
+//   add,
+//   subtract,
+//   multiply,
+//   divide,
+//   leftParenthesis,
+//   rightParenthesis
+// }
 
-class PuzzleList extends Struct {
-  @Int32()
-  external int typeIndex;
+// class PuzzleList extends Struct {
+//   @Int32()
+//   external int typeIndex;
 
-  PuzzlePiece type() {
-    return PuzzlePiece.values[this.typeIndex];
-  }
+//   PuzzlePiece type() {
+//     return PuzzlePiece.values[this.typeIndex];
+//   }
 
-  Pointer<PuzzleList> next;
-}
+//   Pointer<PuzzleList> next;
+// }
 
-class PuzzleSolution extends Struct {
-  @Int32()
-  external int value;
+// class PuzzleSolution extends Struct {
+//   @Int32()
+//   external int value;
 
-  PuzzleList pieces;
-}
+//   PuzzleList pieces;
+// }
 
-class Challenge {
-  final int solution;
-  final List<PuzzlePiece> availablePuzzlePieces;
+// class Challenge {
+//   final int solution;
+//   final List<PuzzlePiece> availablePuzzlePieces;
 
-  Challenge(this.solution, this.availablePuzzlePieces);
+//   Challenge(this.solution, this.availablePuzzlePieces);
 
-  bool checkSolution(PuzzleSolution solution) {
-    final remainingPieces = availablePuzzlePieces;
-    while (solution.pieces.next != nullptr.address) {
-      if (!remainingPieces.contains(solution.pieces[i])) ;
-      return false;
-    }
-    for (int i = 0; i < solution.piecesCount; i++) {}
-    return solution.value == this.solution;
-  }
-}
+//   bool checkSolution(PuzzleSolution solution) {
+//     final remainingPieces = availablePuzzlePieces;
+//     while (solution.pieces.next != nullptr.address) {
+//       if (!remainingPieces.contains(solution.pieces[i])) ;
+//       return false;
+//     }
+//     for (int i = 0; i < solution.piecesCount; i++) {}
+//     return solution.value == this.solution;
+//   }
+// }
 
 class PuzzlePlugin {
   static const MethodChannel _channel = const MethodChannel('puzzle_plugin');

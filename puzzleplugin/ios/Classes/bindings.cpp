@@ -16,7 +16,7 @@ char* tokenToString(int tokenId, int value) {
   return puzzle::tokenToString(tokenId, value);
 }
 
-extern "C" __attribute__((visibility("default"))) __attribute__((used))
-PuzzleSolution solvePuzzle(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
-  return puzzle::solvePuzzle(imageBytes, imageWidth, imageHeight, bytesPerRow);
-}
+// extern "C" __attribute__((visibility("default"))) __attribute__((used))
+// PuzzleSolution solvePuzzle(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
+//   return puzzle::solvePuzzle(imageBytes, imageWidth, imageHeight, bytesPerRow);
+// }
