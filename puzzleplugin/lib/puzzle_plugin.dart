@@ -13,7 +13,7 @@ typedef TokenToStringFunctionNative = Pointer<Utf8> Function(Int32, Int32);
 typedef TokenToStringFunction = Pointer<Utf8> Function(int, int);
 
 // TODO: can we automatically keep this in sync with C++ enum?
-enum PuzzlePieceType {
+enum PuzzlePiece {
   digit0,
   digit1,
   digit2,
@@ -32,37 +32,37 @@ enum PuzzlePieceType {
   rightParenthesis
 }
 
-class PuzzlePiece extends Struct {
+class PuzzleList extends Struct {
   @Int32()
   external int typeIndex;
 
-  PuzzlePieceType type() {
-    return PuzzlePieceType.values[this.typeIndex];
+  PuzzlePiece type() {
+    return PuzzlePiece.values[this.typeIndex];
   }
+
+  Pointer<PuzzleList> next;
 }
 
 class PuzzleSolution extends Struct {
   @Int32()
-  external int piecesCount;
-
-  external Pointer<PuzzlePiece> pieces;
-
-  @Int32()
   external int value;
+
+  PuzzleList pieces;
 }
 
 class Challenge {
   final int solution;
-  final List<PuzzlePieceType> availablePuzzlePieces;
+  final List<PuzzlePiece> availablePuzzlePieces;
 
   Challenge(this.solution, this.availablePuzzlePieces);
 
   bool checkSolution(PuzzleSolution solution) {
     final remainingPieces = availablePuzzlePieces;
-    for (int i = 0; i < solution.piecesCount; i++) {
+    while (solution.pieces.next != nullptr.address) {
       if (!remainingPieces.contains(solution.pieces[i])) ;
       return false;
     }
+    for (int i = 0; i < solution.piecesCount; i++) {}
     return solution.value == this.solution;
   }
 }
