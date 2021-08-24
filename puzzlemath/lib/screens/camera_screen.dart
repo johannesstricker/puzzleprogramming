@@ -6,6 +6,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import 'package:puzzle_plugin/puzzle_plugin.dart';
+import '../widgets/detection_preview.dart';
 
 class CameraScreen extends StatefulWidget {
   @override
@@ -18,6 +19,11 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _isTakingImage = false;
   num _lastImageProcessedTime = 0;
   String _currentText = "";
+
+  double imageWidth = 0;
+  double imageHeight = 0;
+  Color color = Colors.red;
+  NativeDetectedObject? detectedObject;
 
   @override
   void initState() {
@@ -51,7 +57,7 @@ class _CameraScreenState extends State<CameraScreen> {
   void _onImageReceived(CameraImage image) {
     if (_isTakingImage) return;
 
-    final throttleMilliseconds = 1000;
+    final throttleMilliseconds = 50;
     final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
     final millisecondsPassed = _lastImageProcessedTime == 0
         ? throttleMilliseconds
@@ -67,12 +73,16 @@ class _CameraScreenState extends State<CameraScreen> {
       final width = image.planes[0].width!;
       final height = image.planes[0].height!;
       final bytesPerRow = image.planes[0].bytesPerRow;
+
       // PuzzlePlugin.detectAndDecodeArUco32BGRA(
       PuzzlePlugin.detectObject32BGRA(imageBytes, width, height, bytesPerRow)
           .then((NativeDetectedObject content) {
         _currentText = content.id.toString();
         calloc.free(imageBytes);
         setState(() {
+          imageWidth = image.width.toDouble();
+          imageHeight = image.height.toDouble();
+          detectedObject = content;
           _isTakingImage = false;
           _lastImageProcessedTime = currentMilliseconds;
         });
@@ -103,6 +113,18 @@ class _CameraScreenState extends State<CameraScreen> {
           child: CameraPreview(controller),
         ),
       ),
+      Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: AspectRatio(
+            aspectRatio: controller.value.aspectRatio,
+            child: CustomPaint(
+                painter: DetectionPreview(
+                    imageWidth: this.imageWidth,
+                    imageHeight: this.imageHeight,
+                    color: this.color,
+                    detectedObject: this.detectedObject)),
+          )),
       Container(
         padding: const EdgeInsets.all(5.0),
         alignment: Alignment.bottomCenter,
