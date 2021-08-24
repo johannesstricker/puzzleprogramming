@@ -67,10 +67,10 @@ class _CameraScreenState extends State<CameraScreen> {
       final width = image.planes[0].width!;
       final height = image.planes[0].height!;
       final bytesPerRow = image.planes[0].bytesPerRow;
-      PuzzlePlugin.detectAndDecodeArUco32BGRA(
-              imageBytes, width, height, bytesPerRow)
-          .then((String content) {
-        _currentText = content;
+      // PuzzlePlugin.detectAndDecodeArUco32BGRA(
+      PuzzlePlugin.detectObject32BGRA(imageBytes, width, height, bytesPerRow)
+          .then((NativeDetectedObject content) {
+        _currentText = content.id.toString();
         calloc.free(imageBytes);
         setState(() {
           _isTakingImage = false;

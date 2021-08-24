@@ -12,60 +12,28 @@ typedef DetectQrCode32BGRAFunction = Pointer<Utf8> Function(
 typedef TokenToStringFunctionNative = Pointer<Utf8> Function(Int32, Int32);
 typedef TokenToStringFunction = Pointer<Utf8> Function(int, int);
 
-// // TODO: can we automatically keep this in sync with C++ enum?
-// enum PuzzlePiece {
-//   digit0,
-//   digit1,
-//   digit2,
-//   digit3,
-//   digit4,
-//   digit5,
-//   digit6,
-//   digit7,
-//   digit8,
-//   digit9,
-//   add,
-//   subtract,
-//   multiply,
-//   divide,
-//   leftParenthesis,
-//   rightParenthesis
-// }
+class NativeCoordinate extends Struct {
+  @Double()
+  external double x;
 
-// class PuzzleList extends Struct {
-//   @Int32()
-//   external int typeIndex;
+  @Double()
+  external double y;
+}
 
-//   PuzzlePiece type() {
-//     return PuzzlePiece.values[this.typeIndex];
-//   }
+class NativeDetectedObject extends Struct {
+  @Int32()
+  external int id;
 
-//   Pointer<PuzzleList> next;
-// }
+  NativeCoordinate? topLeft;
+  NativeCoordinate? topRight;
+  NativeCoordinate? bottomRight;
+  NativeCoordinate? bottomLeft;
+}
 
-// class PuzzleSolution extends Struct {
-//   @Int32()
-//   external int value;
-
-//   PuzzleList pieces;
-// }
-
-// class Challenge {
-//   final int solution;
-//   final List<PuzzlePiece> availablePuzzlePieces;
-
-//   Challenge(this.solution, this.availablePuzzlePieces);
-
-//   bool checkSolution(PuzzleSolution solution) {
-//     final remainingPieces = availablePuzzlePieces;
-//     while (solution.pieces.next != nullptr.address) {
-//       if (!remainingPieces.contains(solution.pieces[i])) ;
-//       return false;
-//     }
-//     for (int i = 0; i < solution.piecesCount; i++) {}
-//     return solution.value == this.solution;
-//   }
-// }
+typedef DetectObject32BGRAFunctionNative = NativeDetectedObject Function(
+    Pointer<Uint8>, Int32, Int32, Int32);
+typedef DetectObject32BGRAFunction = NativeDetectedObject Function(
+    Pointer<Uint8>, int, int, int);
 
 class PuzzlePlugin {
   static const MethodChannel _channel = const MethodChannel('puzzle_plugin');
@@ -86,6 +54,15 @@ class PuzzlePlugin {
     final result = decodedString.toDartString();
     malloc.free(decodedString);
     return result;
+  }
+
+  static Future<NativeDetectedObject> detectObject32BGRA(Pointer<Uint8> bytes,
+      int imageWidth, int imageHeight, int bytesPerRow) async {
+    DynamicLibrary nativeLib = _getDynamicLibrary();
+    final nativeFunction = nativeLib.lookupFunction<
+        DetectObject32BGRAFunctionNative,
+        DetectObject32BGRAFunction>("detectObject32BGRA");
+    return nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
   }
 
   static Future<String> tokenToString(int tokenId, int value) async {
