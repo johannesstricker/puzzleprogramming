@@ -10,7 +10,7 @@
 #include "math_equations.h"
 
 
-puzzle::DetectedObject puzzle::detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
+std::vector<puzzle::DetectedObject> puzzle::detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
   cv::Mat sourceImage(imageHeight, imageWidth, CV_8UC4, imageBytes, bytesPerRow);
   cv::Mat image;
   cv::cvtColor(sourceImage, image, cv::COLOR_BGRA2GRAY, 1);
@@ -32,10 +32,7 @@ puzzle::DetectedObject puzzle::detectObjects32BGRA(unsigned char* imageBytes, in
     object.bottomLeft.x = corners[3].x; object.bottomLeft.y = corners[3].y;
     objects.push_back(object);
   }
-  if (objects.size() > 0) {
-    return objects[0];
-  }
-  return {};
+  return objects;
 }
 
 char* puzzle::detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {

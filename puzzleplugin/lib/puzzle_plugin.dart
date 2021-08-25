@@ -24,15 +24,29 @@ class NativeDetectedObject extends Struct {
   @Int32()
   external int id;
 
-  NativeCoordinate? topLeft;
-  NativeCoordinate? topRight;
-  NativeCoordinate? bottomRight;
-  NativeCoordinate? bottomLeft;
+  external NativeCoordinate topLeft;
+  external NativeCoordinate topRight;
+  external NativeCoordinate bottomRight;
+  external NativeCoordinate bottomLeft;
+}
+
+class NativeDetectedObjectList extends Struct {
+  @Int32()
+  external int size;
+
+  // TODO: fixed size is a workaround; use dynamic size
+  @Array(25)
+  external Array<NativeDetectedObject> data;
 }
 
 typedef DetectObject32BGRAFunctionNative = NativeDetectedObject Function(
     Pointer<Uint8>, Int32, Int32, Int32);
 typedef DetectObject32BGRAFunction = NativeDetectedObject Function(
+    Pointer<Uint8>, int, int, int);
+
+typedef DetectMultipleObjects32BGRAFunctionNative = NativeDetectedObjectList
+    Function(Pointer<Uint8>, Int32, Int32, Int32);
+typedef DetectMultipleObjects32BGRAFunction = NativeDetectedObjectList Function(
     Pointer<Uint8>, int, int, int);
 
 class PuzzlePlugin {
@@ -62,6 +76,18 @@ class PuzzlePlugin {
     final nativeFunction = nativeLib.lookupFunction<
         DetectObject32BGRAFunctionNative,
         DetectObject32BGRAFunction>("detectObject32BGRA");
+    return nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
+  }
+
+  static Future<NativeDetectedObjectList> detectMultipleObjects32BGRA(
+      Pointer<Uint8> bytes,
+      int imageWidth,
+      int imageHeight,
+      int bytesPerRow) async {
+    DynamicLibrary nativeLib = _getDynamicLibrary();
+    final nativeFunction = nativeLib.lookupFunction<
+        DetectMultipleObjects32BGRAFunctionNative,
+        DetectMultipleObjects32BGRAFunction>("detectMultipleObjects32BGRA");
     return nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
   }
 

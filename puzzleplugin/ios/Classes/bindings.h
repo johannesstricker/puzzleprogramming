@@ -19,14 +19,15 @@ struct DetectedObject_t {
 };
 
 struct DetectedObjectList_t {
-  struct DetectedObject_t object;
-  struct DetectedObjectList_t* next;
+  int size;
+  struct DetectedObject_t data[25];
 };
 
 int avoidCodeStripping(void);
 char* detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
 char* tokenToString(int tokenType, int value);
 struct DetectedObject_t detectObject32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
+struct DetectedObjectList_t detectMultipleObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
 
 #ifdef __cplusplus
 }
