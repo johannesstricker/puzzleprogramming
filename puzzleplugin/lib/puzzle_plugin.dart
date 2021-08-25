@@ -34,9 +34,14 @@ class NativeDetectedObjectList extends Struct {
   @Int32()
   external int size;
 
-  // TODO: fixed size is a workaround; use dynamic size
-  @Array(25)
-  external Array<NativeDetectedObject> data;
+  external Pointer<NativeDetectedObject> data;
+
+  // TODO: is there an option to automatically free the pointer (RAII)?
+  void free() {
+    if (size > 0) {
+      PuzzlePlugin.freeDetectedObjects(data);
+    }
+  }
 }
 
 typedef DetectObject32BGRAFunctionNative = NativeDetectedObject Function(
@@ -48,6 +53,11 @@ typedef DetectMultipleObjects32BGRAFunctionNative = NativeDetectedObjectList
     Function(Pointer<Uint8>, Int32, Int32, Int32);
 typedef DetectMultipleObjects32BGRAFunction = NativeDetectedObjectList Function(
     Pointer<Uint8>, int, int, int);
+
+typedef FreeDetectedObjectsFunctionNative = Void Function(
+    Pointer<NativeDetectedObject>);
+typedef FreeDetectedObjectsFunction = void Function(
+    Pointer<NativeDetectedObject>);
 
 class PuzzlePlugin {
   static const MethodChannel _channel = const MethodChannel('puzzle_plugin');
@@ -99,6 +109,14 @@ class PuzzlePlugin {
     final result = outputString.toDartString();
     malloc.free(outputString);
     return result;
+  }
+
+  static void freeDetectedObjects(Pointer<NativeDetectedObject> ptr) {
+    DynamicLibrary nativeLib = _getDynamicLibrary();
+    final nativeFunction = nativeLib.lookupFunction<
+        FreeDetectedObjectsFunctionNative,
+        FreeDetectedObjectsFunction>("freeDetectedObjects");
+    nativeFunction(ptr);
   }
 
   static DynamicLibrary _getDynamicLibrary() {

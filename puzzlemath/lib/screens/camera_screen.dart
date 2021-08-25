@@ -82,6 +82,7 @@ class _CameraScreenState extends State<CameraScreen> {
         setState(() {
           imageWidth = image.width.toDouble();
           imageHeight = image.height.toDouble();
+          detectedObjects?.free();
           detectedObjects = content;
           _currentText = content.size.toString();
           _isTakingImage = false;

@@ -73,7 +73,7 @@ DetectedObjectList_t detectMultipleObjects32BGRA(unsigned char* imageBytes, int 
 
   DetectedObjectList_t result;
   result.size = size;
-  // result.data = new DetectedObject_t[25];
+  result.data = new DetectedObject_t[size];
 
   for (int i = 0; i < size; i++) {
     result.data[i].id = objects[i].id;
@@ -83,6 +83,10 @@ DetectedObjectList_t detectMultipleObjects32BGRA(unsigned char* imageBytes, int 
     result.data[i].bottomLeft = convert(objects[i].bottomLeft);
   }
 
-  // std::memcpy(result.data, objects.data(), size * sizeof(DetectedObject_t));
   return result;
+}
+
+extern "C" __attribute__((visibility("default"))) __attribute__((used))
+void freeDetectedObjects(DetectedObject_t* ptr) {
+  delete[] ptr;
 }
