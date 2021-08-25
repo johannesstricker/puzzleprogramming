@@ -23,7 +23,7 @@ class _CameraScreenState extends State<CameraScreen> {
   double imageWidth = 0;
   double imageHeight = 0;
   Color color = Colors.red;
-  NativeDetectedObjectList? detectedObjects;
+  List<DetectedObject> detectedObjects = const [];
 
   @override
   void initState() {
@@ -77,14 +77,13 @@ class _CameraScreenState extends State<CameraScreen> {
       // PuzzlePlugin.detectAndDecodeArUco32BGRA(
       PuzzlePlugin.detectMultipleObjects32BGRA(
               imageBytes, width, height, bytesPerRow)
-          .then((NativeDetectedObjectList content) {
+          .then((List<DetectedObject> objects) {
         calloc.free(imageBytes);
         setState(() {
           imageWidth = image.width.toDouble();
           imageHeight = image.height.toDouble();
-          detectedObjects?.free();
-          detectedObjects = content;
-          _currentText = content.size.toString();
+          detectedObjects = objects;
+          _currentText = objects.length.toString();
           _isTakingImage = false;
           _lastImageProcessedTime = currentMilliseconds;
         });
@@ -125,7 +124,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     imageWidth: this.imageWidth,
                     imageHeight: this.imageHeight,
                     color: this.color,
-                    detectedObjects: this.detectedObjects)),
+                    objects: this.detectedObjects)),
           )),
       Container(
         padding: const EdgeInsets.all(5.0),

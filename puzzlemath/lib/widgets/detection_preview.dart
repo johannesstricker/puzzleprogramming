@@ -8,28 +8,22 @@ class DetectionPreview extends CustomPainter {
       {required this.imageWidth,
       required this.imageHeight,
       required this.color,
-      this.detectedObjects});
+      this.objects = const []});
 
   double imageWidth;
   double imageHeight;
   Color color;
-  NativeDetectedObjectList? detectedObjects;
+  List<DetectedObject> objects;
 
   @override
   void paint(Canvas canvas, Size size) {
-    NativeDetectedObjectList? objects = detectedObjects;
-    if (objects == null) return;
-
     double scaleX = size.width / imageWidth;
     double scaleY = size.height / imageHeight;
-
-    for (var i = 0; i < objects.size; i++) {
-      paintDetectedObject(canvas, objects.data[i], scaleX, scaleY);
-    }
+    objects.forEach((obj) => paintDetectedObject(canvas, obj, scaleX, scaleY));
   }
 
-  void paintDetectedObject(Canvas canvas, NativeDetectedObject object,
-      double scaleX, double scaleY) {
+  void paintDetectedObject(
+      Canvas canvas, DetectedObject object, double scaleX, double scaleY) {
     // TODO: scale to full size of puzzle piece instead of only the size of aruco code
     final points = [
       Offset(object.topLeft.x * scaleX, object.topLeft.y * scaleY),

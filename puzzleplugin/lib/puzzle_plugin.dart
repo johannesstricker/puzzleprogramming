@@ -15,33 +15,50 @@ typedef TokenToStringFunction = Pointer<Utf8> Function(int, int);
 class NativeCoordinate extends Struct {
   @Double()
   external double x;
-
   @Double()
   external double y;
+
+  Coordinate clone() {
+    return Coordinate(x, y);
+  }
+}
+
+class Coordinate {
+  final double x;
+  final double y;
+
+  Coordinate(this.x, this.y);
 }
 
 class NativeDetectedObject extends Struct {
   @Int32()
   external int id;
-
   external NativeCoordinate topLeft;
   external NativeCoordinate topRight;
   external NativeCoordinate bottomRight;
   external NativeCoordinate bottomLeft;
+
+  DetectedObject clone() {
+    return DetectedObject(id, topLeft.clone(), topRight.clone(),
+        bottomRight.clone(), bottomLeft.clone());
+  }
+}
+
+class DetectedObject {
+  final int id;
+  final Coordinate topLeft;
+  final Coordinate topRight;
+  final Coordinate bottomRight;
+  final Coordinate bottomLeft;
+
+  DetectedObject(
+      this.id, this.topLeft, this.topRight, this.bottomRight, this.bottomLeft);
 }
 
 class NativeDetectedObjectList extends Struct {
   @Int32()
   external int size;
-
   external Pointer<NativeDetectedObject> data;
-
-  // TODO: is there an option to automatically free the pointer (RAII)?
-  void free() {
-    if (size > 0) {
-      PuzzlePlugin.freeDetectedObjects(data);
-    }
-  }
 }
 
 typedef DetectObject32BGRAFunctionNative = NativeDetectedObject Function(
@@ -89,7 +106,7 @@ class PuzzlePlugin {
     return nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
   }
 
-  static Future<NativeDetectedObjectList> detectMultipleObjects32BGRA(
+  static Future<List<DetectedObject>> detectMultipleObjects32BGRA(
       Pointer<Uint8> bytes,
       int imageWidth,
       int imageHeight,
@@ -98,7 +115,16 @@ class PuzzlePlugin {
     final nativeFunction = nativeLib.lookupFunction<
         DetectMultipleObjects32BGRAFunctionNative,
         DetectMultipleObjects32BGRAFunction>("detectMultipleObjects32BGRA");
-    return nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
+
+    final objects = nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
+    final List<DetectedObject> output = List<DetectedObject>.generate(
+      objects.size,
+      (i) => objects.data[i].clone(),
+    );
+    if (objects.size > 0) {
+      freeDetectedObjects(objects.data);
+    }
+    return output;
   }
 
   static Future<String> tokenToString(int tokenId, int value) async {
