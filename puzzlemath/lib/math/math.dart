@@ -1,5 +1,6 @@
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'dart:ffi';
+import 'package:flutter/foundation.dart';
 
 List<DetectedObject> sortObjectListLTR(List<DetectedObject> objects) {
   objects.sort((a, b) => a.topLeft.x.compareTo(b.topLeft.x));
@@ -145,7 +146,6 @@ class TokenParser {
     if (isParenthesisMarker(markers.first)) {
       return _consumeParenthesis();
     }
-    markers.removeAt(0);
     return next();
   }
 
@@ -170,7 +170,9 @@ class TokenParser {
   }
 
   Token _consumeOperator() {
-    switch (markers.first) {
+    Marker next = markers.first;
+    markers.removeAt(0);
+    switch (next) {
       case Marker.OperatorAdd:
         return Token(TokenType.OperatorAdd);
       case Marker.OperatorSubtract:
@@ -180,18 +182,20 @@ class TokenParser {
       case Marker.OperatorDivide:
         return Token(TokenType.OperatorDivide);
       default:
-        throw ('Marker ${markers.first} is not an operator type.');
+        throw ('Marker ${next} is not an operator type.');
     }
   }
 
   Token _consumeParenthesis() {
-    switch (markers.first) {
+    Marker next = markers.first;
+    markers.removeAt(0);
+    switch (next) {
       case Marker.LeftParenthesis:
         return Token(TokenType.LeftParenthesis);
       case Marker.RightParenthesis:
         return Token(TokenType.RightParenthesis);
       default:
-        throw ('Marker ${markers.first} is not a parenthesis');
+        throw ('Marker ${next} is not a parenthesis');
     }
   }
 }
@@ -358,7 +362,10 @@ class _ASTParser {
 
   _ASTParser(List<Token> tokens) : _tokens = toReversePolishNotation(tokens);
 
-  ASTNode parse() {
+  ASTNode? parse() {
+    if (_tokens.isEmpty) {
+      return null;
+    }
     return _consumeToken();
   }
 
@@ -385,6 +392,9 @@ class _ASTParser {
   }
 
   ASTNode _consumeToken() {
+    if (_tokens.isEmpty) {
+      throw ('Failed to parse AST. Missing token.');
+    }
     Token nextToken = _tokens.last;
     _tokens.removeLast();
     if (isNumberToken(nextToken)) {
@@ -398,9 +408,6 @@ class _ASTParser {
 }
 
 ASTNode? parseAbstractSyntaxTree(List<Token> tokens) {
-  if (tokens.isEmpty) {
-    return null;
-  }
   _ASTParser parser = _ASTParser(tokens);
   return parser.parse();
 }
@@ -412,21 +419,27 @@ ASTNode? parseAbstractSyntaxTreeFromMarkers(List<Marker> markers) {
 
 class MathEquation {
   List<Token> tokens;
-  int value;
+  int? value;
 
   MathEquation(this.tokens, this.value);
 
   String toString() {
-    final equationString = tokens.map((token) => tokens.toString()).join('');
-    return equationString + "=" + value.toString();
+    final equationString = tokens.map((token) => token.toString()).join('');
+    final valueString = value?.toString() ?? "?";
+    return equationString + "=" + valueString;
   }
 }
 
 MathEquation? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
   final sortedObjects = sortObjectListLTR(objects);
+  debugPrint('Sorted objects.');
+
   final markers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
+  debugPrint('Created markers.');
   TokenParser parser = TokenParser(markers);
   final tokens = parser.toList();
-  final ast = parseAbstractSyntaxTree(tokens);
-  return ast == null ? null : MathEquation(tokens, ast.value());
+  debugPrint('Parsed ${tokens.length} tokens.');
+  final ast = parseAbstractSyntaxTree(List.from(tokens));
+  debugPrint('Created AST. Remaining tokens: ${tokens.length}');
+  return MathEquation(tokens, ast?.value());
 }
