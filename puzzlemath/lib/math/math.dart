@@ -353,46 +353,56 @@ class ASTOperatorDivide implements ASTNode {
   }
 }
 
-ASTNode createNumberNode(Token token) {
-  return ASTNumber(token.value);
-}
+class _ASTParser {
+  List<Token> _tokens;
 
-ASTNode createOperatorNode(Token token, List<Token> remainingTokens) {
-  final leftOperand = consumeToken(remainingTokens);
-  remainingTokens.removeLast();
-  final rightOperand = consumeToken(remainingTokens);
-  remainingTokens.removeLast();
-  switch (token.id) {
-    case TokenType.OperatorAdd:
-      return ASTOperatorAdd(leftOperand, rightOperand);
-    case TokenType.OperatorSubtract:
-      return ASTOperatorSubtract(leftOperand, rightOperand);
-    case TokenType.OperatorMultiply:
-      return ASTOperatorMultiply(leftOperand, rightOperand);
-    case TokenType.OperatorDivide:
-      return ASTOperatorDivide(leftOperand, rightOperand);
-    default:
-      throw ('Failed to create operator node from non-operator token.');
-  }
-}
+  _ASTParser(List<Token> tokens) : _tokens = toReversePolishNotation(tokens);
 
-ASTNode consumeToken(List<Token> tokens) {
-  Token nextToken = tokens.last;
-  tokens.removeLast();
-  if (isNumberToken(nextToken)) {
-    return createNumberNode(nextToken);
+  ASTNode parse() {
+    return _consumeToken();
   }
-  if (isOperatorToken(nextToken)) {
-    return createOperatorNode(nextToken, tokens);
+
+  ASTNode _createNumberNode(Token token) {
+    return ASTNumber(token.value);
   }
-  throw ('Failed to parse abstract syntax tree. Unexpected token type.');
+
+  ASTNode _createOperatorNode(Token token) {
+    final rightOperand = _consumeToken();
+    final leftOperand = _consumeToken();
+
+    switch (token.id) {
+      case TokenType.OperatorAdd:
+        return ASTOperatorAdd(leftOperand, rightOperand);
+      case TokenType.OperatorSubtract:
+        return ASTOperatorSubtract(leftOperand, rightOperand);
+      case TokenType.OperatorMultiply:
+        return ASTOperatorMultiply(leftOperand, rightOperand);
+      case TokenType.OperatorDivide:
+        return ASTOperatorDivide(leftOperand, rightOperand);
+      default:
+        throw ('Failed to create operator node from non-operator token.');
+    }
+  }
+
+  ASTNode _consumeToken() {
+    Token nextToken = _tokens.last;
+    _tokens.removeLast();
+    if (isNumberToken(nextToken)) {
+      return _createNumberNode(nextToken);
+    }
+    if (isOperatorToken(nextToken)) {
+      return _createOperatorNode(nextToken);
+    }
+    throw ('Failed to parse abstract syntax tree. Unexpected token type.');
+  }
 }
 
 ASTNode? parseAbstractSyntaxTree(List<Token> tokens) {
   if (tokens.isEmpty) {
     return null;
   }
-  return consumeToken(toReversePolishNotation(tokens));
+  _ASTParser parser = _ASTParser(tokens);
+  return parser.parse();
 }
 
 ASTNode? parseAbstractSyntaxTreeFromMarkers(List<Marker> markers) {
