@@ -243,9 +243,9 @@ class _ReversePolishConverter {
         _outputQueue.add(nextToken);
       } else if (isOperatorToken(nextToken)) {
         _resolveOperatorPrecedence(nextToken);
-        _outputQueue.insert(0, nextToken);
+        _operatorStack.insert(0, nextToken);
       } else if (isLeftParenthesisToken(nextToken)) {
-        _outputQueue.insert(0, nextToken);
+        _operatorStack.insert(0, nextToken);
       } else if (isRightParenthesisToken(nextToken)) {
         _resolveRightParenthesis();
       } else {
@@ -360,13 +360,20 @@ class ASTOperatorDivide implements ASTNode {
 class _ASTParser {
   List<Token> _tokens;
 
-  _ASTParser(List<Token> tokens) : _tokens = toReversePolishNotation(tokens);
+  _ASTParser(List<Token> tokens)
+      : _tokens = toReversePolishNotation(tokens);
+  }
 
   ASTNode? parse() {
     if (_tokens.isEmpty) {
       return null;
     }
-    return _consumeToken();
+    try {
+      return _consumeToken();
+    } catch (error) {
+      debugPrint(error.toString());
+      return null;
+    }
   }
 
   ASTNode _createNumberNode(Token token) {
@@ -412,11 +419,6 @@ ASTNode? parseAbstractSyntaxTree(List<Token> tokens) {
   return parser.parse();
 }
 
-ASTNode? parseAbstractSyntaxTreeFromMarkers(List<Marker> markers) {
-  TokenParser parser = TokenParser(markers);
-  return parseAbstractSyntaxTree(parser.toList());
-}
-
 class MathEquation {
   List<Token> tokens;
   int? value;
@@ -424,6 +426,9 @@ class MathEquation {
   MathEquation(this.tokens, this.value);
 
   String toString() {
+    if (tokens.length == 0) {
+      return "<invalid equation>";
+    }
     final equationString = tokens.map((token) => token.toString()).join('');
     final valueString = value?.toString() ?? "?";
     return equationString + "=" + valueString;
@@ -435,11 +440,8 @@ MathEquation? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
   debugPrint('Sorted objects.');
 
   final markers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
-  debugPrint('Created markers.');
   TokenParser parser = TokenParser(markers);
   final tokens = parser.toList();
-  debugPrint('Parsed ${tokens.length} tokens.');
   final ast = parseAbstractSyntaxTree(List.from(tokens));
-  debugPrint('Created AST. Remaining tokens: ${tokens.length}');
   return MathEquation(tokens, ast?.value());
 }
