@@ -93,6 +93,31 @@ class Token implements Comparable<Token> {
     }
     return byId;
   }
+
+  String toString() {
+    if (id == TokenType.Number) {
+      return value.toString();
+    }
+    if (id == TokenType.LeftParenthesis) {
+      return "(";
+    }
+    if (id == TokenType.RightParenthesis) {
+      return ")";
+    }
+    if (id == TokenType.OperatorAdd) {
+      return "+";
+    }
+    if (id == TokenType.OperatorSubtract) {
+      return "-";
+    }
+    if (id == TokenType.OperatorMultiply) {
+      return "*";
+    }
+    if (id == TokenType.OperatorDivide) {
+      return "/";
+    }
+    return "<unknown token>";
+  }
 }
 
 class ConsumeResult {
@@ -326,4 +351,72 @@ class ASTOperatorDivide implements ASTNode {
   int value() {
     return (_leftOperand.value() / _rightOperand.value()).round();
   }
+}
+
+ASTNode createNumberNode(Token token) {
+  return ASTNumber(token.value);
+}
+
+ASTNode createOperatorNode(Token token, List<Token> remainingTokens) {
+  final leftOperand = consumeToken(remainingTokens);
+  remainingTokens.removeLast();
+  final rightOperand = consumeToken(remainingTokens);
+  remainingTokens.removeLast();
+  switch (token.id) {
+    case TokenType.OperatorAdd:
+      return ASTOperatorAdd(leftOperand, rightOperand);
+    case TokenType.OperatorSubtract:
+      return ASTOperatorSubtract(leftOperand, rightOperand);
+    case TokenType.OperatorMultiply:
+      return ASTOperatorMultiply(leftOperand, rightOperand);
+    case TokenType.OperatorDivide:
+      return ASTOperatorDivide(leftOperand, rightOperand);
+    default:
+      throw ('Failed to create operator node from non-operator token.');
+  }
+}
+
+ASTNode consumeToken(List<Token> tokens) {
+  Token nextToken = tokens.last;
+  tokens.removeLast();
+  if (isNumberToken(nextToken)) {
+    return createNumberNode(nextToken);
+  }
+  if (isOperatorToken(nextToken)) {
+    return createOperatorNode(nextToken, tokens);
+  }
+  throw ('Failed to parse abstract syntax tree. Unexpected token type.');
+}
+
+ASTNode? parseAbstractSyntaxTree(List<Token> tokens) {
+  if (tokens.isEmpty) {
+    return null;
+  }
+  return consumeToken(toReversePolishNotation(tokens));
+}
+
+ASTNode? parseAbstractSyntaxTreeFromMarkers(List<Marker> markers) {
+  TokenParser parser = TokenParser(markers);
+  return parseAbstractSyntaxTree(parser.toList());
+}
+
+class MathEquation {
+  List<Token> tokens;
+  int value;
+
+  MathEquation(this.tokens, this.value);
+
+  String toString() {
+    final equationString = tokens.map((token) => tokens.toString()).join('');
+    return equationString + "=" + value.toString();
+  }
+}
+
+MathEquation? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
+  final sortedObjects = sortObjectListLTR(objects);
+  final markers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
+  TokenParser parser = TokenParser(markers);
+  final tokens = parser.toList();
+  final ast = parseAbstractSyntaxTree(tokens);
+  return ast == null ? null : MathEquation(tokens, ast.value());
 }

@@ -6,6 +6,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import 'package:puzzle_plugin/puzzle_plugin.dart';
+import 'package:puzzlemath/math/math.dart';
 import '../widgets/detection_preview.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -79,11 +80,14 @@ class _CameraScreenState extends State<CameraScreen> {
               imageBytes, width, height, bytesPerRow)
           .then((List<DetectedObject> objects) {
         calloc.free(imageBytes);
+
+        MathEquation? equation = parseAbstractSyntaxTreeFromObjects(objects);
+
         setState(() {
           imageWidth = image.width.toDouble();
           imageHeight = image.height.toDouble();
           detectedObjects = objects;
-          _currentText = objects.length.toString();
+          _currentText = equation?.toString() ?? '';
           _isTakingImage = false;
           _lastImageProcessedTime = currentMilliseconds;
         });
