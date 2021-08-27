@@ -7,9 +7,22 @@ import 'package:flutter/material.dart';
 
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
+import 'package:puzzlemath/math/challenge.dart';
 import '../widgets/detection_preview.dart';
 
+class CameraScreenArguments {
+  final Challenge challenge;
+
+  CameraScreenArguments({required this.challenge});
+}
+
 class CameraScreen extends StatefulWidget {
+  static const routeName = '/camera';
+
+  final Challenge challenge;
+
+  CameraScreen(CameraScreenArguments args) : challenge = args.challenge;
+
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
@@ -87,7 +100,7 @@ class _CameraScreenState extends State<CameraScreen> {
           imageWidth = image.width.toDouble();
           imageHeight = image.height.toDouble();
           detectedObjects = objects;
-          _currentText = equation?.toString() ?? '';
+          _currentText = equation?.toString() ?? '?';
           _isTakingImage = false;
           _lastImageProcessedTime = currentMilliseconds;
         });

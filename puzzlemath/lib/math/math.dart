@@ -360,9 +360,7 @@ class ASTOperatorDivide implements ASTNode {
 class _ASTParser {
   List<Token> _tokens;
 
-  _ASTParser(List<Token> tokens)
-      : _tokens = toReversePolishNotation(tokens);
-  }
+  _ASTParser(List<Token> tokens) : _tokens = toReversePolishNotation(tokens);
 
   ASTNode? parse() {
     if (_tokens.isEmpty) {
@@ -420,18 +418,24 @@ ASTNode? parseAbstractSyntaxTree(List<Token> tokens) {
 }
 
 class MathEquation {
+  List<Marker> markers;
   List<Token> tokens;
   int? value;
 
-  MathEquation(this.tokens, this.value);
+  MathEquation({
+    this.value,
+    required this.tokens,
+    required this.markers,
+  });
 
   String toString() {
     if (tokens.length == 0) {
       return "<invalid equation>";
     }
     final equationString = tokens.map((token) => token.toString()).join('');
-    final valueString = value?.toString() ?? "?";
-    return equationString + "=" + valueString;
+    return equationString;
+    // final valueString = value?.toString() ?? "?";
+    // return equationString + "=" + valueString;
   }
 }
 
@@ -443,5 +447,5 @@ MathEquation? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
   TokenParser parser = TokenParser(markers);
   final tokens = parser.toList();
   final ast = parseAbstractSyntaxTree(List.from(tokens));
-  return MathEquation(tokens, ast?.value());
+  return MathEquation(markers: markers, tokens: tokens, value: ast?.value());
 }
