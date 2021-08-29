@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/camera_screen.dart';
+import 'package:puzzlemath/screens/challenge_screen.dart';
 import 'package:puzzlemath/math/challenge.dart';
 
 class ChallengeListItem extends StatelessWidget {
@@ -57,6 +58,14 @@ class ChallengeListItem extends StatelessWidget {
     );
   }
 
+  void navigateToChallenge(BuildContext context) {
+    Navigator.pushNamed(
+      context,
+      ChallengeScreen.routeName,
+      arguments: ChallengeScreenArguments(challenge: challenge),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -65,13 +74,7 @@ class ChallengeListItem extends StatelessWidget {
         child: challenge.state == ChallengeState.Locked
             ? buildRow()
             : InkWell(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    CameraScreen.routeName,
-                    arguments: CameraScreenArguments(challenge: challenge),
-                  );
-                },
+                onTap: () => navigateToChallenge(context),
                 child: buildRow(),
               ),
       ),

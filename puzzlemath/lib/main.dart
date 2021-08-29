@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'screens/camera_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/challenge_list_screen.dart';
+import 'screens/challenge_screen.dart';
 
 void main() {
   runApp(CameraApp());
 }
 
-ChallengeListScreen navigateToHomeScreen(context) {
+ChallengeListScreen navigateToChallengeListScreen(context) {
   return ChallengeListScreen();
 }
 
@@ -17,11 +18,11 @@ CameraScreen navigateToCameraScreen(context) {
   return CameraScreen(args);
 }
 
-// FinalScreen navigateToFinalScreen(context) {
-//   final args =
-//       ModalRoute.of(context)!.settings.arguments as FinalScreenArguments;
-//   return FinalScreen(args.message);
-// }
+ChallengeScreen navigateToChallengeScreen(context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as ChallengeScreenArguments;
+  return ChallengeScreen(args);
+}
 
 class CameraApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -34,8 +35,9 @@ class CameraApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': navigateToHomeScreen,
-        '/camera': navigateToCameraScreen,
+        '/': navigateToChallengeListScreen,
+        CameraScreen.routeName: navigateToCameraScreen,
+        ChallengeScreen.routeName: navigateToChallengeScreen,
       },
     );
   }
