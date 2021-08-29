@@ -16,12 +16,17 @@ class ChallengeListScreen extends StatelessWidget {
                 Marker.Digit3,
                 Marker.Digit3,
                 Marker.Digit7
-              ]),
-          Challenge(name: "Child's play.", solution: 2, availableMarkers: [
-            Marker.Digit1,
-            Marker.Digit1,
-            Marker.OperatorAdd
-          ]),
+              ],
+              state: ChallengeState.Solved),
+          Challenge(
+              name: "Child's play.",
+              solution: 2,
+              availableMarkers: [
+                Marker.Digit1,
+                Marker.Digit1,
+                Marker.OperatorAdd
+              ],
+              state: ChallengeState.Unlocked),
           Challenge(
               name: 'Easy peasy, lemon squeezy!',
               solution: 28,
