@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/camera_screen.dart';
 import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/math/math.dart';
 
 class ChallengeScreenArguments {
   final Challenge challenge;
@@ -31,10 +32,32 @@ class ChallengeScreen extends StatelessWidget {
     );
   }
 
-  Widget buildMarker(BuildContext context) {
-    return Expanded(
-      child: const DecoratedBox(
-        decoration: const BoxDecoration(color: Colors.red),
+  Widget buildMarker(BuildContext context, Marker marker) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(0, 0, 0, 0.05),
+        borderRadius: BorderRadius.circular(3.0),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset('assets/images/${marker.toString()}.png'),
+          SizedBox(width: 4.0),
+          Text('\u2715',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10.0,
+              )),
+          SizedBox(width: 2.0),
+          Text('10',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              )),
+        ],
       ),
     );
   }
@@ -44,11 +67,15 @@ class ChallengeScreen extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
-      crossAxisSpacing: 12.0,
-      mainAxisSpacing: 12.0,
+      crossAxisSpacing: 8.0,
+      mainAxisSpacing: 8.0,
+      childAspectRatio: 1.33,
       children: List.generate(
-        challenge.availableMarkers?.length ?? 0,
-        (index) => buildMarker(context),
+        challenge.availableMarkers.length,
+        (index) {
+          final marker = challenge.availableMarkers[index];
+          return buildMarker(context, marker);
+        },
       ),
     );
   }
