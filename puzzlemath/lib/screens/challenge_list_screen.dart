@@ -1,8 +1,7 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import '../math/challenge.dart';
-import '../math/math.dart';
-import './camera_screen.dart';
+import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/math/math.dart';
+import 'package:puzzlemath/widgets/challenge_list_item.dart';
 
 class ChallengeListScreen extends StatelessWidget {
   final List<Challenge> challenges;
@@ -49,29 +48,7 @@ class ChallengeListScreen extends StatelessWidget {
 
   Widget buildChallengeItem(BuildContext context, int index) {
     final Challenge challenge = challenges[index];
-    return Container(
-      // color: Colors.white,
-      child: InkWell(
-        onTap: () {
-          debugPrint(challenge.name);
-          Navigator.pushNamed(
-            context,
-            CameraScreen.routeName,
-            arguments: CameraScreenArguments(challenge: challenge),
-          );
-        },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(challenge.name),
-            ],
-          ),
-        ),
-      ),
-    );
+    return ChallengeListItem(challenge);
   }
 
   @override
@@ -83,9 +60,9 @@ class ChallengeListScreen extends StatelessWidget {
         ),
         body: ListView.separated(
           separatorBuilder: (context, index) => Divider(
-            thickness: 2.0,
-            height: 2.0,
-            color: Colors.white,
+            thickness: 1.0,
+            height: 1.0,
+            color: Colors.black12,
           ),
           itemCount: challenges.length,
           itemBuilder: buildChallengeItem,
