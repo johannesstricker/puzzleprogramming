@@ -16,23 +16,30 @@ class ChallengeScreen extends StatelessWidget {
 
   ChallengeScreen(ChallengeScreenArguments args) : challenge = args.challenge;
 
-  Widget buildHeader(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(challenge.name,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20.0,
-            )),
-        SizedBox(height: 12),
-        Text(challenge.description),
-      ],
-    );
+  Map<Marker, int> countAvailableMarkers() {
+    final Map<Marker, int> markers = Map<Marker, int>();
+    challenge.availableMarkers.forEach((marker) {
+      markers[marker] = (markers[marker] ?? 0) + 1;
+    });
+    return markers;
   }
 
-  Widget buildMarker(BuildContext context, Marker marker) {
+  Text buildTitle(BuildContext context) {
+    return Text(challenge.name,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20.0,
+        ));
+  }
+
+  Text buildDescription(BuildContext context) {
+    return Text(challenge.description,
+        style: TextStyle(
+          color: Colors.black87,
+        ));
+  }
+
+  Widget buildMarker(BuildContext context, Marker marker, int count) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
       decoration: BoxDecoration(
@@ -45,16 +52,21 @@ class ChallengeScreen extends StatelessWidget {
         children: [
           Image.asset('assets/images/${marker.toString()}.png'),
           SizedBox(width: 4.0),
-          Text('\u2715',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 10.0,
-              )),
-          SizedBox(width: 2.0),
-          Text('10',
+          Padding(
+            padding: EdgeInsets.only(top: 1.0),
+            child: Text('\u2715',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 10.0,
+                )),
+          ),
+          SizedBox(width: 4.0),
+          Text(count.toString(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.0,
+                color: Colors.black87,
                 fontWeight: FontWeight.bold,
               )),
         ],
@@ -62,7 +74,16 @@ class ChallengeScreen extends StatelessWidget {
     );
   }
 
+  Text buildSectionTitle(BuildContext context, String text) {
+    return Text(text,
+        style: TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.bold,
+        ));
+  }
+
   Widget buildMarkerList(BuildContext context) {
+    final availableMarkers = countAvailableMarkers();
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -71,10 +92,10 @@ class ChallengeScreen extends StatelessWidget {
       mainAxisSpacing: 8.0,
       childAspectRatio: 1.33,
       children: List.generate(
-        challenge.availableMarkers.length,
+        availableMarkers.length,
         (index) {
-          final marker = challenge.availableMarkers[index];
-          return buildMarker(context, marker);
+          final marker = availableMarkers.entries.toList()[index];
+          return buildMarker(context, marker.key, marker.value);
         },
       ),
     );
@@ -90,13 +111,11 @@ class ChallengeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildHeader(context),
+              buildTitle(context),
+              SizedBox(height: 12.0),
+              buildDescription(context),
               SizedBox(height: 24),
-              Text('Use these puzzle pieces',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  )),
+              buildSectionTitle(context, 'Use these puzzle pieces'),
               SizedBox(height: 12),
               buildMarkerList(context),
               SizedBox(height: 24),
