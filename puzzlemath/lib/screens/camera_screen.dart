@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/screens/solution_screen.dart';
 import '../widgets/detection_preview.dart';
 
 class CameraScreenArguments {
@@ -33,6 +34,8 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _isTakingImage = false;
   bool _isButtonEnabled = false;
   num _lastImageProcessedTime = 0;
+  List<Marker>? _usedMarkers;
+  int? _proposedSolution;
 
   double imageWidth = 0;
   double imageHeight = 0;
@@ -103,6 +106,9 @@ class _CameraScreenState extends State<CameraScreen> {
           imageWidth = image.width.toDouble();
           imageHeight = image.height.toDouble();
           detectedObjects = sortedObjects;
+          _proposedSolution = proposedSolution;
+          _usedMarkers =
+              sortedObjects.map((obj) => createMarker(obj.id)).toList();
           _isTakingImage = false;
           _isButtonEnabled = proposedSolution != null;
           _lastImageProcessedTime = currentMilliseconds;
@@ -153,13 +159,18 @@ class _CameraScreenState extends State<CameraScreen> {
     final opacity = _isButtonEnabled ? 1.0 : 0.1;
     final onPressed = _isButtonEnabled
         ? () {
-            Navigator.pop(context);
+            if (_proposedSolution == null || _usedMarkers == null) {
+              return;
+            }
             // TODO: don't push
-            // Navigator.pushNamed(
-            //   context,
-            //   CameraScreen.routeName,
-            //   arguments: CameraScreenArguments(challenge: challenge),
-            // );
+            Navigator.pushNamed(
+              context,
+              SolutionScreen.routeName,
+              arguments: SolutionScreenArguments(
+                  proposedSolution: _proposedSolution!,
+                  usedMarkers: _usedMarkers!,
+                  challenge: widget.challenge),
+            );
           }
         : null;
     return Opacity(

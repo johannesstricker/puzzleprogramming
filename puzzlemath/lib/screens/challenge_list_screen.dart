@@ -4,19 +4,16 @@ import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/widgets/challenge_list_item.dart';
 
 class ChallengeListScreen extends StatelessWidget {
+  static const routeName = '/';
+
   final List<Challenge> challenges;
 
   ChallengeListScreen()
       : challenges = [
           Challenge(
               name: "What's the magic number?",
-              solution: 1337,
-              availableMarkers: [
-                Marker.Digit1,
-                Marker.Digit3,
-                Marker.Digit3,
-                Marker.Digit7
-              ],
+              solution: 137,
+              availableMarkers: [Marker.Digit1, Marker.Digit3, Marker.Digit7],
               state: ChallengeState.Solved),
           Challenge(
               name: "Child's play.",

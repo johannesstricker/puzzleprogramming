@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/camera_screen.dart';
-import 'screens/home_screen.dart';
 import 'screens/challenge_list_screen.dart';
 import 'screens/challenge_screen.dart';
+import 'screens/solution_screen.dart';
 
 void main() {
   runApp(CameraApp());
@@ -24,6 +24,12 @@ ChallengeScreen navigateToChallengeScreen(context) {
   return ChallengeScreen(args);
 }
 
+SolutionScreen navigateToSolutionScreen(context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as SolutionScreenArguments;
+  return SolutionScreen(args);
+}
+
 class CameraApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -35,9 +41,10 @@ class CameraApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': navigateToChallengeListScreen,
+        ChallengeListScreen.routeName: navigateToChallengeListScreen,
         CameraScreen.routeName: navigateToCameraScreen,
         ChallengeScreen.routeName: navigateToChallengeScreen,
+        SolutionScreen.routeName: navigateToSolutionScreen,
       },
     );
   }

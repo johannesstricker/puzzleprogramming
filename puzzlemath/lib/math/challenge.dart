@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'math.dart';
 
 enum ChallengeState {
@@ -23,8 +25,8 @@ class Challenge {
       this.state = ChallengeState.Locked,
       this.description = DescriptionPlaceholder});
 
-  bool solve(MathEquation equation) {
-    // TODO: check that only allowed markers were used
-    return equation.value == solution;
+  bool checkSolution(int proposedSolution, List<Marker> usedMarkers) {
+    Function eq = const UnorderedIterableEquality().equals;
+    return eq(availableMarkers, usedMarkers) && proposedSolution == solution;
   }
 }

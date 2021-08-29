@@ -434,8 +434,6 @@ class MathEquation {
     }
     final equationString = tokens.map((token) => token.toString()).join('');
     return equationString;
-    // final valueString = value?.toString() ?? "?";
-    // return equationString + "=" + valueString;
   }
 }
 
