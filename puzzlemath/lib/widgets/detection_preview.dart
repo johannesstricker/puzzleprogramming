@@ -34,8 +34,9 @@ class DetectionPreview extends CustomPainter {
     ];
     final paint = Paint()
       ..color = color.withOpacity(0.5)
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round;
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.square;
     canvas.drawPoints(PointMode.polygon, points, paint);
   }
 

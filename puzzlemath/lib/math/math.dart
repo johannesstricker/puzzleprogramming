@@ -439,13 +439,10 @@ class MathEquation {
   }
 }
 
-MathEquation? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
-  final sortedObjects = sortObjectListLTR(objects);
-  debugPrint('Sorted objects.');
-
-  final markers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
+int? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
+  final markers = objects.map((obj) => createMarker(obj.id)).toList();
   TokenParser parser = TokenParser(markers);
   final tokens = parser.toList();
   final ast = parseAbstractSyntaxTree(List.from(tokens));
-  return MathEquation(markers: markers, tokens: tokens, value: ast?.value());
+  return ast?.value();
 }

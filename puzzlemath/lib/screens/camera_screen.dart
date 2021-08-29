@@ -31,12 +31,12 @@ class _CameraScreenState extends State<CameraScreen> {
   late final CameraController controller;
   bool _isInitialized = false;
   bool _isTakingImage = false;
+  bool _isButtonEnabled = false;
   num _lastImageProcessedTime = 0;
-  String _currentText = "";
 
   double imageWidth = 0;
   double imageHeight = 0;
-  Color color = Colors.red;
+  Color color = Colors.greenAccent;
   List<DetectedObject> detectedObjects = const [];
 
   @override
@@ -71,7 +71,7 @@ class _CameraScreenState extends State<CameraScreen> {
   void _onImageReceived(CameraImage image) {
     if (_isTakingImage) return;
 
-    final throttleMilliseconds = 1000;
+    final throttleMilliseconds = 100;
     final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
     final millisecondsPassed = _lastImageProcessedTime == 0
         ? throttleMilliseconds
@@ -88,20 +88,23 @@ class _CameraScreenState extends State<CameraScreen> {
       final height = image.planes[0].height!;
       final bytesPerRow = image.planes[0].bytesPerRow;
 
-      // PuzzlePlugin.detectAndDecodeArUco32BGRA(
       PuzzlePlugin.detectMultipleObjects32BGRA(
               imageBytes, width, height, bytesPerRow)
           .then((List<DetectedObject> objects) {
         calloc.free(imageBytes);
 
-        MathEquation? equation = parseAbstractSyntaxTreeFromObjects(objects);
+        final sortedObjects = sortObjectListLTR(objects);
+        int? proposedSolution = null;
+        try {
+          proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
+        } catch (error) {}
 
         setState(() {
           imageWidth = image.width.toDouble();
           imageHeight = image.height.toDouble();
-          detectedObjects = objects;
-          _currentText = equation?.toString() ?? '?';
+          detectedObjects = sortedObjects;
           _isTakingImage = false;
+          _isButtonEnabled = proposedSolution != null;
           _lastImageProcessedTime = currentMilliseconds;
         });
       });
@@ -143,16 +146,29 @@ class _CameraScreenState extends State<CameraScreen> {
                     color: this.color,
                     objects: this.detectedObjects)),
           )),
-      Container(
-        padding: const EdgeInsets.all(5.0),
-        alignment: Alignment.bottomCenter,
-        child: Text(
-          _currentText,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontSize: 14.0),
-        ),
-      ),
     ]);
+  }
+
+  Widget buildFloatingActionButton(BuildContext context) {
+    final opacity = _isButtonEnabled ? 1.0 : 0.1;
+    final onPressed = _isButtonEnabled
+        ? () {
+            Navigator.pop(context);
+            // TODO: don't push
+            // Navigator.pushNamed(
+            //   context,
+            //   CameraScreen.routeName,
+            //   arguments: CameraScreenArguments(challenge: challenge),
+            // );
+          }
+        : null;
+    return Opacity(
+      opacity: opacity,
+      child: FloatingActionButton(
+        onPressed: onPressed,
+        child: Icon(Icons.camera),
+      ),
+    );
   }
 
   @override
@@ -162,6 +178,7 @@ class _CameraScreenState extends State<CameraScreen> {
         title: Text('Take a picture'),
         centerTitle: true,
       ),
+      floatingActionButton: buildFloatingActionButton(context),
       body: Container(
         height: double.infinity,
         width: double.infinity,
