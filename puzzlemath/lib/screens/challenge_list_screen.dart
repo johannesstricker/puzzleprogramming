@@ -11,16 +11,21 @@ class ChallengeListScreen extends StatelessWidget {
 
   ChallengeListScreen({this.progress = 0})
       : challenges = [
-          Challenge(
+          Challenge(0,
               name: "What's the magic number?",
               solution: 137,
               availableMarkers: [Marker.Digit1, Marker.Digit3, Marker.Digit7]),
-          Challenge(name: "Child's play.", solution: 2, availableMarkers: [
-            Marker.Digit1,
-            Marker.Digit1,
-            Marker.OperatorAdd,
-          ]),
           Challenge(
+            1,
+            name: "Child's play.",
+            solution: 2,
+            availableMarkers: [
+              Marker.Digit1,
+              Marker.Digit1,
+              Marker.OperatorAdd,
+            ],
+          ),
+          Challenge(2,
               name: 'Easy peasy, lemon squeezy!',
               solution: 28,
               availableMarkers: [
@@ -32,7 +37,7 @@ class ChallengeListScreen extends StatelessWidget {
                 Marker.OperatorSubtract,
                 Marker.Digit4
               ]),
-          Challenge(
+          Challenge(3,
               name: "Let's turn these numbers up!",
               solution: 999,
               availableMarkers: [

@@ -27,7 +27,9 @@ from the `puzzlelib/` directory. Alternatively, you can build the project from v
 
 ## Roadmap
 
+- [ ] Implement state management
+- [ ] Implement a widget library
 - [ ] Write tests for flutter math parsing
 - [ ] Remove unused code from C-Library
-- [ ] Implement challenges
+- [x] Implement challenges
 - [ ] Implement error hints

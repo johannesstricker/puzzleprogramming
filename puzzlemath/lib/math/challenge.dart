@@ -12,12 +12,13 @@ const String DescriptionPlaceholder =
     'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.';
 
 class Challenge {
+  final int id;
   final String name;
   final int solution;
   final List<Marker> availableMarkers;
   final String description;
 
-  Challenge(
+  Challenge(this.id,
       {required this.name,
       required this.solution,
       required this.availableMarkers,
