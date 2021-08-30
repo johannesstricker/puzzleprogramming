@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/camera_screen.dart';
 import 'package:puzzlemath/math/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
+import 'package:puzzlemath/widgets/puzzle_piece.dart';
 
 class ChallengeScreenArguments {
   final Challenge challenge;
@@ -50,7 +51,7 @@ class ChallengeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset('assets/images/${marker.toString()}.png'),
+          PuzzlePiece(marker),
           SizedBox(width: 4.0),
           Padding(
             padding: EdgeInsets.only(top: 1.0),
