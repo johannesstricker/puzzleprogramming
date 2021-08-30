@@ -6,24 +6,20 @@ import 'package:puzzlemath/widgets/challenge_list_item.dart';
 class ChallengeListScreen extends StatelessWidget {
   static const routeName = '/';
 
+  final int progress;
   final List<Challenge> challenges;
 
-  ChallengeListScreen()
+  ChallengeListScreen({this.progress = 0})
       : challenges = [
           Challenge(
               name: "What's the magic number?",
               solution: 137,
-              availableMarkers: [Marker.Digit1, Marker.Digit3, Marker.Digit7],
-              state: ChallengeState.Solved),
-          Challenge(
-              name: "Child's play.",
-              solution: 2,
-              availableMarkers: [
-                Marker.Digit1,
-                Marker.Digit1,
-                Marker.OperatorAdd
-              ],
-              state: ChallengeState.Unlocked),
+              availableMarkers: [Marker.Digit1, Marker.Digit3, Marker.Digit7]),
+          Challenge(name: "Child's play.", solution: 2, availableMarkers: [
+            Marker.Digit1,
+            Marker.Digit1,
+            Marker.OperatorAdd,
+          ]),
           Challenge(
               name: 'Easy peasy, lemon squeezy!',
               solution: 28,
@@ -50,7 +46,13 @@ class ChallengeListScreen extends StatelessWidget {
 
   Widget buildChallengeItem(BuildContext context, int index) {
     final Challenge challenge = challenges[index];
-    return ChallengeListItem(challenge);
+    ChallengeState state = ChallengeState.Locked;
+    if (progress > index) {
+      state = ChallengeState.Solved;
+    } else if (progress == index) {
+      state = ChallengeState.Unlocked;
+    }
+    return ChallengeListItem(challenge, state: state);
   }
 
   @override

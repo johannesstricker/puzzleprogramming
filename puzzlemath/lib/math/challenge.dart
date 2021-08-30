@@ -15,14 +15,12 @@ class Challenge {
   final String name;
   final int solution;
   final List<Marker> availableMarkers;
-  final ChallengeState state;
   final String description;
 
   Challenge(
       {required this.name,
       required this.solution,
       required this.availableMarkers,
-      this.state = ChallengeState.Locked,
       this.description = DescriptionPlaceholder});
 
   bool checkSolution(int proposedSolution, List<Marker> usedMarkers) {
