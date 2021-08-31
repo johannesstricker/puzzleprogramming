@@ -37,6 +37,9 @@ class _CameraScreenState extends State<CameraScreen> {
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
 
+  int bufferSize = 0;
+  Pointer<Uint8> buffer = nullptr;
+
   double imageWidth = 0;
   double imageHeight = 0;
   Color color = Colors.greenAccent;
@@ -59,11 +62,18 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void dispose() {
     controller.stopImageStream();
+    if (buffer != null) {
+      calloc.free(buffer);
+    }
     super.dispose();
   }
 
   Pointer<Uint8> _createImagePlanePointer(Uint8List plane) {
-    final buffer = calloc<Uint8>(plane.length);
+    if (bufferSize < plane.length) {
+      calloc.free(buffer);
+      buffer = calloc<Uint8>(plane.length);
+      bufferSize = plane.length;
+    }
     final bufferBytes = buffer.asTypedList(plane.length);
     bufferBytes.setAll(0, plane);
     return buffer;
@@ -94,8 +104,6 @@ class _CameraScreenState extends State<CameraScreen> {
       PuzzlePlugin.detectMultipleObjects32BGRA(
               imageBytes, width, height, bytesPerRow)
           .then((List<DetectedObject> objects) {
-        calloc.free(imageBytes);
-
         final sortedObjects = sortObjectListLTR(objects);
         int? proposedSolution;
         try {
