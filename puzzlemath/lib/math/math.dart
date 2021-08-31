@@ -1,5 +1,4 @@
 import 'package:puzzle_plugin/puzzle_plugin.dart';
-import 'dart:ffi';
 import 'package:flutter/foundation.dart';
 
 List<DetectedObject> sortObjectListLTR(List<DetectedObject> objects) {
@@ -161,7 +160,7 @@ class TokenParser {
 
   Token _consumeNumber() {
     final List<int> digits = [];
-    while (!markers.isEmpty && isDigitMarker(markers.first)) {
+    while (markers.isNotEmpty && isDigitMarker(markers.first)) {
       digits.add(digitValue(markers.first));
       markers.removeAt(0);
     }
@@ -182,7 +181,7 @@ class TokenParser {
       case Marker.OperatorDivide:
         return Token(TokenType.OperatorDivide);
       default:
-        throw ('Marker ${next} is not an operator type.');
+        throw ('Marker $next is not an operator type.');
     }
   }
 
@@ -195,7 +194,7 @@ class TokenParser {
       case Marker.RightParenthesis:
         return Token(TokenType.RightParenthesis);
       default:
-        throw ('Marker ${next} is not a parenthesis');
+        throw ('Marker $next is not a parenthesis');
     }
   }
 }
@@ -236,7 +235,7 @@ class _ReversePolishConverter {
   List<Token> _shuntingYardAlgorithm() {
     _outputQueue = [];
     _operatorStack = [];
-    while (!_tokens.isEmpty) {
+    while (_tokens.isNotEmpty) {
       Token nextToken = _tokens.first;
       _tokens.removeAt(0);
       if (isNumberToken(nextToken)) {
@@ -252,7 +251,7 @@ class _ReversePolishConverter {
         throw ('Unknown token encountered.');
       }
     }
-    while (!_operatorStack.isEmpty) {
+    while (_operatorStack.isNotEmpty) {
       Token nextToken = _operatorStack.first;
       _operatorStack.removeAt(0);
       if (isParenthesisToken(nextToken)) {
@@ -264,7 +263,7 @@ class _ReversePolishConverter {
   }
 
   void _resolveOperatorPrecedence(Token nextToken) {
-    while (!_operatorStack.isEmpty &&
+    while (_operatorStack.isNotEmpty &&
         isOperatorToken(nextToken) &&
         nextToken.precedence() <= _operatorStack.first.precedence()) {
       _outputQueue.add(_operatorStack.first);

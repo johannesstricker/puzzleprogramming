@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
-import 'dart:ffi';
 
 class DetectionPreview extends CustomPainter {
   DetectionPreview(

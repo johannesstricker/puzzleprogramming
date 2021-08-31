@@ -97,7 +97,7 @@ class _CameraScreenState extends State<CameraScreen> {
         calloc.free(imageBytes);
 
         final sortedObjects = sortObjectListLTR(objects);
-        int? proposedSolution = null;
+        int? proposedSolution;
         try {
           proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
         } catch (error) {}

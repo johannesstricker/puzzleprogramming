@@ -192,7 +192,7 @@ class SolutionScreen extends StatelessWidget {
         children: [
           PuzzlePiece(marker),
           SizedBox(width: 8.0),
-          Text('${used}/${available}',
+          Text('$used/$available',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.0,
