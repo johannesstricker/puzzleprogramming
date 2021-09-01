@@ -1,22 +1,11 @@
 #include "bindings.h"
 #include <puzzlelib/puzzlelib.h>
-#include <puzzlelib/types.h>
 #include <vector>
 #include <cstring>
 
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
 int avoidCodeStripping(void) {
   return 0;
-}
-
-extern "C" __attribute__((visibility("default"))) __attribute__((used))
-char* detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
-  return puzzle::detectAndDecodeArUco32BGRA(imageBytes, imageWidth, imageHeight, bytesPerRow);
-}
-
-extern "C" __attribute__((visibility("default"))) __attribute__((used))
-char* tokenToString(int tokenId, int value) {
-  return puzzle::tokenToString(tokenId, value);
 }
 
 Coordinate_t createCoordinate(double x, double y) {
@@ -51,19 +40,7 @@ DetectedObject_t convert(puzzle::DetectedObject input) {
 
 
 extern "C" __attribute__((visibility("default"))) __attribute__((used))
-DetectedObject_t detectObject32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
-  std::vector<puzzle::DetectedObject> objects = puzzle::detectObjects32BGRA(imageBytes,
-    imageWidth,
-    imageHeight,
-    bytesPerRow);
-  if (objects.size() > 0) {
-    return convert(objects[0]);
-  }
-  return createDetectedObject(-1);
-}
-
-extern "C" __attribute__((visibility("default"))) __attribute__((used))
-DetectedObjectList_t detectMultipleObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
+DetectedObjectList_t detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
   std::vector<puzzle::DetectedObject> objects = puzzle::detectObjects32BGRA(imageBytes,
     imageWidth,
     imageHeight,

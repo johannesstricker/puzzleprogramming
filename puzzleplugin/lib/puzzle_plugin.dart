@@ -1,16 +1,7 @@
 import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
-import 'package:ffi/ffi.dart';
 import 'package:flutter/services.dart';
-
-typedef DetectQrCode32BGRAFunctionNative = Pointer<Utf8> Function(
-    Pointer<Uint8>, Int32, Int32, Int32);
-typedef DetectQrCode32BGRAFunction = Pointer<Utf8> Function(
-    Pointer<Uint8>, int, int, int);
-
-typedef TokenToStringFunctionNative = Pointer<Utf8> Function(Int32, Int32);
-typedef TokenToStringFunction = Pointer<Utf8> Function(int, int);
 
 class NativeCoordinate extends Struct {
   @Double()
@@ -61,14 +52,9 @@ class NativeDetectedObjectList extends Struct {
   external Pointer<NativeDetectedObject> data;
 }
 
-typedef DetectObject32BGRAFunctionNative = NativeDetectedObject Function(
+typedef DetectObjects32BGRAFunctionNative = NativeDetectedObjectList Function(
     Pointer<Uint8>, Int32, Int32, Int32);
-typedef DetectObject32BGRAFunction = NativeDetectedObject Function(
-    Pointer<Uint8>, int, int, int);
-
-typedef DetectMultipleObjects32BGRAFunctionNative = NativeDetectedObjectList
-    Function(Pointer<Uint8>, Int32, Int32, Int32);
-typedef DetectMultipleObjects32BGRAFunction = NativeDetectedObjectList Function(
+typedef DetectObjects32BGRAFunction = NativeDetectedObjectList Function(
     Pointer<Uint8>, int, int, int);
 
 typedef FreeDetectedObjectsFunctionNative = Void Function(
@@ -84,28 +70,7 @@ class PuzzlePlugin {
     return version;
   }
 
-  static Future<String> detectAndDecodeArUco32BGRA(Pointer<Uint8> bytes,
-      int imageWidth, int imageHeight, int bytesPerRow) async {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<
-        DetectQrCode32BGRAFunctionNative,
-        DetectQrCode32BGRAFunction>("detectAndDecodeArUco32BGRA");
-    Pointer<Utf8> decodedString =
-        nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
-    final result = decodedString.toDartString();
-    malloc.free(decodedString);
-    return result;
-  }
-
-  static Future<NativeDetectedObject> detectObject32BGRA(Pointer<Uint8> bytes,
-      int imageWidth, int imageHeight, int bytesPerRow) async {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<
-        DetectObject32BGRAFunctionNative,
-        DetectObject32BGRAFunction>("detectObject32BGRA");
-    return nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
-  }
-
+  // TODO: offer multiple detectObjects functions but do conversion to the right format right here
   static Future<List<DetectedObject>> detectMultipleObjects32BGRA(
       Pointer<Uint8> bytes,
       int imageWidth,
@@ -113,8 +78,8 @@ class PuzzlePlugin {
       int bytesPerRow) async {
     DynamicLibrary nativeLib = _getDynamicLibrary();
     final nativeFunction = nativeLib.lookupFunction<
-        DetectMultipleObjects32BGRAFunctionNative,
-        DetectMultipleObjects32BGRAFunction>("detectMultipleObjects32BGRA");
+        DetectObjects32BGRAFunctionNative,
+        DetectObjects32BGRAFunction>("detectObjects32BGRA");
 
     final objects = nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
     final List<DetectedObject> output = List<DetectedObject>.generate(
@@ -127,16 +92,6 @@ class PuzzlePlugin {
     return output;
   }
 
-  static Future<String> tokenToString(int tokenId, int value) async {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<TokenToStringFunctionNative,
-        TokenToStringFunction>("tokenToString");
-    Pointer<Utf8> outputString = nativeFunction(tokenId, value);
-    final result = outputString.toDartString();
-    malloc.free(outputString);
-    return result;
-  }
-
   static void freeDetectedObjects(Pointer<NativeDetectedObject> ptr) {
     DynamicLibrary nativeLib = _getDynamicLibrary();
     final nativeFunction = nativeLib.lookupFunction<
@@ -145,6 +100,7 @@ class PuzzlePlugin {
     nativeFunction(ptr);
   }
 
+  // TODO: avoid calling this on every frame
   static DynamicLibrary _getDynamicLibrary() {
     final DynamicLibrary nativeEdgeDetection = Platform.isAndroid
         ? DynamicLibrary.open("lib_puzzlelib.so")

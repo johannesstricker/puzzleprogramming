@@ -24,10 +24,7 @@ struct DetectedObjectList_t {
 };
 
 int avoidCodeStripping(void);
-char* detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
-char* tokenToString(int tokenType, int value);
-struct DetectedObject_t detectObject32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
-struct DetectedObjectList_t detectMultipleObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
+struct DetectedObjectList_t detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow);
 void freeDetectedObjects(struct DetectedObject_t* ptr);
 
 #ifdef __cplusplus

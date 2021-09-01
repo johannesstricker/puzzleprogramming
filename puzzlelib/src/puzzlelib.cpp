@@ -1,17 +1,20 @@
 #include "puzzlelib/puzzlelib.h"
 #include <string.h>
-#include <memory>
-#include <sstream>
 #include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv-contrib/aruco.hpp>
-#include "math_equations.h"
 
+using namespace puzzle;
 
-std::vector<puzzle::DetectedObject> puzzle::detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
+std::vector<DetectedObject> puzzle::detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
   cv::Mat sourceImage(imageHeight, imageWidth, CV_8UC4, imageBytes, bytesPerRow);
+  return detectObjects(sourceImage);
+}
+
+// TODO: maybe we can avoid copying the matrix here
+std::vector<DetectedObject> puzzle::detectObjects(const cv::Mat& sourceImage) {
   cv::Mat image;
   cv::cvtColor(sourceImage, image, cv::COLOR_BGRA2GRAY, 1);
 
@@ -21,9 +24,9 @@ std::vector<puzzle::DetectedObject> puzzle::detectObjects32BGRA(unsigned char* i
   cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
   cv::aruco::detectMarkers(image, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 
-  std::vector<puzzle::DetectedObject> objects;
+  std::vector<DetectedObject> objects;
   for (int i = 0; i < markerIds.size(); i++) {
-    puzzle::DetectedObject object;
+    DetectedObject object;
     object.id = markerIds[i];
     std::vector<cv::Point2f>& corners = markerCorners[i];
     object.topLeft.x = corners[0].x; object.topLeft.y = corners[0].y;
@@ -35,57 +38,32 @@ std::vector<puzzle::DetectedObject> puzzle::detectObjects32BGRA(unsigned char* i
   return objects;
 }
 
-char* puzzle::detectAndDecodeArUco32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
-  cv::Mat src(imageHeight, imageWidth, CV_8UC4, imageBytes, bytesPerRow);
-  cv::Mat mat;
-  cv::cvtColor(src, mat, cv::COLOR_BGRA2GRAY, 1);
-
-  if (mat.size().width == 0 || mat.size().height == 0) {
-    std::string error("Error: invalid image size.");
-    return strdup(error.c_str());
-  }
-
-  std::ostringstream buffer;
-  try {
-    auto markers = detectAndDecodeArUco(mat);
-    auto tokens = parseTokens(markers);
-    if (tokens.size() == 0) {
-      std::string empty = "";
-      return strdup(empty.c_str());
-    }
-    buffer << toString(tokens);
-    auto tokensRPN = toReversePolishNotation(tokens);
-    auto ast = parseAST(tokensRPN);
-    if (ast == nullptr) {
-      buffer << " = ?";
-    } else {
-      buffer << " = " << ast->value();
-    }
-    return strdup(buffer.str().c_str());
-    // return strdup(toString(tokens).c_str());
-  } catch(const std::exception& error) {
-    std::string errorString(error.what());
-    return strdup(errorString.c_str());
-  }
-}
-
-char* puzzle::tokenToString(int tokenId, int value) {
-  Token token(static_cast<Token::ID>(tokenId), value);
-  return strdup(token.toString().c_str());
-}
-
-std::list<Marker> detectAndDecodeArUco(const cv::Mat& image) {
+void puzzle::createObjectMarkerImages(int size) {
   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-  std::vector<int> markerIds;
-  std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
-  cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
-  cv::aruco::detectMarkers(image, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+  for (int code = static_cast<int>(Marker::Digit_0); code <= static_cast<int>(Marker::End); code++) {
+    cv::Mat image;
+    cv::aruco::drawMarker(dictionary, code, size, image, 1);
 
-  auto markerIdsSortedLTR = sortMarkersLTR(markerIds, markerCorners);
-  std::list<Marker> output;
-  for (auto id : markerIdsSortedLTR) {
-    // TODO: sanitize
-    output.push_back(static_cast<Marker>(id));
+    Marker marker = static_cast<Marker>(code);
+    std::string fileName = markerToString(marker) + ".png";
+    std::string filePath = fileName;
+    cv::imwrite(filePath, image);
   }
-  return output;
+}
+
+std::string puzzle::markerToString(Marker marker) {
+  switch (marker) {
+    case Marker::OperatorAdd: return "OPERATOR_ADD";
+    case Marker::OperatorSubtract: return "OPERATOR_SUBTRACT";
+    case Marker::OperatorMultiply: return "OPERATOR_MULTIPLY";
+    case Marker::OperatorDivide: return "OPERATOR_DIVIDE";
+    case Marker::LeftParenthesis: return "LEFT_PARENTHESIS";
+    case Marker::RightParenthesis: return "RIGHT_PARENTHESIS";
+    case Marker::Start: return "START";
+    case Marker::End: return "END";
+    default: {
+      int value = static_cast<int>(marker) - static_cast<int>(Marker::Digit_0);
+      return "DIGIT_" + std::to_string(value);
+    }
+  }
 }

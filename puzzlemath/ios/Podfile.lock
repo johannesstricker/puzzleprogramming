@@ -43,7 +43,7 @@ SPEC CHECKSUMS:
   OpenCV: 681e0451c1e54c5930a8922277f817ed5d5ab459
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   puzzle_plugin: fd191f2de28a97eb4c42ee3bf79b6734df2639c8
-  puzzlelib: aa60ddc5bb8ef7d07775c8a139b7d189fe668927
+  puzzlelib: fdb3ab506c4241f4978cdeeda464c8592bb4f1d8
 
 PODFILE CHECKSUM: 74f1446a5ac4b093ff5ed364ea696e4a7553af72
 
