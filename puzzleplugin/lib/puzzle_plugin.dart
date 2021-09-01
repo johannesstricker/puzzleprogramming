@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'package:ffi/ffi.dart';
 import 'dart:io';
-import 'package:flutter/services.dart';
+import 'package:camera/camera.dart';
 
 class NativeCoordinate extends Struct {
   @Double()
@@ -52,6 +53,100 @@ class NativeDetectedObjectList extends Struct {
   external Pointer<NativeDetectedObject> data;
 }
 
+// NOTE: on iOS the image format is 32BGRA; on Android it's YUV_420_888
+class ImageBuffer {
+  Pointer<Uint8> data;
+  int width;
+  int height;
+  int bytesPerRow;
+  int _bufferSize;
+
+  ImageBuffer._internal(
+      {required this.data,
+      required this.width,
+      required this.height,
+      required this.bytesPerRow})
+      : _bufferSize = 0;
+
+  factory ImageBuffer.empty() {
+    return ImageBuffer._internal(
+      data: nullptr,
+      width: 0,
+      height: 0,
+      bytesPerRow: 0,
+    );
+  }
+
+  void update(CameraImage image) {
+    final plane = image.planes[0];
+    final bytes = plane.bytes;
+
+    width = plane.width ?? 0;
+    height = plane.height ?? 0;
+    bytesPerRow = plane.bytesPerRow;
+
+    if (_bufferSize < bytes.length) {
+      calloc.free(data);
+      data = calloc<Uint8>(bytes.length);
+      _bufferSize = bytes.length;
+    }
+    final bufferBytes = data.asTypedList(bytes.length);
+    bufferBytes.setAll(0, bytes);
+  }
+
+  void free() {
+    if (data != nullptr) {
+      calloc.free(data);
+    }
+  }
+}
+
+class PuzzlePlugin {
+  static Future<List<DetectedObject>> detectObjects(ImageBuffer image) async {
+    // TODO: implement for Android
+    final objects = _PuzzleLib().detectObjects32BGRA(
+        image.data, image.width, image.height, image.bytesPerRow);
+    final List<DetectedObject> output = List<DetectedObject>.generate(
+      objects.size,
+      (i) => objects.data[i].clone(),
+    );
+    if (objects.size > 0) {
+      _freeDetectedObjects(objects.data);
+    }
+    return output;
+  }
+
+  static void _freeDetectedObjects(Pointer<NativeDetectedObject> ptr) {
+    _PuzzleLib().freeDetectedObjects(ptr);
+  }
+}
+
+class _PuzzleLib {
+  final DynamicLibrary _lib;
+  late final FreeDetectedObjectsFunction freeDetectedObjects;
+  late final DetectObjects32BGRAFunction detectObjects32BGRA;
+
+  static final _PuzzleLib _singleton = _PuzzleLib._internal();
+
+  factory _PuzzleLib() {
+    return _singleton;
+  }
+
+  _PuzzleLib._internal() : _lib = _getDynamicLibrary() {
+    freeDetectedObjects = _lib.lookupFunction<FreeDetectedObjectsFunctionNative,
+        FreeDetectedObjectsFunction>("freeDetectedObjects");
+    detectObjects32BGRA = _lib.lookupFunction<DetectObjects32BGRAFunctionNative,
+        DetectObjects32BGRAFunction>("detectObjects32BGRA");
+  }
+
+  static DynamicLibrary _getDynamicLibrary() {
+    final DynamicLibrary nativeEdgeDetection = Platform.isAndroid
+        ? DynamicLibrary.open("lib_puzzlelib.so")
+        : DynamicLibrary.process();
+    return nativeEdgeDetection;
+  }
+}
+
 typedef DetectObjects32BGRAFunctionNative = NativeDetectedObjectList Function(
     Pointer<Uint8>, Int32, Int32, Int32);
 typedef DetectObjects32BGRAFunction = NativeDetectedObjectList Function(
@@ -61,50 +156,3 @@ typedef FreeDetectedObjectsFunctionNative = Void Function(
     Pointer<NativeDetectedObject>);
 typedef FreeDetectedObjectsFunction = void Function(
     Pointer<NativeDetectedObject>);
-
-class PuzzlePlugin {
-  static const MethodChannel _channel = const MethodChannel('puzzle_plugin');
-
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
-  // TODO: offer multiple detectObjects functions but do conversion to the right format right here
-  static Future<List<DetectedObject>> detectMultipleObjects32BGRA(
-      Pointer<Uint8> bytes,
-      int imageWidth,
-      int imageHeight,
-      int bytesPerRow) async {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<
-        DetectObjects32BGRAFunctionNative,
-        DetectObjects32BGRAFunction>("detectObjects32BGRA");
-
-    final objects = nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
-    final List<DetectedObject> output = List<DetectedObject>.generate(
-      objects.size,
-      (i) => objects.data[i].clone(),
-    );
-    if (objects.size > 0) {
-      freeDetectedObjects(objects.data);
-    }
-    return output;
-  }
-
-  static void freeDetectedObjects(Pointer<NativeDetectedObject> ptr) {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<
-        FreeDetectedObjectsFunctionNative,
-        FreeDetectedObjectsFunction>("freeDetectedObjects");
-    nativeFunction(ptr);
-  }
-
-  // TODO: avoid calling this on every frame
-  static DynamicLibrary _getDynamicLibrary() {
-    final DynamicLibrary nativeEdgeDetection = Platform.isAndroid
-        ? DynamicLibrary.open("lib_puzzlelib.so")
-        : DynamicLibrary.process();
-    return nativeEdgeDetection;
-  }
-}

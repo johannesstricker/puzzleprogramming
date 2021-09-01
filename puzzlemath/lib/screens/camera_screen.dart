@@ -37,8 +37,7 @@ class _CameraScreenState extends State<CameraScreen> {
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
 
-  int bufferSize = 0;
-  Pointer<Uint8> buffer = nullptr;
+  ImageBuffer _imageBuffer = ImageBuffer.empty();
 
   double imageWidth = 0;
   double imageHeight = 0;
@@ -62,24 +61,9 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void dispose() {
     controller.stopImageStream();
-    if (buffer != null) {
-      calloc.free(buffer);
-    }
+    _imageBuffer.free();
     super.dispose();
   }
-
-  Pointer<Uint8> _createImagePlanePointer(Uint8List plane) {
-    if (bufferSize < plane.length) {
-      calloc.free(buffer);
-      buffer = calloc<Uint8>(plane.length);
-      bufferSize = plane.length;
-    }
-    final bufferBytes = buffer.asTypedList(plane.length);
-    bufferBytes.setAll(0, plane);
-    return buffer;
-  }
-
-  // NOTE: on iOS the image format is 32BGRA; on Android it's YUV_420_888
 
   void _onImageReceived(CameraImage image) {
     if (_isTakingImage) return;
@@ -91,18 +75,10 @@ class _CameraScreenState extends State<CameraScreen> {
         : currentMilliseconds - _lastImageProcessedTime;
     final isTimedOut = millisecondsPassed >= throttleMilliseconds;
     if (isTimedOut) {
-      setState(() {
-        _isTakingImage = true;
-      });
+      _isTakingImage = true;
 
-      final imageBytes = _createImagePlanePointer(image.planes[0].bytes);
-      // final bytesPerPixel = image.planes[0].bytesPerPixel;
-      final width = image.planes[0].width!;
-      final height = image.planes[0].height!;
-      final bytesPerRow = image.planes[0].bytesPerRow;
-
-      PuzzlePlugin.detectMultipleObjects32BGRA(
-              imageBytes, width, height, bytesPerRow)
+      _imageBuffer.update(image);
+      PuzzlePlugin.detectObjects(_imageBuffer)
           .then((List<DetectedObject> objects) {
         final sortedObjects = sortObjectListLTR(objects);
         int? proposedSolution;
