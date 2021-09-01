@@ -24,7 +24,33 @@ enum Marker {
   LeftParenthesis,
   RightParenthesis,
   Start,
-  End
+  End,
+  Unknown,
+}
+
+List<Marker> stringToMarkers(String input) {
+  const Map<String, Marker> mapping = {
+    '0': Marker.Digit0,
+    '1': Marker.Digit1,
+    '2': Marker.Digit2,
+    '3': Marker.Digit3,
+    '4': Marker.Digit4,
+    '5': Marker.Digit5,
+    '6': Marker.Digit6,
+    '7': Marker.Digit7,
+    '8': Marker.Digit8,
+    '9': Marker.Digit9,
+    '+': Marker.OperatorAdd,
+    '-': Marker.OperatorSubtract,
+    '*': Marker.OperatorMultiply,
+    '/': Marker.OperatorDivide,
+    '(': Marker.LeftParenthesis,
+    ')': Marker.RightParenthesis,
+  };
+  return input
+      .split('')
+      .map((char) => mapping[char] ?? Marker.Unknown)
+      .toList();
 }
 
 Marker createMarker(int id) {
@@ -145,6 +171,7 @@ class TokenParser {
     if (isParenthesisMarker(markers.first)) {
       return _consumeParenthesis();
     }
+    markers.removeAt(0);
     return next();
   }
 
@@ -436,10 +463,14 @@ class MathEquation {
   }
 }
 
-int? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
-  final markers = objects.map((obj) => createMarker(obj.id)).toList();
+ASTNode? parseEquation(List<Marker> markers) {
   TokenParser parser = TokenParser(markers);
   final tokens = parser.toList();
   final ast = parseAbstractSyntaxTree(List.from(tokens));
-  return ast?.value();
+  return ast;
+}
+
+int? parseAbstractSyntaxTreeFromObjects(List<DetectedObject> objects) {
+  final markers = objects.map((obj) => createMarker(obj.id)).toList();
+  return parseEquation(markers)?.value();
 }
