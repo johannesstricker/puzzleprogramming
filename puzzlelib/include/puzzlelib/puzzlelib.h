@@ -5,6 +5,19 @@ namespace cv {
   class Mat;
 }
 
+struct Coordinate {
+  double x;
+  double y;
+};
+
+struct DetectedObject {
+  int id;
+  Coordinate topLeft;
+  Coordinate topRight;
+  Coordinate bottomRight;
+  Coordinate bottomLeft;
+};
+
 namespace puzzle {
   enum class Marker : int {
     Digit_0,
@@ -25,19 +38,6 @@ namespace puzzle {
     RightParenthesis,
     Start,
     End
-  };
-
-  struct Coordinate {
-    double x;
-    double y;
-  };
-
-  struct DetectedObject {
-    int id;
-    Coordinate topLeft;
-    Coordinate topRight;
-    Coordinate bottomRight;
-    Coordinate bottomLeft;
   };
 
   std::vector<DetectedObject> detectObjects(const cv::Mat& image);
