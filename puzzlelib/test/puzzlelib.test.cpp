@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "puzzlelib/puzzlelib.h"
-#include <opencv/core.h>
+#include <opencv2/core.h>
 #include <opencv2/imgcodecs.hpp>
 #include <vector>
 #include <map>
