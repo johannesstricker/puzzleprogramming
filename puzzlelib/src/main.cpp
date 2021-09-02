@@ -7,7 +7,7 @@
 
 int main()
 {
-  createObjectMarkerImages("./math_equations");
+  createObjectMarkerImages();
   printf("ArUco markers created.");
   return 0;
 }
