@@ -11,12 +11,8 @@ Pod::Spec.new do |spec|
   spec.source       = { :path => '.' }
   spec.source_files  = [
     "src/puzzlelib.cpp",
-    # "src/math_equations.h",
-    # "src/math_equations.cpp",
   ]
-  spec.private_header_files = [
-    # "src/math_equations.h",
-  ]
+  spec.private_header_files = []
   spec.public_header_files = [
     "include/**/*.{h,hpp}"
   ]
