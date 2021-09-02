@@ -17,7 +17,7 @@ class Challenge {
   final List<Marker> availableMarkers;
   final String description;
 
-  Challenge(this.id,
+  const Challenge(this.id,
       {required this.name,
       required this.solution,
       required this.availableMarkers,

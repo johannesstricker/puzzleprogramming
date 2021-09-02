@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     setState(() {
       _platformVersion = "42";
-    })
+    });
   }
 
   @override

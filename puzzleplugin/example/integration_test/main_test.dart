@@ -5,8 +5,8 @@ import 'package:puzzle_plugin/puzzle_plugin.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets("tokenToString", (WidgetTester tester) async {
+  testWidgets("can call native function", (WidgetTester tester) async {
     final buffer = ImageBuffer.empty();
-    expect(await () => PuzzlePlugin.detectObjects(buffer), throwsException);
+    expect(await PuzzlePlugin.detectObjects(buffer), []);
   });
 }

@@ -1,7 +1,7 @@
 import 'package:puzzlemath/math/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 
-List<Challenge> ChallengeRepository = [
+const List<Challenge> ChallengeRepository = [
   Challenge(0,
       name: "What's the magic number?",
       solution: 137,
