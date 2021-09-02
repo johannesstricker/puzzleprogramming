@@ -6,6 +6,9 @@ import 'package:puzzlemath/math/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
 import '../widgets/detection_preview.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:puzzlemath/blocs/blocs.dart';
+
 class CameraScreenArguments {
   final Challenge challenge;
 
@@ -24,11 +27,10 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
+  final CameraBloc _cameraBloc = CameraBloc(100);
+
   late final CameraController controller;
-  bool _isInitialized = false;
-  bool _isTakingImage = false;
   bool _isButtonEnabled = false;
-  num _lastImageProcessedTime = 0;
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
 
@@ -61,50 +63,42 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   void _onImageReceived(CameraImage image) {
-    if (_isTakingImage) return;
+    _imageBuffer.update(image);
+    PuzzlePlugin.detectObjects(_imageBuffer)
+        .then((List<DetectedObject> objects) {
+      final sortedObjects = sortObjectListLTR(objects);
+      int? proposedSolution;
+      try {
+        proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
+      } catch (error) {}
 
-    final throttleMilliseconds = 100;
-    final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
-    final millisecondsPassed = _lastImageProcessedTime == 0
-        ? throttleMilliseconds
-        : currentMilliseconds - _lastImageProcessedTime;
-    final isTimedOut = millisecondsPassed >= throttleMilliseconds;
-    if (isTimedOut) {
-      _isTakingImage = true;
-
-      _imageBuffer.update(image);
-      PuzzlePlugin.detectObjects(_imageBuffer)
-          .then((List<DetectedObject> objects) {
-        final sortedObjects = sortObjectListLTR(objects);
-        int? proposedSolution;
-        try {
-          proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
-        } catch (error) {}
-
-        setState(() {
-          imageWidth = image.width.toDouble();
-          imageHeight = image.height.toDouble();
-          detectedObjects = sortedObjects;
-          _proposedSolution = proposedSolution;
-          _usedMarkers =
-              sortedObjects.map((obj) => createMarker(obj.id)).toList();
-          _isTakingImage = false;
-          _isButtonEnabled = proposedSolution != null;
-          _lastImageProcessedTime = currentMilliseconds;
-        });
+      setState(() {
+        imageWidth = image.width.toDouble();
+        imageHeight = image.height.toDouble();
+        detectedObjects = sortedObjects;
+        _proposedSolution = proposedSolution;
+        _usedMarkers =
+            sortedObjects.map((obj) => createMarker(obj.id)).toList();
+        _isButtonEnabled = proposedSolution != null;
       });
-    }
+    });
   }
 
   Future _initCameraController(CameraDescription description) async {
+    // TODO: move controller to bloc
     controller = CameraController(description, ResolutionPreset.high);
     try {
       await controller.initialize();
-      controller.startImageStream(_onImageReceived);
-      setState(() {
-        _isInitialized = true;
+      controller
+          .startImageStream((image) => _cameraBloc.add(TakePicture(image)));
+      _cameraBloc.add(InitializeCamera());
+      _cameraBloc.stream.listen((CameraState state) {
+        if (state is CameraBusy) {
+          _onImageReceived(state.image);
+        }
       });
     } on CameraException catch (error) {
+      // TODO: implement CameraError event and state
       print('Camera exception: $error');
     }
   }
@@ -174,7 +168,14 @@ class _CameraScreenState extends State<CameraScreen> {
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        child: _isInitialized ? _buildCameraPreview(context) : Container(),
+        child: BlocBuilder(
+            bloc: _cameraBloc,
+            builder: (BuildContext context, CameraState state) {
+              if (state is CameraInitialized) {
+                return _buildCameraPreview(context);
+              }
+              return Container();
+            }),
       ),
     );
   }
