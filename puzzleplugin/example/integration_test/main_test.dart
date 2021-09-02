@@ -6,8 +6,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets("tokenToString", (WidgetTester tester) async {
-    expect(await PuzzlePlugin.tokenToString(1, 0), equals('+'));
-    expect(await PuzzlePlugin.tokenToString(0, 9), equals('9'));
-    expect(await PuzzlePlugin.tokenToString(5, 0), equals('('));
+    final buffer = ImageBuffer.empty();
+    expect(await () => PuzzlePlugin.detectObjects(buffer), throwsException);
   });
 }
