@@ -24,12 +24,3 @@ cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcp
 cmake --build build
 ```
 from the `puzzlelib/` directory. Alternatively, you can build the project from vscode with the [CMake Tools Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools).
-
-## Roadmap
-
-- [ ] Implement state management
-- [ ] Implement a widget library
-- [ ] Write tests for flutter math parsing
-- [ ] Remove unused code from C-Library
-- [x] Implement challenges
-- [ ] Implement error hints
