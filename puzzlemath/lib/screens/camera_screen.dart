@@ -114,6 +114,8 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
+  // TODO: set focus mode on screen tap
+  ////     e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
   Widget _buildCameraPreview(BuildContext context) {
     return Stack(children: [
       Container(

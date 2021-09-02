@@ -3,7 +3,9 @@ FIND_PACKAGE(Catch2 REQUIRED)
 ADD_EXECUTABLE(Tests)
 TARGET_SOURCES(Tests
   PRIVATE
+    main.test.cpp
     aruco.test.cpp
+    puzzlelib.test.cpp
     ${CMAKE_SOURCE_DIR}/src/puzzlelib.cpp
 )
 TARGET_LINK_LIBRARIES(Tests

@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
