@@ -12,5 +12,6 @@ TARGET_LINK_LIBRARIES(puzzleprogramming
 )
 TARGET_INCLUDE_DIRECTORIES(puzzleprogramming
   PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
 )

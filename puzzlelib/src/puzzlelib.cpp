@@ -15,6 +15,10 @@ std::vector<DetectedObject> puzzle::detectObjects32BGRA(unsigned char* imageByte
 
 // TODO: maybe we can avoid copying the matrix here
 std::vector<DetectedObject> puzzle::detectObjects(const cv::Mat& sourceImage) {
+  if (sourceImage.empty()) {
+    return std::vector<DetectedObject>();
+  }
+
   cv::Mat image;
   cv::cvtColor(sourceImage, image, cv::COLOR_BGRA2GRAY, 1);
 
