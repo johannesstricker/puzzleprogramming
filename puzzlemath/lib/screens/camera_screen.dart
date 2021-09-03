@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
@@ -27,9 +29,9 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  final CameraBloc _cameraBloc = CameraBloc(100);
+  final CameraBloc _cameraBloc = CameraBloc(10);
+  StreamSubscription<CameraState>? _cameraStreamSubscription;
 
-  late final CameraController controller;
   bool _isButtonEnabled = false;
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
@@ -43,25 +45,24 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void initState() {
-    super.initState();
-    availableCameras().then((cameras) {
-      if (cameras.length > 0) {
-        _initCameraController(cameras[0]).then((void v) {});
-      } else {
-        print('No camera available');
+    _cameraBloc.add(InitializeCamera());
+    _cameraStreamSubscription = _cameraBloc.stream.listen((CameraState state) {
+      if (state is CameraCapture) {
+        _onImageReceived(state.image);
       }
-    }).catchError((error) {
-      print('Error: $error.code\nError Message: $error.message');
     });
+    super.initState();
   }
 
   @override
-  void dispose() {
-    controller.stopImageStream();
+  void dispose() async {
     _imageBuffer.free();
+    await _cameraStreamSubscription?.cancel();
+    await _cameraBloc.close();
     super.dispose();
   }
 
+  // TODO: use old AST for a while when parsing fails to avoid spurious errors
   void _onImageReceived(CameraImage image) {
     _imageBuffer.update(image);
     PuzzlePlugin.detectObjects(_imageBuffer)
@@ -84,28 +85,11 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
-  Future _initCameraController(CameraDescription description) async {
-    // TODO: move controller to bloc
-    controller = CameraController(description, ResolutionPreset.high);
-    try {
-      await controller.initialize();
-      controller
-          .startImageStream((image) => _cameraBloc.add(TakePicture(image)));
-      _cameraBloc.add(InitializeCamera());
-      _cameraBloc.stream.listen((CameraState state) {
-        if (state is CameraBusy) {
-          _onImageReceived(state.image);
-        }
-      });
-    } on CameraException catch (error) {
-      // TODO: implement CameraError event and state
-      print('Camera exception: $error');
-    }
-  }
-
   // TODO: set focus mode on screen tap
-  ////     e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
+  //       e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
+  // TODO: fix aspect ratio of camera image
   Widget _buildCameraPreview(BuildContext context) {
+    final controller = BlocProvider.of<CameraBloc>(context).controller;
     return Stack(children: [
       Container(
         height: double.infinity,
@@ -159,23 +143,25 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Take a picture'),
-        centerTitle: true,
-      ),
-      floatingActionButton: buildFloatingActionButton(context),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: BlocBuilder(
-            bloc: _cameraBloc,
-            builder: (BuildContext context, CameraState state) {
-              if (state is CameraInitialized) {
-                return _buildCameraPreview(context);
-              }
-              return Container();
-            }),
+    return BlocProvider<CameraBloc>(
+      create: (context) => _cameraBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Take a picture'),
+          centerTitle: true,
+        ),
+        floatingActionButton: buildFloatingActionButton(context),
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: BlocBuilder<CameraBloc, CameraState>(
+              builder: (BuildContext context, CameraState state) {
+            if (state is CameraInitialized) {
+              return _buildCameraPreview(context);
+            }
+            return Container();
+          }),
+        ),
       ),
     );
   }

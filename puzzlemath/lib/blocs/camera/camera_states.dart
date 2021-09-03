@@ -7,17 +7,15 @@ class CameraUninitialized extends CameraState {
   String toString() => 'CameraDisabled';
 }
 
-abstract class CameraInitialized extends CameraState {}
-
-class CameraReady extends CameraInitialized {
+class CameraInitialized extends CameraState {
   @override
-  String toString() => 'CameraReady';
+  String toString() => 'CameraInitialized';
 }
 
-class CameraBusy extends CameraInitialized {
+class CameraCapture extends CameraInitialized {
   final CameraImage image;
 
-  CameraBusy(this.image);
+  CameraCapture(this.image);
 
   @override
   String toString() => 'CameraBusy';
