@@ -48,5 +48,4 @@ TEST_CASE("detectObjects") {
       REQUIRE(xPositions[Marker::Digit_2] < xPositions[Marker::End]);
     }
   }
-  }
 }
