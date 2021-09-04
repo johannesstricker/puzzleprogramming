@@ -3,6 +3,7 @@ import './challenges_events.dart';
 import './challenges_states.dart';
 import 'package:puzzlemath/math/challenge.dart';
 import 'package:puzzlemath/math/challenge_repository.dart';
+import 'package:collection/collection.dart';
 
 class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   ChallengesBloc() : super(ChallengesLoading()) {
@@ -25,12 +26,19 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   Stream<ChallengesState> _mapSolveChallengeToState(
       SolveChallenge event) async* {
     if (state is ChallengesLoaded) {
-      final updatedChallenges = (state as ChallengesLoaded)
-          .challenges
-          .map((challenge) => challenge == event.challenge
-              ? challenge.copyWithState(ChallengeState.Solved)
-              : challenge)
-          .toList();
+      final unlockedChallengeIndex =
+          (state as ChallengesLoaded).challenges.indexOf(event.challenge) + 1;
+      final updatedChallenges =
+          (state as ChallengesLoaded).challenges.mapIndexed((index, challenge) {
+        if (challenge == event.challenge) {
+          return challenge.copyWithState(ChallengeState.Solved);
+        } else if (index == unlockedChallengeIndex) {
+          return challenge.state == ChallengeState.Locked
+              ? challenge.copyWithState(ChallengeState.Unlocked)
+              : challenge;
+        }
+        return challenge;
+      }).toList();
       yield ChallengesLoaded(challenges: updatedChallenges);
     }
   }
