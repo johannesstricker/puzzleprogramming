@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:puzzlemath/blocs/challenges/challenges.dart';
 import 'screens/camera_screen.dart';
 import 'screens/challenge_list_screen.dart';
 import 'screens/challenge_screen.dart';
 import 'screens/solution_screen.dart';
 
 void main() {
-  runApp(CameraApp());
+  runApp(BlocProvider(
+    create: (context) => ChallengesBloc(),
+    child: CameraApp(),
+  ));
 }
 
 ChallengeListScreen navigateToChallengeListScreen(context) {
