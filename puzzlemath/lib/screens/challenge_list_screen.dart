@@ -13,13 +13,7 @@ class ChallengeListScreen extends StatelessWidget {
 
   Widget buildChallengeItem(List<Challenge> challenges, int index) {
     final Challenge challenge = challenges[index];
-    ChallengeState state = ChallengeState.Locked;
-    if (progress > index) {
-      state = ChallengeState.Solved;
-    } else if (progress == index) {
-      state = ChallengeState.Unlocked;
-    }
-    return ChallengeListItem(challenge, state: state);
+    return ChallengeListItem(challenge);
   }
 
   Widget buildBody(BuildContext context) {

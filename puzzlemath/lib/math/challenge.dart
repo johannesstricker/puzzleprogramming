@@ -16,11 +16,13 @@ class Challenge {
   final int solution;
   final List<Marker> availableMarkers;
   final String description;
+  final ChallengeState state;
 
   const Challenge(this.id,
       {required this.name,
       required this.solution,
       required this.availableMarkers,
+      this.state = ChallengeState.Locked,
       this.description = DescriptionPlaceholder});
 
   bool checkSolution(int proposedSolution, List<Marker> usedMarkers) {
