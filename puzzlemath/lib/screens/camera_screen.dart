@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
@@ -7,7 +6,6 @@ import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/math/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
 import '../widgets/detection_preview.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
 
@@ -120,6 +118,13 @@ class _CameraScreenState extends State<CameraScreen> {
         ? () {
             if (_proposedSolution == null || _usedMarkers == null) {
               return;
+            }
+            // TODO: push to success or error route
+            bool challengeSolved = widget.challenge
+                .checkSolution(_proposedSolution!, _usedMarkers!);
+            if (challengeSolved) {
+              BlocProvider.of<ChallengesBloc>(context)
+                  .add(SolveChallenge(widget.challenge));
             }
             // TODO: don't push
             Navigator.pushNamed(
