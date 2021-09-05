@@ -1,4 +1,4 @@
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 
 const List<Challenge> ChallengeRepository = [

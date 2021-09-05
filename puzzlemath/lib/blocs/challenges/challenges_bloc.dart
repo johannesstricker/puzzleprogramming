@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import './challenges_events.dart';
 import './challenges_states.dart';
-import 'package:puzzlemath/math/challenge.dart';
-import 'package:puzzlemath/math/challenge_repository.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge_repository.dart';
 import 'package:collection/collection.dart';
 
 class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {

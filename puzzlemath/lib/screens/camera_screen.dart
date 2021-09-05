@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
 import '../widgets/detection_preview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

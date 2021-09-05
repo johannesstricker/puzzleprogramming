@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'math.dart';
+import '../../math/math.dart';
 import 'package:equatable/equatable.dart';
 
 enum ChallengeState {

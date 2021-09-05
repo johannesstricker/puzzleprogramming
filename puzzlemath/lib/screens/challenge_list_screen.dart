@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/challenges/challenges.dart';
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/widgets/challenge_list_item.dart';
 
 class ChallengeListScreen extends StatelessWidget {
