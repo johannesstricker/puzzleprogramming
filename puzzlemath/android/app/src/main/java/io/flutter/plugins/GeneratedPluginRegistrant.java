@@ -4,6 +4,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugins.camera.CameraPlugin;
 import io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
+import com.tekartik.sqflite.SqflitePlugin;
 
 /**
  * Generated file. Do not edit.
@@ -16,6 +17,7 @@ public final class GeneratedPluginRegistrant {
     CameraPlugin.registerWith(registry.registrarFor("io.flutter.plugins.camera.CameraPlugin"));
     FlutterAndroidLifecyclePlugin.registerWith(registry.registrarFor("io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin"));
     PathProviderPlugin.registerWith(registry.registrarFor("io.flutter.plugins.pathprovider.PathProviderPlugin"));
+    SqflitePlugin.registerWith(registry.registrarFor("com.tekartik.sqflite.SqflitePlugin"));
   }
 
   private static boolean alreadyRegisteredWith(PluginRegistry registry) {
