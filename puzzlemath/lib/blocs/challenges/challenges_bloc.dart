@@ -46,6 +46,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
         }
         return challenge;
       }).toList();
+      await _repository.saveAll(updatedChallenges);
       yield ChallengesLoaded(challenges: updatedChallenges);
     }
   }

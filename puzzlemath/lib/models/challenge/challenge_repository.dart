@@ -29,6 +29,10 @@ class ChallengeRepository {
         state: challenge.state);
   }
 
+  Future<List<Challenge>> saveAll(List<Challenge> challenges) async {
+    return Future.wait(challenges.map((challenge) => save(challenge)));
+  }
+
   Future<List<Challenge>> all() async {
     final List<Map<String, dynamic>> items =
         await connection.query(TABLE_NAME, orderBy: 'id ASC');
@@ -36,8 +40,7 @@ class ChallengeRepository {
   }
 
   Future<List<Challenge>> seed() async {
-    await Future.wait(_seeds.map((challenge) => save(challenge)));
-    return all();
+    return saveAll(_seeds);
   }
 }
 
