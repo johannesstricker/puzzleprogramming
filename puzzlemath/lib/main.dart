@@ -7,50 +7,70 @@ import 'screens/challenge_screen.dart';
 import 'screens/solution_screen.dart';
 
 void main() {
-  runApp(BlocProvider(
-    create: (context) => ChallengesBloc(),
-    child: CameraApp(),
-  ));
+  runApp(PuzzleApp());
 }
 
-ChallengeListScreen navigateToChallengeListScreen(context) {
+ChallengeListScreen buildChallengeListScreen(context) {
   return ChallengeListScreen();
 }
 
-CameraScreen navigateToCameraScreen(context) {
+CameraScreen buildCameraScreen(context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as CameraScreenArguments;
   return CameraScreen(args);
 }
 
-ChallengeScreen navigateToChallengeScreen(context) {
+ChallengeScreen buildChallengeScreen(context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as ChallengeScreenArguments;
   return ChallengeScreen(args);
 }
 
-SolutionScreen navigateToSolutionScreen(context) {
+SolutionScreen buildSolutionScreen(context) {
   final args =
       ModalRoute.of(context)!.settings.arguments as SolutionScreenArguments;
   return SolutionScreen(args);
 }
 
-class CameraApp extends StatelessWidget {
-  // This widget is the root of your application.
+class PuzzleApp extends StatefulWidget {
+  @override
+  _PuzzleAppState createState() => _PuzzleAppState();
+}
+
+class _PuzzleAppState extends State<PuzzleApp> {
+  final _challengesBloc = ChallengesBloc();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Camera Demo',
+      title: 'PuzzleMath',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
       routes: {
-        ChallengeListScreen.routeName: navigateToChallengeListScreen,
-        CameraScreen.routeName: navigateToCameraScreen,
-        ChallengeScreen.routeName: navigateToChallengeScreen,
-        SolutionScreen.routeName: navigateToSolutionScreen,
+        ChallengeListScreen.routeName: (context) => BlocProvider.value(
+              value: _challengesBloc,
+              child: buildChallengeListScreen(context),
+            ),
+        CameraScreen.routeName: (context) => BlocProvider.value(
+              value: _challengesBloc,
+              child: buildCameraScreen(context),
+            ),
+        ChallengeScreen.routeName: (context) => BlocProvider.value(
+              value: _challengesBloc,
+              child: buildChallengeScreen(context),
+            ),
+        SolutionScreen.routeName: (context) => BlocProvider.value(
+              value: _challengesBloc,
+              child: buildSolutionScreen(context),
+            ),
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _challengesBloc.close();
+    super.dispose();
   }
 }
