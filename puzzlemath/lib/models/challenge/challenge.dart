@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:puzzlemath/utilities/serialization.dart';
 import '../../math/math.dart';
 import 'package:equatable/equatable.dart';
+import 'dart:convert';
 
 enum ChallengeState {
   Locked,
@@ -44,4 +46,26 @@ class Challenge extends Equatable {
 
   @override
   List<Object> get props => [id];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'solution': solution,
+      'description': description,
+      'state': enumToString(state),
+      'markers': jsonEncodeEnumList(availableMarkers),
+    };
+  }
+
+  factory Challenge.fromMap(Map<String, dynamic> input) {
+    return Challenge(
+      input['id'],
+      name: input['name'],
+      description: input['description'],
+      solution: input['solution'],
+      state: stringToEnum(input['state'], ChallengeState.values),
+      availableMarkers: jsonDecodeEnumList(input['markers'], Marker.values),
+    );
+  }
 }

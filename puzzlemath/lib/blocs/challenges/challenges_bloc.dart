@@ -6,6 +6,8 @@ import 'package:puzzlemath/models/challenge/challenge_repository.dart';
 import 'package:collection/collection.dart';
 
 class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
+  late final ChallengeRepository _repository;
+
   ChallengesBloc() : super(ChallengesLoading()) {
     add(LoadChallenges());
   }
@@ -20,7 +22,9 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   }
 
   Stream<ChallengesState> _mapLoadChallengesToState() async* {
-    yield ChallengesLoaded(challenges: ChallengeRepository);
+    _repository = await ChallengeRepository.connected();
+    final challenges = await _repository.seed();
+    yield ChallengesLoaded(challenges: challenges);
   }
 
   Stream<ChallengesState> _mapSolveChallengeToState(
