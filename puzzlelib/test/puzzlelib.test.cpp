@@ -1,16 +1,25 @@
-#include "catch.hpp"
 #include "puzzlelib/puzzlelib.h"
+#include "catch.hpp"
+#include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <vector>
 #include <map>
+#include <iostream>
+
+#include <filesystem>
+
+using namespace puzzle;
 
 TEST_CASE("detectObjects") {
   GIVEN("an image with multiple aruco markers") {
-    cv::Mat image = cv::imread("./data/images/equation.test.jpg");
+    cv::Mat image = cv::imread("./data/images/equation.test.png");
 
-    TEST("it returns an unordered list of detected objects") {
+    THEN("it returns an unordered list of detected objects") {
       auto objects = puzzle::detectObjects(image);
+      for (auto obj : objects) {
+        std::cout << obj.id << std::endl;
+      }
       std::vector<int> objectIds;
       std::transform(objects.begin(), objects.end(), std::back_inserter(objectIds), [](const DetectedObject& object) {
         return object.id;
@@ -30,12 +39,12 @@ TEST_CASE("detectObjects") {
       REQUIRE_THAT(objectIds, Catch::Matchers::UnorderedEquals(expectedObjectIds));
     }
 
-    TEST("it returns objects with the correct position relative to each other") {
+    THEN("it returns objects with the correct position relative to each other") {
       auto objects = puzzle::detectObjects(image);
-      std::map<int, int> xPositions;
+      std::map<Marker, double> xPositions;
       for (auto& object : objects) {
-        int centerX = (object.topLeft.x + object.topRight.x + object.bottomRight.x + object.bottomLeft.x) / 4.0;
-        xPositions[object.id] = centerX;
+        double centerX = (object.topLeft.x + object.topRight.x + object.bottomRight.x + object.bottomLeft.x) / 4.0;
+        xPositions[static_cast<Marker>(object.id)] = centerX;
       }
 
       REQUIRE(xPositions[Marker::Start] < xPositions[Marker::LeftParenthesis]);
