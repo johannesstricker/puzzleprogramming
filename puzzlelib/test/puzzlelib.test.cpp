@@ -13,13 +13,9 @@ using namespace puzzle;
 
 TEST_CASE("detectObjects") {
   GIVEN("an image with multiple aruco markers") {
-    cv::Mat image = cv::imread("./data/images/equation.test.png");
-
     THEN("it returns an unordered list of detected objects") {
+      cv::Mat image = cv::imread("./data/images/equation.test.png");
       auto objects = puzzle::detectObjects(image);
-      for (auto obj : objects) {
-        std::cout << obj.id << std::endl;
-      }
       std::vector<int> objectIds;
       std::transform(objects.begin(), objects.end(), std::back_inserter(objectIds), [](const DetectedObject& object) {
         return object.id;
@@ -40,6 +36,7 @@ TEST_CASE("detectObjects") {
     }
 
     THEN("it returns objects with the correct position relative to each other") {
+      cv::Mat image = cv::imread("./data/images/equation.test.png");
       auto objects = puzzle::detectObjects(image);
       std::map<Marker, double> xPositions;
       for (auto& object : objects) {
