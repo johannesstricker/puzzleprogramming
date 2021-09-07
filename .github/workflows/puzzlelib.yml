@@ -54,7 +54,9 @@ jobs:
 
     - name: Show directory content
       working-directory: ${{ env.BUILD_DIR }}
-      run: ls
+      run: |
+        ls
+        ls test
 
     - name: Test
       working-directory: ${{ env.BUILD_DIR }}
