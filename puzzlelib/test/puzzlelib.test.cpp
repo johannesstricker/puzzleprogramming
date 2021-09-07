@@ -13,8 +13,12 @@ using namespace puzzle;
 
 TEST_CASE("detectObjects") {
   GIVEN("an image with multiple aruco markers") {
+    cv::Mat image = cv::imread("./data/images/equation.test.png");
+    std::cout << "WORKING DIRECTORY: " << std::filesystem::current_path().string() << std::endl;
+    bool exists = std::filesystem::exists(std::filesystem::current_path() / "data" / "images" / "equation.test.png");
+    std::cout << "FILE EXISTS: " << exists << std::endl;
+
     THEN("it returns an unordered list of detected objects") {
-      cv::Mat image = cv::imread("./data/images/equation.test.png");
       auto objects = puzzle::detectObjects(image);
       std::vector<int> objectIds;
       std::transform(objects.begin(), objects.end(), std::back_inserter(objectIds), [](const DetectedObject& object) {
@@ -36,7 +40,6 @@ TEST_CASE("detectObjects") {
     }
 
     THEN("it returns objects with the correct position relative to each other") {
-      cv::Mat image = cv::imread("./data/images/equation.test.png");
       auto objects = puzzle::detectObjects(image);
       std::map<Marker, double> xPositions;
       for (auto& object : objects) {

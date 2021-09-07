@@ -52,6 +52,10 @@ jobs:
         useVcpkgToolchainFile: true
         buildWithCMake: true
 
+    - name: Show directory content
+      working-directory: ${{ env.BUILD_DIR }}
+      run: ls
+
     - name: Test
       working-directory: ${{ env.BUILD_DIR }}
-      run: ctest -T test --output-on-failure
+      run: ctest -T test --output-on-failure --verbose
