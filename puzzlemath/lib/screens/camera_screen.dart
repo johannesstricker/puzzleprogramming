@@ -5,7 +5,7 @@ import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
-import '../widgets/detection_preview.dart';
+import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
 

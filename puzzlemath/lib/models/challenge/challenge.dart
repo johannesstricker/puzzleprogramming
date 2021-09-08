@@ -1,8 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:puzzlemath/utilities/serialization.dart';
-import '../../math/math.dart';
+import 'package:puzzlemath/math/math.dart';
 import 'package:equatable/equatable.dart';
-import 'dart:convert';
 
 enum ChallengeState {
   Locked,
