@@ -13,11 +13,11 @@ Future<CameraController> _getCameraController() async {
 
 // TODO: maybe switch to cameraawesome package (https://pub.dev/packages/camerawesome)
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
-  CameraController? controller = null;
+  CameraController? controller;
   final num _throttle;
   num _busySince = 0;
 
-  CameraBloc(this._throttle) : super(CameraUninitialized()) {}
+  CameraBloc(this._throttle) : super(CameraUninitialized());
 
   @override
   Stream<CameraState> mapEventToState(CameraEvent event) async* {
