@@ -87,7 +87,7 @@ class _CameraScreenState extends State<CameraScreen> {
   //       e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
   // TODO: fix aspect ratio of camera image
   Widget _buildCameraPreview(BuildContext context) {
-    final controller = BlocProvider.of<CameraBloc>(context).controller;
+    final controller = BlocProvider.of<CameraBloc>(context).controller!;
     return Stack(children: [
       Container(
         height: double.infinity,

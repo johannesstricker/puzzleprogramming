@@ -13,7 +13,7 @@ Future<CameraController> _getCameraController() async {
 
 // TODO: maybe switch to cameraawesome package (https://pub.dev/packages/camerawesome)
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
-  late final CameraController controller;
+  CameraController? controller = null;
   final num _throttle;
   num _busySince = 0;
 
@@ -30,10 +30,11 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
 
   Stream<CameraState> _mapInitializeCameraToState() async* {
     try {
+      controller?.dispose();
       controller = await _getCameraController();
-      await controller.initialize();
+      await controller!.initialize();
       yield CameraInitialized();
-      controller.startImageStream((image) => add(TakePicture(image)));
+      controller!.startImageStream((image) => add(TakePicture(image)));
     } on CameraException catch (error) {
       // TODO: add CameraError state
       debugPrint(error.description);
@@ -55,7 +56,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
 
   @override
   Future<void> close() async {
-    await controller.dispose();
+    await controller?.dispose();
     return super.close();
   }
 }
