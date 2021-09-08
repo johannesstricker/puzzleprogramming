@@ -7,7 +7,7 @@ import 'package:camera/camera.dart';
 
 Future<CameraController> _getCameraController() async {
   final cameras = await availableCameras();
-  return CameraController(cameras.first, ResolutionPreset.low,
+  return CameraController(cameras.first, ResolutionPreset.medium,
       enableAudio: false);
 }
 
