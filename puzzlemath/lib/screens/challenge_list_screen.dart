@@ -20,10 +20,10 @@ class ChallengeListScreen extends StatelessWidget {
     return BlocBuilder<ChallengesBloc, ChallengesState>(
         builder: (context, state) {
       if (state is ChallengesLoading) {
-        return Container();
+        return Center(child: CircularProgressIndicator());
       }
       if (state is ChallengesError) {
-        return Container();
+        return Center(child: Text('An error occured.'));
       }
       final List<Challenge> challenges = (state as ChallengesLoaded).challenges;
       return ListView.separated(
