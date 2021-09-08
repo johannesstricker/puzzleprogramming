@@ -23,10 +23,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
 
   Stream<ChallengesState> _mapLoadChallengesToState() async* {
     _repository = await ChallengeRepository.connected();
-    List<Challenge> challenges = await _repository.all();
-    if (challenges.isEmpty) {
-      challenges = await _repository.seed();
-    }
+    List<Challenge> challenges = await _repository.load();
     yield ChallengesLoaded(challenges: challenges);
   }
 

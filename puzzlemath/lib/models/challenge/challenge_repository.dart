@@ -11,6 +11,7 @@ class ChallengeRepository {
   ChallengeRepository(this.connection);
 
   static connected() async {
+    // TODO: somehow inject the database connection
     final connection = await connectToDatabase();
     return ChallengeRepository(connection);
   }
@@ -33,18 +34,22 @@ class ChallengeRepository {
     return Future.wait(challenges.map((challenge) => save(challenge)));
   }
 
-  Future<List<Challenge>> all() async {
+  Future<List<Challenge>> load() async {
     final List<Map<String, dynamic>> items =
         await connection.query(TABLE_NAME, orderBy: 'id ASC');
-    return items.map((item) => Challenge.fromMap(item)).toList();
-  }
-
-  Future<List<Challenge>> seed() async {
-    return saveAll(_seeds);
+    final storedChallenges =
+        items.map((item) => Challenge.fromMap(item)).toList();
+    final challengeStates = Map.fromIterable(storedChallenges,
+        key: (challenge) => challenge.id,
+        value: (challenge) => challenge.state);
+    return CHALLENGES.map((challenge) {
+      return challenge
+          .copyWithState(challengeStates[challenge.id] ?? challenge.state);
+    }).toList();
   }
 }
 
-const List<Challenge> _seeds = [
+const List<Challenge> CHALLENGES = [
   Challenge(0,
       name: "What's the magic number?",
       solution: 137,
