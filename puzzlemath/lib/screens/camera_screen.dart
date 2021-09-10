@@ -63,23 +63,20 @@ class _CameraScreenState extends State<CameraScreen> {
   // TODO: use old AST for a while when parsing fails to avoid spurious errors
   void _onImageReceived(CameraImage image) {
     _imageBuffer.update(image);
-    PuzzlePlugin.detectObjects(_imageBuffer)
-        .then((List<DetectedObject> objects) {
-      final sortedObjects = sortObjectListLTR(objects);
-      int? proposedSolution;
-      try {
-        proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
-      } catch (error) {}
+    final objects = PuzzlePlugin.detectObjects(_imageBuffer);
+    final sortedObjects = sortObjectListLTR(objects);
+    int? proposedSolution;
+    try {
+      proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
+    } catch (error) {}
 
-      setState(() {
-        imageWidth = image.width.toDouble();
-        imageHeight = image.height.toDouble();
-        detectedObjects = sortedObjects;
-        _proposedSolution = proposedSolution;
-        _usedMarkers =
-            sortedObjects.map((obj) => createMarker(obj.id)).toList();
-        _isButtonEnabled = proposedSolution != null;
-      });
+    setState(() {
+      imageWidth = image.width.toDouble();
+      imageHeight = image.height.toDouble();
+      detectedObjects = sortedObjects;
+      _proposedSolution = proposedSolution;
+      _usedMarkers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
+      _isButtonEnabled = proposedSolution != null;
     });
   }
 
