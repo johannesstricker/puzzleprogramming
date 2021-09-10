@@ -7,10 +7,8 @@ import 'package:camera/camera.dart';
 
 Future<CameraController> _getCameraController() async {
   final cameras = await availableCameras();
-  final controller = CameraController(cameras.first, ResolutionPreset.medium,
+  return CameraController(cameras.first, ResolutionPreset.medium,
       enableAudio: false, imageFormatGroup: ImageFormatGroup.bgra8888);
-  controller.setFocusMode(FocusMode.auto);
-  return controller;
 }
 
 // TODO: maybe switch to cameraawesome package (https://pub.dev/packages/camerawesome)
@@ -62,6 +60,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     if (state is CameraInitialized) {
       controller?.setExposurePoint(event.point);
       controller?.setFocusPoint(event.point);
+      controller?.setFocusMode(FocusMode.locked);
     }
   }
 
