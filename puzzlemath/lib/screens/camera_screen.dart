@@ -83,33 +83,55 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
+  void _onScreenTap(TapDownDetails tapDetails, BoxConstraints constraints) {
+    final point = Offset(
+      tapDetails.localPosition.dx / constraints.maxWidth,
+      tapDetails.localPosition.dy / constraints.maxHeight,
+    );
+    _cameraBloc.add(FocusCamera(point));
+  }
+
   // TODO: set focus mode on screen tap
   //       e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
   // TODO: fix aspect ratio of camera image
   Widget _buildCameraPreview(BuildContext context) {
     final controller = BlocProvider.of<CameraBloc>(context).controller!;
-    return Stack(children: [
-      Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: CameraPreview(controller),
-        ),
-      ),
-      Container(
-          height: double.infinity,
+    return Stack(
+      children: [
+        Container(
           width: double.infinity,
+          height: double.infinity,
           child: AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: CustomPaint(
-                painter: DetectionPreview(
-                    imageWidth: this.imageWidth,
-                    imageHeight: this.imageHeight,
-                    color: this.color,
-                    objects: this.detectedObjects)),
-          )),
-    ]);
+            aspectRatio: 1.0 / controller.value.aspectRatio,
+            child: CameraPreview(
+              controller,
+              child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTapDown: (details) => _onScreenTap(details, constraints),
+                );
+              }),
+            ),
+          ),
+        ),
+        IgnorePointer(
+          child: Container(
+            height: double.infinity,
+            width: double.infinity,
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: CustomPaint(
+                  painter: DetectionPreview(
+                      imageWidth: this.imageWidth,
+                      imageHeight: this.imageHeight,
+                      color: this.color,
+                      objects: this.detectedObjects)),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildFloatingActionButton(BuildContext context) {
