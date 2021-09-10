@@ -20,7 +20,7 @@ std::vector<DetectedObject> puzzle::detectObjects(const cv::Mat& sourceImage) {
 
   cv::Mat image;
   cv::cvtColor(sourceImage, image, cv::COLOR_BGRA2GRAY, 1);
-  cv::threshold(image, image, 125, 255, cv::THRESH_BINARY |cv::THRESH_OTSU);
+  // NOTE: if detection is not good enough, use adaptive threshold
 
   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
   std::vector<int> markerIds;
