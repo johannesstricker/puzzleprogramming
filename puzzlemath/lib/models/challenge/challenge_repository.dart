@@ -61,7 +61,7 @@ const List<Challenge> CHALLENGES = [
     1,
     name: "Child's play.",
     description:
-        "Small numbers are boring. Kids know that they can create gigantic numbers by chaining multiple numbers.",
+        "Small numbers are boring. Kids know that they can create gigantic numbers by chaining multiple puzzle pieces.",
     solution: 137,
     availableMarkers: [
       Marker.Digit1,
