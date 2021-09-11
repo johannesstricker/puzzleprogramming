@@ -6,7 +6,7 @@
     {
       "name": "opencv4",
       "default-features": false,
-      "features": ["png", "dnn"]
+      "features": ["dnn", "png", "jpeg"]
     }
   ]
 }
