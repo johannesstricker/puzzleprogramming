@@ -4,14 +4,13 @@ import 'package:puzzlemath/math/challenge.dart';
 
 class ChallengeListItem extends StatelessWidget {
   final Challenge challenge;
-  final ChallengeState state;
 
-  ChallengeListItem(this.challenge, {this.state = ChallengeState.Locked});
+  ChallengeListItem(this.challenge);
 
   Icon buildIcon() {
-    if (state == ChallengeState.Solved) {
+    if (challenge.state == ChallengeState.Solved) {
       return Icon(Icons.done, color: Colors.green);
-    } else if (state == ChallengeState.Unlocked) {
+    } else if (challenge.state == ChallengeState.Unlocked) {
       return Icon(Icons.lock_open, color: Colors.black54);
     }
     return Icon(Icons.lock_outline, color: Colors.black26);
@@ -21,15 +20,18 @@ class ChallengeListItem extends StatelessWidget {
     return Text(challenge.name,
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: state == ChallengeState.Locked ? Colors.black26 : Colors.black,
+          color: challenge.state == ChallengeState.Locked
+              ? Colors.black26
+              : Colors.black,
         ));
   }
 
   Text buildDescription() {
     return Text('Lorem ipsum dolor sit amit.',
         style: TextStyle(
-          color:
-              state == ChallengeState.Locked ? Colors.black26 : Colors.black54,
+          color: challenge.state == ChallengeState.Locked
+              ? Colors.black26
+              : Colors.black54,
         ));
   }
 
@@ -68,7 +70,7 @@ class ChallengeListItem extends StatelessWidget {
     return Container(
       child: Material(
         color: Colors.white,
-        child: state == ChallengeState.Locked
+        child: challenge.state == ChallengeState.Locked
             ? buildRow()
             : InkWell(
                 onTap: () => navigateToChallenge(context),

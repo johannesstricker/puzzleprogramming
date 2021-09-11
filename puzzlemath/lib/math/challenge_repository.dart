@@ -5,7 +5,8 @@ const List<Challenge> ChallengeRepository = [
   Challenge(0,
       name: "What's the magic number?",
       solution: 137,
-      availableMarkers: [Marker.Digit1, Marker.Digit3, Marker.Digit7]),
+      availableMarkers: [Marker.Digit1, Marker.Digit3, Marker.Digit7],
+      state: ChallengeState.Unlocked),
   Challenge(
     1,
     name: "Child's play.",

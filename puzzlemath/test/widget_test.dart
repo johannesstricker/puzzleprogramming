@@ -12,7 +12,7 @@ import 'package:puzzlemath/widgets/challenge_list_item.dart';
 
 void main() {
   testWidgets('Shows a camera button', (WidgetTester tester) async {
-    await tester.pumpWidget(CameraApp());
+    await tester.pumpWidget(PuzzleApp());
     expect(find.widgetWithText(ChallengeListItem, "What's the magic number?"),
         findsOneWidget);
   });

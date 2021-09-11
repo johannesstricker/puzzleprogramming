@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
@@ -5,6 +6,8 @@ import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/math/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
 import '../widgets/detection_preview.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:puzzlemath/blocs/blocs.dart';
 
 class CameraScreenArguments {
   final Challenge challenge;
@@ -24,11 +27,10 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  late final CameraController controller;
-  bool _isInitialized = false;
-  bool _isTakingImage = false;
+  final CameraBloc _cameraBloc = CameraBloc(10);
+  StreamSubscription<CameraState>? _cameraStreamSubscription;
+
   bool _isButtonEnabled = false;
-  num _lastImageProcessedTime = 0;
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
 
@@ -41,77 +43,51 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void initState() {
-    super.initState();
-    availableCameras().then((cameras) {
-      if (cameras.length > 0) {
-        _initCameraController(cameras[0]).then((void v) {});
-      } else {
-        print('No camera available');
+    _cameraBloc.add(InitializeCamera());
+    _cameraStreamSubscription = _cameraBloc.stream.listen((CameraState state) {
+      if (state is CameraCapture) {
+        _onImageReceived(state.image);
       }
-    }).catchError((error) {
-      print('Error: $error.code\nError Message: $error.message');
     });
+    super.initState();
   }
 
   @override
-  void dispose() {
-    controller.stopImageStream();
+  void dispose() async {
     _imageBuffer.free();
+    await _cameraStreamSubscription?.cancel();
+    await _cameraBloc.close();
     super.dispose();
   }
 
+  // TODO: use old AST for a while when parsing fails to avoid spurious errors
   void _onImageReceived(CameraImage image) {
-    if (_isTakingImage) return;
+    _imageBuffer.update(image);
+    PuzzlePlugin.detectObjects(_imageBuffer)
+        .then((List<DetectedObject> objects) {
+      final sortedObjects = sortObjectListLTR(objects);
+      int? proposedSolution;
+      try {
+        proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
+      } catch (error) {}
 
-    final throttleMilliseconds = 100;
-    final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
-    final millisecondsPassed = _lastImageProcessedTime == 0
-        ? throttleMilliseconds
-        : currentMilliseconds - _lastImageProcessedTime;
-    final isTimedOut = millisecondsPassed >= throttleMilliseconds;
-    if (isTimedOut) {
-      _isTakingImage = true;
-
-      _imageBuffer.update(image);
-      PuzzlePlugin.detectObjects(_imageBuffer)
-          .then((List<DetectedObject> objects) {
-        final sortedObjects = sortObjectListLTR(objects);
-        int? proposedSolution;
-        try {
-          proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
-        } catch (error) {}
-
-        setState(() {
-          imageWidth = image.width.toDouble();
-          imageHeight = image.height.toDouble();
-          detectedObjects = sortedObjects;
-          _proposedSolution = proposedSolution;
-          _usedMarkers =
-              sortedObjects.map((obj) => createMarker(obj.id)).toList();
-          _isTakingImage = false;
-          _isButtonEnabled = proposedSolution != null;
-          _lastImageProcessedTime = currentMilliseconds;
-        });
-      });
-    }
-  }
-
-  Future _initCameraController(CameraDescription description) async {
-    controller = CameraController(description, ResolutionPreset.high);
-    try {
-      await controller.initialize();
-      controller.startImageStream(_onImageReceived);
       setState(() {
-        _isInitialized = true;
+        imageWidth = image.width.toDouble();
+        imageHeight = image.height.toDouble();
+        detectedObjects = sortedObjects;
+        _proposedSolution = proposedSolution;
+        _usedMarkers =
+            sortedObjects.map((obj) => createMarker(obj.id)).toList();
+        _isButtonEnabled = proposedSolution != null;
       });
-    } on CameraException catch (error) {
-      print('Camera exception: $error');
-    }
+    });
   }
 
   // TODO: set focus mode on screen tap
-  ////     e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
+  //       e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
+  // TODO: fix aspect ratio of camera image
   Widget _buildCameraPreview(BuildContext context) {
+    final controller = BlocProvider.of<CameraBloc>(context).controller;
     return Stack(children: [
       Container(
         height: double.infinity,
@@ -143,6 +119,13 @@ class _CameraScreenState extends State<CameraScreen> {
             if (_proposedSolution == null || _usedMarkers == null) {
               return;
             }
+            // TODO: push to success or error route
+            bool challengeSolved = widget.challenge
+                .checkSolution(_proposedSolution!, _usedMarkers!);
+            if (challengeSolved) {
+              BlocProvider.of<ChallengesBloc>(context)
+                  .add(SolveChallenge(widget.challenge));
+            }
             // TODO: don't push
             Navigator.pushNamed(
               context,
@@ -165,16 +148,25 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Take a picture'),
-        centerTitle: true,
-      ),
-      floatingActionButton: buildFloatingActionButton(context),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: _isInitialized ? _buildCameraPreview(context) : Container(),
+    return BlocProvider<CameraBloc>(
+      create: (context) => _cameraBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Take a picture'),
+          centerTitle: true,
+        ),
+        floatingActionButton: buildFloatingActionButton(context),
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: BlocBuilder<CameraBloc, CameraState>(
+              builder: (BuildContext context, CameraState state) {
+            if (state is CameraInitialized) {
+              return _buildCameraPreview(context);
+            }
+            return Container();
+          }),
+        ),
       ),
     );
   }
