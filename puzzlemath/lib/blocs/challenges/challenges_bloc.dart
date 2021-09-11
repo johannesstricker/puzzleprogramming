@@ -24,7 +24,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
 
   Stream<ChallengesState> _mapLoadChallengesToState() async* {
     final databaseConnection = await Database.instance.connection;
-    _repository = await ChallengeRepository(databaseConnection);
+    _repository = ChallengeRepository(databaseConnection);
     List<Challenge> challenges = await _repository.load();
     yield ChallengesLoaded(challenges: challenges);
   }
