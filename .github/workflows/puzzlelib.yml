@@ -48,6 +48,7 @@ jobs:
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/puzzlelib/CMakeLists.txt'
+        workingDirectory: ${{ github.workspace }}/puzzlelib
         buildDirectory: ${{ env.BUILD_DIR }}
         useVcpkgToolchainFile: true
         buildWithCMake: true
