@@ -15,11 +15,6 @@ TEST_CASE("detectObjects") {
   GIVEN("an image with multiple aruco markers") {
     auto imagePath = std::filesystem::current_path() / "data" / "images" / "equation.test.jpg";
     cv::Mat image = cv::imread(imagePath.string(), cv::IMREAD_COLOR);
-    std::cout << "WORKING DIRECTORY: " << std::filesystem::current_path().string() << std::endl;
-    bool exists = std::filesystem::exists(imagePath);
-    std::cout << "IMAGE PATH: " << imagePath << std::endl;
-    std::cout << "FILE EXISTS: " << exists << std::endl;
-    std::cout << "IMAGE SIZE: " << image.cols << " x " << image.rows << std::endl;
 
     THEN("it returns an unordered list of detected objects") {
       auto objects = puzzle::detectObjects(image);
