@@ -53,10 +53,10 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
     _imageBuffer.free();
-    await _cameraStreamSubscription?.cancel();
-    await _cameraBloc.close();
+    _cameraStreamSubscription?.cancel();
+    _cameraBloc.close();
     super.dispose();
   }
 
