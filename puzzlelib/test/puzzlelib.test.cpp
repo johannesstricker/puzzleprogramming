@@ -13,13 +13,11 @@ using namespace puzzle;
 
 TEST_CASE("detectObjects") {
   GIVEN("an image with multiple aruco markers") {
-    cv::Mat image = cv::imread("./data/images/equation.test.png");
+    auto imagePath = std::filesystem::current_path() / "data" / "images" / "equation.test.jpg";
+    cv::Mat image = cv::imread(imagePath.string(), cv::IMREAD_COLOR);
 
     THEN("it returns an unordered list of detected objects") {
       auto objects = puzzle::detectObjects(image);
-      for (auto obj : objects) {
-        std::cout << obj.id << std::endl;
-      }
       std::vector<int> objectIds;
       std::transform(objects.begin(), objects.end(), std::back_inserter(objectIds), [](const DetectedObject& object) {
         return object.id;
