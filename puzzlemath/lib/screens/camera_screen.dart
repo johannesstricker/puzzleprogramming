@@ -1,13 +1,24 @@
-import 'dart:ffi';
-import 'dart:typed_data';
-import 'package:ffi/ffi.dart';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-
 import 'package:puzzle_plugin/puzzle_plugin.dart';
+import 'package:puzzlemath/math/math.dart';
+import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/screens/solution_screen.dart';
+import '../widgets/detection_preview.dart';
+
+class CameraScreenArguments {
+  final Challenge challenge;
+
+  CameraScreenArguments({required this.challenge});
+}
 
 class CameraScreen extends StatefulWidget {
+  static const routeName = '/camera';
+
+  final Challenge challenge;
+
+  CameraScreen(CameraScreenArguments args) : challenge = args.challenge;
+
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
@@ -16,8 +27,17 @@ class _CameraScreenState extends State<CameraScreen> {
   late final CameraController controller;
   bool _isInitialized = false;
   bool _isTakingImage = false;
+  bool _isButtonEnabled = false;
   num _lastImageProcessedTime = 0;
-  String _currentText = "";
+  List<Marker>? _usedMarkers;
+  int? _proposedSolution;
+
+  ImageBuffer _imageBuffer = ImageBuffer.empty();
+
+  double imageWidth = 0;
+  double imageHeight = 0;
+  Color color = Colors.greenAccent;
+  List<DetectedObject> detectedObjects = const [];
 
   @override
   void initState() {
@@ -36,44 +56,40 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void dispose() {
     controller.stopImageStream();
+    _imageBuffer.free();
     super.dispose();
   }
-
-  Pointer<Uint8> _createImagePlanePointer(Uint8List plane) {
-    final buffer = calloc<Uint8>(plane.length);
-    final bufferBytes = buffer.asTypedList(plane.length);
-    bufferBytes.setAll(0, plane);
-    return buffer;
-  }
-
-  // NOTE: on iOS the image format is 32BGRA; on Android it's YUV_420_888
 
   void _onImageReceived(CameraImage image) {
     if (_isTakingImage) return;
 
-    final throttleMilliseconds = 1000;
+    final throttleMilliseconds = 100;
     final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
     final millisecondsPassed = _lastImageProcessedTime == 0
         ? throttleMilliseconds
         : currentMilliseconds - _lastImageProcessedTime;
     final isTimedOut = millisecondsPassed >= throttleMilliseconds;
     if (isTimedOut) {
-      setState(() {
-        _isTakingImage = true;
-      });
+      _isTakingImage = true;
 
-      final imageBytes = _createImagePlanePointer(image.planes[0].bytes);
-      // final bytesPerPixel = image.planes[0].bytesPerPixel;
-      final width = image.planes[0].width!;
-      final height = image.planes[0].height!;
-      final bytesPerRow = image.planes[0].bytesPerRow;
-      PuzzlePlugin.detectAndDecodeArUco32BGRA(
-              imageBytes, width, height, bytesPerRow)
-          .then((String content) {
-        _currentText = content;
-        calloc.free(imageBytes);
+      _imageBuffer.update(image);
+      PuzzlePlugin.detectObjects(_imageBuffer)
+          .then((List<DetectedObject> objects) {
+        final sortedObjects = sortObjectListLTR(objects);
+        int? proposedSolution;
+        try {
+          proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
+        } catch (error) {}
+
         setState(() {
+          imageWidth = image.width.toDouble();
+          imageHeight = image.height.toDouble();
+          detectedObjects = sortedObjects;
+          _proposedSolution = proposedSolution;
+          _usedMarkers =
+              sortedObjects.map((obj) => createMarker(obj.id)).toList();
           _isTakingImage = false;
+          _isButtonEnabled = proposedSolution != null;
           _lastImageProcessedTime = currentMilliseconds;
         });
       });
@@ -93,6 +109,8 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
+  // TODO: set focus mode on screen tap
+  ////     e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
   Widget _buildCameraPreview(BuildContext context) {
     return Stack(children: [
       Container(
@@ -104,15 +122,45 @@ class _CameraScreenState extends State<CameraScreen> {
         ),
       ),
       Container(
-        padding: const EdgeInsets.all(5.0),
-        alignment: Alignment.bottomCenter,
-        child: Text(
-          _currentText,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontSize: 14.0),
-        ),
-      ),
+          height: double.infinity,
+          width: double.infinity,
+          child: AspectRatio(
+            aspectRatio: controller.value.aspectRatio,
+            child: CustomPaint(
+                painter: DetectionPreview(
+                    imageWidth: this.imageWidth,
+                    imageHeight: this.imageHeight,
+                    color: this.color,
+                    objects: this.detectedObjects)),
+          )),
     ]);
+  }
+
+  Widget buildFloatingActionButton(BuildContext context) {
+    final opacity = _isButtonEnabled ? 1.0 : 0.1;
+    final onPressed = _isButtonEnabled
+        ? () {
+            if (_proposedSolution == null || _usedMarkers == null) {
+              return;
+            }
+            // TODO: don't push
+            Navigator.pushNamed(
+              context,
+              SolutionScreen.routeName,
+              arguments: SolutionScreenArguments(
+                  proposedSolution: _proposedSolution!,
+                  usedMarkers: _usedMarkers!,
+                  challenge: widget.challenge),
+            );
+          }
+        : null;
+    return Opacity(
+      opacity: opacity,
+      child: FloatingActionButton(
+        onPressed: onPressed,
+        child: Icon(Icons.camera),
+      ),
+    );
   }
 
   @override
@@ -122,6 +170,7 @@ class _CameraScreenState extends State<CameraScreen> {
         title: Text('Take a picture'),
         centerTitle: true,
       ),
+      floatingActionButton: buildFloatingActionButton(context),
       body: Container(
         height: double.infinity,
         width: double.infinity,

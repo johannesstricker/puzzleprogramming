@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
 import 'screens/camera_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/challenge_list_screen.dart';
+import 'screens/challenge_screen.dart';
+import 'screens/solution_screen.dart';
 
 void main() {
   runApp(CameraApp());
 }
 
-HomeScreen navigateToHomeScreen(context) {
-  return HomeScreen();
+ChallengeListScreen navigateToChallengeListScreen(context) {
+  return ChallengeListScreen();
 }
 
 CameraScreen navigateToCameraScreen(context) {
-  return CameraScreen();
+  final args =
+      ModalRoute.of(context)!.settings.arguments as CameraScreenArguments;
+  return CameraScreen(args);
 }
 
-// FinalScreen navigateToFinalScreen(context) {
-//   final args =
-//       ModalRoute.of(context)!.settings.arguments as FinalScreenArguments;
-//   return FinalScreen(args.message);
-// }
+ChallengeScreen navigateToChallengeScreen(context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as ChallengeScreenArguments;
+  return ChallengeScreen(args);
+}
+
+SolutionScreen navigateToSolutionScreen(context) {
+  final args =
+      ModalRoute.of(context)!.settings.arguments as SolutionScreenArguments;
+  return SolutionScreen(args);
+}
 
 class CameraApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -31,8 +41,10 @@ class CameraApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': navigateToHomeScreen,
-        '/camera': navigateToCameraScreen,
+        ChallengeListScreen.routeName: navigateToChallengeListScreen,
+        CameraScreen.routeName: navigateToCameraScreen,
+        ChallengeScreen.routeName: navigateToChallengeScreen,
+        SolutionScreen.routeName: navigateToSolutionScreen,
       },
     );
   }

@@ -1,46 +1,142 @@
 import 'dart:async';
 import 'dart:ffi';
-import 'dart:io';
 import 'package:ffi/ffi.dart';
-import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:camera/camera.dart';
 
-typedef DetectQrCode32BGRAFunctionNative = Pointer<Utf8> Function(
-    Pointer<Uint8>, Int32, Int32, Int32);
-typedef DetectQrCode32BGRAFunction = Pointer<Utf8> Function(
-    Pointer<Uint8>, int, int, int);
+class NativeCoordinate extends Struct {
+  @Double()
+  external double x;
+  @Double()
+  external double y;
 
-typedef TokenToStringFunctionNative = Pointer<Utf8> Function(Int32, Int32);
-typedef TokenToStringFunction = Pointer<Utf8> Function(int, int);
+  Coordinate clone() {
+    return Coordinate(x, y);
+  }
+}
+
+class Coordinate {
+  final double x;
+  final double y;
+
+  Coordinate(this.x, this.y);
+}
+
+class NativeDetectedObject extends Struct {
+  @Int32()
+  external int id;
+  external NativeCoordinate topLeft;
+  external NativeCoordinate topRight;
+  external NativeCoordinate bottomRight;
+  external NativeCoordinate bottomLeft;
+
+  DetectedObject clone() {
+    return DetectedObject(id, topLeft.clone(), topRight.clone(),
+        bottomRight.clone(), bottomLeft.clone());
+  }
+}
+
+class DetectedObject {
+  final int id;
+  final Coordinate topLeft;
+  final Coordinate topRight;
+  final Coordinate bottomRight;
+  final Coordinate bottomLeft;
+
+  DetectedObject(
+      this.id, this.topLeft, this.topRight, this.bottomRight, this.bottomLeft);
+}
+
+class NativeDetectedObjectList extends Struct {
+  @Int32()
+  external int size;
+  external Pointer<NativeDetectedObject> data;
+}
+
+// NOTE: on iOS the image format is 32BGRA; on Android it's YUV_420_888
+class ImageBuffer {
+  Pointer<Uint8> data;
+  int width;
+  int height;
+  int bytesPerRow;
+  int _bufferSize;
+
+  ImageBuffer._internal(
+      {required this.data,
+      required this.width,
+      required this.height,
+      required this.bytesPerRow})
+      : _bufferSize = 0;
+
+  factory ImageBuffer.empty() {
+    return ImageBuffer._internal(
+      data: nullptr,
+      width: 0,
+      height: 0,
+      bytesPerRow: 0,
+    );
+  }
+
+  void update(CameraImage image) {
+    final plane = image.planes[0];
+    final bytes = plane.bytes;
+
+    width = plane.width ?? 0;
+    height = plane.height ?? 0;
+    bytesPerRow = plane.bytesPerRow;
+
+    if (_bufferSize < bytes.length) {
+      calloc.free(data);
+      data = calloc<Uint8>(bytes.length);
+      _bufferSize = bytes.length;
+    }
+    final bufferBytes = data.asTypedList(bytes.length);
+    bufferBytes.setAll(0, bytes);
+  }
+
+  void free() {
+    if (data != nullptr) {
+      calloc.free(data);
+    }
+  }
+}
 
 class PuzzlePlugin {
-  static const MethodChannel _channel = const MethodChannel('puzzle_plugin');
-
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
+  static Future<List<DetectedObject>> detectObjects(ImageBuffer image) async {
+    // TODO: implement for Android
+    final objects = _PuzzleLib().detectObjects32BGRA(
+        image.data, image.width, image.height, image.bytesPerRow);
+    final List<DetectedObject> output = List<DetectedObject>.generate(
+      objects.size,
+      (i) => objects.data[i].clone(),
+    );
+    if (objects.size > 0) {
+      _freeDetectedObjects(objects.data);
+    }
+    return output;
   }
 
-  static Future<String> detectAndDecodeArUco32BGRA(Pointer<Uint8> bytes,
-      int imageWidth, int imageHeight, int bytesPerRow) async {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<
-        DetectQrCode32BGRAFunctionNative,
-        DetectQrCode32BGRAFunction>("detectAndDecodeArUco32BGRA");
-    Pointer<Utf8> decodedString =
-        nativeFunction(bytes, imageWidth, imageHeight, bytesPerRow);
-    final result = decodedString.toDartString();
-    malloc.free(decodedString);
-    return result;
+  static void _freeDetectedObjects(Pointer<NativeDetectedObject> ptr) {
+    _PuzzleLib().freeDetectedObjects(ptr);
+  }
+}
+
+class _PuzzleLib {
+  final DynamicLibrary _lib;
+  late final FreeDetectedObjectsFunction freeDetectedObjects;
+  late final DetectObjects32BGRAFunction detectObjects32BGRA;
+
+  static final _PuzzleLib _singleton = _PuzzleLib._internal();
+
+  factory _PuzzleLib() {
+    return _singleton;
   }
 
-  static Future<String> tokenToString(int tokenId, int value) async {
-    DynamicLibrary nativeLib = _getDynamicLibrary();
-    final nativeFunction = nativeLib.lookupFunction<TokenToStringFunctionNative,
-        TokenToStringFunction>("tokenToString");
-    Pointer<Utf8> outputString = nativeFunction(tokenId, value);
-    final result = outputString.toDartString();
-    malloc.free(outputString);
-    return result;
+  _PuzzleLib._internal() : _lib = _getDynamicLibrary() {
+    freeDetectedObjects = _lib.lookupFunction<FreeDetectedObjectsFunctionNative,
+        FreeDetectedObjectsFunction>("freeDetectedObjects");
+    detectObjects32BGRA = _lib.lookupFunction<DetectObjects32BGRAFunctionNative,
+        DetectObjects32BGRAFunction>("detectObjects32BGRA");
   }
 
   static DynamicLibrary _getDynamicLibrary() {
@@ -50,3 +146,13 @@ class PuzzlePlugin {
     return nativeEdgeDetection;
   }
 }
+
+typedef DetectObjects32BGRAFunctionNative = NativeDetectedObjectList Function(
+    Pointer<Uint8>, Int32, Int32, Int32);
+typedef DetectObjects32BGRAFunction = NativeDetectedObjectList Function(
+    Pointer<Uint8>, int, int, int);
+
+typedef FreeDetectedObjectsFunctionNative = Void Function(
+    Pointer<NativeDetectedObject>);
+typedef FreeDetectedObjectsFunction = void Function(
+    Pointer<NativeDetectedObject>);

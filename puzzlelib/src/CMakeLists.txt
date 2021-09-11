@@ -4,7 +4,7 @@ ADD_EXECUTABLE(puzzleprogramming)
 TARGET_SOURCES(puzzleprogramming
   PRIVATE
     main.cpp
-    math_equations.cpp
+    puzzlelib.cpp
 )
 TARGET_LINK_LIBRARIES(puzzleprogramming
   PRIVATE
@@ -12,5 +12,6 @@ TARGET_LINK_LIBRARIES(puzzleprogramming
 )
 TARGET_INCLUDE_DIRECTORIES(puzzleprogramming
   PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
 )

@@ -4,8 +4,9 @@ ADD_EXECUTABLE(Tests)
 TARGET_SOURCES(Tests
   PRIVATE
     main.test.cpp
-    math_equations.test.cpp
-    ${CMAKE_SOURCE_DIR}/src/math_equations.cpp
+    aruco.test.cpp
+    puzzlelib.test.cpp
+    ${CMAKE_SOURCE_DIR}/src/puzzlelib.cpp
 )
 TARGET_LINK_LIBRARIES(Tests
   PRIVATE
@@ -15,11 +16,12 @@ TARGET_LINK_LIBRARIES(Tests
 )
 TARGET_INCLUDE_DIRECTORIES(Tests
   PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
 )
 
 ADD_CUSTOM_COMMAND(TARGET Tests POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/test/data $<TARGET_FILE_DIR:Tests>/data
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/test/data ${CMAKE_CURRENT_BINARY_DIR}/data
 )
 
 SET_TARGET_PROPERTIES(Tests PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")

@@ -39,10 +39,9 @@ jobs:
         appendedCacheKey: ${{ hashFiles( '**/vcpkg.json' ) }}
         # vcpkgTriplet: ${{ matrix.triplet }}
         # Because vcpkg is not used as a submodule, we need to specify the exact git commit id
-        vcpkgGitCommitId: b67fab9861239e33b722b9a44f5c96dec6ca807e
+        vcpkgGitCommitId: 1909fbc4eb8ef30017a79dce50c0f232d149a051
         # Ensure the vcpkg artifacts are cached, they are generated in the 'CMAKE_BINARY_DIR/vcpkg_installed' directory.
         additionalCachedPaths: ${{ env.BUILD_DIR }}/vcpkg_installed
-        post-if: 'always()'
 
     - name: Build
       uses: lukka/run-cmake@v3
@@ -55,4 +54,4 @@ jobs:
 
     - name: Test
       working-directory: ${{ env.BUILD_DIR }}
-      run: ctest -T test --output-on-failure
+      run: ctest -T test --output-on-failure --verbose

@@ -5,14 +5,15 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:puzzlemath/main.dart';
+import 'package:puzzlemath/widgets/challenge_list_item.dart';
 
 void main() {
   testWidgets('Shows a camera button', (WidgetTester tester) async {
     await tester.pumpWidget(CameraApp());
-    expect(find.widgetWithIcon(IconButton, Icons.camera), findsOneWidget);
+    expect(find.widgetWithText(ChallengeListItem, "What's the magic number?"),
+        findsOneWidget);
   });
 }
