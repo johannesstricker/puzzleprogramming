@@ -1,4 +1,3 @@
-import 'package:puzzlemath/config/database.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,12 +8,6 @@ class ChallengeRepository {
   late final Database connection;
 
   ChallengeRepository(this.connection);
-
-  static connected() async {
-    // TODO: somehow inject the database connection
-    final connection = await connectToDatabase();
-    return ChallengeRepository(connection);
-  }
 
   Future<Challenge> save(Challenge challenge) async {
     final id = await connection.insert(

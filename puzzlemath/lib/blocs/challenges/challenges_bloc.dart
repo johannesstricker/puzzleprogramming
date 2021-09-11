@@ -4,6 +4,7 @@ import './challenges_states.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/models/challenge/challenge_repository.dart';
 import 'package:collection/collection.dart';
+import 'package:puzzlemath/config/database.dart';
 
 class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   late final ChallengeRepository _repository;
@@ -22,7 +23,8 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   }
 
   Stream<ChallengesState> _mapLoadChallengesToState() async* {
-    _repository = await ChallengeRepository.connected();
+    final databaseConnection = await Database.instance.connection;
+    _repository = await ChallengeRepository(databaseConnection);
     List<Challenge> challenges = await _repository.load();
     yield ChallengesLoaded(challenges: challenges);
   }
