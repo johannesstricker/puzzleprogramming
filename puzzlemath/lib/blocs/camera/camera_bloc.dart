@@ -17,7 +17,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
   final num _throttle;
   num _busySince = 0;
 
-  CameraBloc(this._throttle) : super(CameraUninitialized()) {}
+  CameraBloc(this._throttle) : super(CameraUninitialized());
 
   @override
   Stream<CameraState> mapEventToState(CameraEvent event) async* {
