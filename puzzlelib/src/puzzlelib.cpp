@@ -3,10 +3,28 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 #include <string.h>
 #include <vector>
 
 using namespace puzzle;
+
+// NOTE: This might help when trying to make detection work regardless of background.
+//       Alternatively, make puzzle piece colors more vibrant and preprocess based on hue.
+// namespace puzzle {
+//   void convertToBinaryImage(cv::Mat& image) {
+//     cv::Mat mask;
+//     double minVal;
+//     double maxVal;
+//     cv::Point minIdx;
+//     cv::Point maxIdx;
+//     cv::blur(image, mask, cv::Size(11, 11));
+//     cv::minMaxLoc(mask, &minVal, &maxVal, &minIdx, &maxIdx);
+//     double scale = 255.0 / (maxVal - minVal);
+//     image = (image - minVal) * scale;
+//     cv::threshold(image, image, maxVal * 0.6, 255, cv::THRESH_BINARY);
+//   }
+// }
 
 std::vector<DetectedObject> puzzle::detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
   cv::Mat sourceImage(imageHeight, imageWidth, CV_8UC4, imageBytes, bytesPerRow);
