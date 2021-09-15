@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ffi';
 import 'package:ffi/ffi.dart';
 import 'dart:io';
@@ -102,7 +101,7 @@ class ImageBuffer {
 }
 
 class PuzzlePlugin {
-  static Future<List<DetectedObject>> detectObjects(ImageBuffer image) async {
+  static List<DetectedObject> detectObjects(ImageBuffer image) {
     // TODO: implement for Android
     final objects = _PuzzleLib().detectObjects32BGRA(
         image.data, image.width, image.height, image.bytesPerRow);
@@ -110,9 +109,7 @@ class PuzzlePlugin {
       objects.size,
       (i) => objects.data[i].clone(),
     );
-    if (objects.size > 0) {
-      _freeDetectedObjects(objects.data);
-    }
+    _freeDetectedObjects(objects.data);
     return output;
   }
 

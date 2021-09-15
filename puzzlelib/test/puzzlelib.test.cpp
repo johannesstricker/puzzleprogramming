@@ -11,18 +11,22 @@
 
 using namespace puzzle;
 
+std::vector<int> getObjectIDs(const std::vector<DetectedObject>& objects) {
+  std::vector<int> objectIDs;
+  std::transform(objects.begin(), objects.end(), std::back_inserter(objectIDs), [](const DetectedObject& object) {
+    return object.id;
+  });
+  return objectIDs;
+}
+
 TEST_CASE("detectObjects") {
   GIVEN("an image with multiple aruco markers") {
-    auto imagePath = std::filesystem::current_path() / "data" / "images" / "equation.test.jpg";
+    auto imagePath = std::filesystem::current_path() / "data" / "images" / "equation_light_background.test.jpg";
     cv::Mat image = cv::imread(imagePath.string(), cv::IMREAD_COLOR);
 
     THEN("it returns an unordered list of detected objects") {
       auto objects = puzzle::detectObjects(image);
-      std::vector<int> objectIds;
-      std::transform(objects.begin(), objects.end(), std::back_inserter(objectIds), [](const DetectedObject& object) {
-        return object.id;
-      });
-
+      std::vector<int> objectIds = getObjectIDs(objects);
       std::vector<int> expectedObjectIds{
         static_cast<int>(Marker::Start),
         static_cast<int>(Marker::LeftParenthesis),
@@ -55,4 +59,27 @@ TEST_CASE("detectObjects") {
       REQUIRE(xPositions[Marker::Digit_2] < xPositions[Marker::End]);
     }
   }
+
+  // TODO: preprocess image to be able to detect markers regardless of background
+  // GIVEN("an image with multiple aruco markes on dark background") {
+  //   auto imagePath = std::filesystem::current_path() / "data" / "images" / "equation_dark_background.test.jpg";
+  //   cv::Mat image = cv::imread(imagePath.string(), cv::IMREAD_COLOR);
+
+  //   THEN("it returns an unordered list of detected objects") {
+  //     auto objects = puzzle::detectObjects(image);
+  //     std::vector<int> objectIds = getObjectIDs(objects);
+  //     std::vector<int> expectedObjectIds{
+  //       static_cast<int>(Marker::Start),
+  //       static_cast<int>(Marker::Digit_5),
+  //       static_cast<int>(Marker::Digit_6),
+  //       static_cast<int>(Marker::OperatorAdd),
+  //       static_cast<int>(Marker::Digit_3),
+  //       static_cast<int>(Marker::Digit_0),
+  //       static_cast<int>(Marker::OperatorMultiply),
+  //       static_cast<int>(Marker::Digit_4),
+  //       static_cast<int>(Marker::End)
+  //     };
+  //     REQUIRE_THAT(objectIds, Catch::Matchers::UnorderedEquals(expectedObjectIds));
+  //   }
+  // }
 }

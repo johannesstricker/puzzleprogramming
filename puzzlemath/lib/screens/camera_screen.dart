@@ -3,9 +3,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
-import '../widgets/detection_preview.dart';
+import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
 
@@ -53,63 +53,82 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   @override
-  void dispose() async {
+  void dispose() {
     _imageBuffer.free();
-    await _cameraStreamSubscription?.cancel();
-    await _cameraBloc.close();
+    _cameraStreamSubscription?.cancel();
+    _cameraBloc.close();
     super.dispose();
   }
 
   // TODO: use old AST for a while when parsing fails to avoid spurious errors
   void _onImageReceived(CameraImage image) {
     _imageBuffer.update(image);
-    PuzzlePlugin.detectObjects(_imageBuffer)
-        .then((List<DetectedObject> objects) {
-      final sortedObjects = sortObjectListLTR(objects);
-      int? proposedSolution;
-      try {
-        proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
-      } catch (error) {}
+    final objects = PuzzlePlugin.detectObjects(_imageBuffer);
+    final sortedObjects = sortObjectListLTR(objects);
+    int? proposedSolution;
+    try {
+      proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
+    } catch (error) {}
 
-      setState(() {
-        imageWidth = image.width.toDouble();
-        imageHeight = image.height.toDouble();
-        detectedObjects = sortedObjects;
-        _proposedSolution = proposedSolution;
-        _usedMarkers =
-            sortedObjects.map((obj) => createMarker(obj.id)).toList();
-        _isButtonEnabled = proposedSolution != null;
-      });
+    setState(() {
+      imageWidth = image.width.toDouble();
+      imageHeight = image.height.toDouble();
+      detectedObjects = sortedObjects;
+      _proposedSolution = proposedSolution;
+      _usedMarkers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
+      _isButtonEnabled = proposedSolution != null;
     });
+  }
+
+  void _onScreenTap(TapDownDetails tapDetails, BoxConstraints constraints) {
+    final point = Offset(
+      tapDetails.localPosition.dx / constraints.maxWidth,
+      tapDetails.localPosition.dy / constraints.maxHeight,
+    );
+    _cameraBloc.add(FocusCamera(point));
   }
 
   // TODO: set focus mode on screen tap
   //       e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
   // TODO: fix aspect ratio of camera image
   Widget _buildCameraPreview(BuildContext context) {
-    final controller = BlocProvider.of<CameraBloc>(context).controller;
-    return Stack(children: [
-      Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: CameraPreview(controller),
-        ),
-      ),
-      Container(
-          height: double.infinity,
+    final controller = BlocProvider.of<CameraBloc>(context).controller!;
+    return Stack(
+      children: [
+        Container(
           width: double.infinity,
+          height: double.infinity,
           child: AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: CustomPaint(
-                painter: DetectionPreview(
-                    imageWidth: this.imageWidth,
-                    imageHeight: this.imageHeight,
-                    color: this.color,
-                    objects: this.detectedObjects)),
-          )),
-    ]);
+            aspectRatio: 1.0 / controller.value.aspectRatio,
+            child: CameraPreview(
+              controller,
+              child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTapDown: (details) => _onScreenTap(details, constraints),
+                );
+              }),
+            ),
+          ),
+        ),
+        IgnorePointer(
+          child: Container(
+            height: double.infinity,
+            width: double.infinity,
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: CustomPaint(
+                  painter: DetectionPreview(
+                      imageWidth: this.imageWidth,
+                      imageHeight: this.imageHeight,
+                      color: this.color,
+                      objects: this.detectedObjects)),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildFloatingActionButton(BuildContext context) {

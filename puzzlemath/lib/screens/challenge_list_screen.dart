@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/challenges/challenges.dart';
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/widgets/challenge_list_item.dart';
 
 class ChallengeListScreen extends StatelessWidget {
@@ -20,10 +20,10 @@ class ChallengeListScreen extends StatelessWidget {
     return BlocBuilder<ChallengesBloc, ChallengesState>(
         builder: (context, state) {
       if (state is ChallengesLoading) {
-        return Container();
+        return Center(child: CircularProgressIndicator());
       }
       if (state is ChallengesError) {
-        return Container();
+        return Center(child: Text('An error occured.'));
       }
       final List<Challenge> challenges = (state as ChallengesLoaded).challenges;
       return ListView.separated(

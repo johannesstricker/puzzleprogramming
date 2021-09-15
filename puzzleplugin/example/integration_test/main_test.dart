@@ -7,6 +7,6 @@ void main() {
 
   testWidgets("can call native function", (WidgetTester tester) async {
     final buffer = ImageBuffer.empty();
-    expect(await PuzzlePlugin.detectObjects(buffer), []);
+    expect(PuzzlePlugin.detectObjects(buffer), []);
   });
 }

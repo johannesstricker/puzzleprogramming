@@ -7,13 +7,13 @@ import 'package:camera/camera.dart';
 
 Future<CameraController> _getCameraController() async {
   final cameras = await availableCameras();
-  return CameraController(cameras.first, ResolutionPreset.low,
-      enableAudio: false);
+  return CameraController(cameras.first, ResolutionPreset.medium,
+      enableAudio: false, imageFormatGroup: ImageFormatGroup.bgra8888);
 }
 
 // TODO: maybe switch to cameraawesome package (https://pub.dev/packages/camerawesome)
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
-  late final CameraController controller;
+  CameraController? controller;
   final num _throttle;
   num _busySince = 0;
 
@@ -25,15 +25,18 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
       yield* _mapInitializeCameraToState();
     } else if (event is TakePicture) {
       yield* _mapTakePictureToState(event);
+    } else if (event is FocusCamera) {
+      yield* _mapFocusCameraToState(event);
     }
   }
 
   Stream<CameraState> _mapInitializeCameraToState() async* {
     try {
+      controller?.dispose();
       controller = await _getCameraController();
-      await controller.initialize();
+      await controller!.initialize();
       yield CameraInitialized();
-      controller.startImageStream((image) => add(TakePicture(image)));
+      controller!.startImageStream((image) => add(TakePicture(image)));
     } on CameraException catch (error) {
       // TODO: add CameraError state
       debugPrint(error.description);
@@ -53,9 +56,17 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     }
   }
 
+  Stream<CameraState> _mapFocusCameraToState(FocusCamera event) async* {
+    if (state is CameraInitialized) {
+      controller?.setExposurePoint(event.point);
+      controller?.setFocusPoint(event.point);
+      controller?.setFocusMode(FocusMode.locked);
+    }
+  }
+
   @override
   Future<void> close() async {
-    await controller.dispose();
+    await controller?.dispose();
     return super.close();
   }
 }

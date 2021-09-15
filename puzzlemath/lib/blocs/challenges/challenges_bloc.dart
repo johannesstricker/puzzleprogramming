@@ -1,11 +1,14 @@
 import 'package:bloc/bloc.dart';
 import './challenges_events.dart';
 import './challenges_states.dart';
-import 'package:puzzlemath/math/challenge.dart';
-import 'package:puzzlemath/math/challenge_repository.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge_repository.dart';
 import 'package:collection/collection.dart';
+import 'package:puzzlemath/config/database.dart';
 
 class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
+  late final ChallengeRepository _repository;
+
   ChallengesBloc() : super(ChallengesLoading()) {
     add(LoadChallenges());
   }
@@ -20,7 +23,10 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   }
 
   Stream<ChallengesState> _mapLoadChallengesToState() async* {
-    yield ChallengesLoaded(challenges: ChallengeRepository);
+    final databaseConnection = await Database.instance.connection;
+    _repository = ChallengeRepository(databaseConnection);
+    List<Challenge> challenges = await _repository.load();
+    yield ChallengesLoaded(challenges: challenges);
   }
 
   Stream<ChallengesState> _mapSolveChallengeToState(
@@ -39,6 +45,7 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
         }
         return challenge;
       }).toList();
+      await _repository.saveAll(updatedChallenges);
       yield ChallengesLoaded(challenges: updatedChallenges);
     }
   }

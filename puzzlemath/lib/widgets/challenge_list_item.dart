@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/challenge_screen.dart';
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 
 class ChallengeListItem extends StatelessWidget {
   final Challenge challenge;

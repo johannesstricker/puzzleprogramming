@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/camera_screen.dart';
-import 'package:puzzlemath/math/challenge.dart';
+import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
 
