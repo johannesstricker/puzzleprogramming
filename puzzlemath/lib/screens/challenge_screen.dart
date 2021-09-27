@@ -83,8 +83,17 @@ class ChallengeScreen extends StatelessWidget {
         ));
   }
 
+  Text buildSolution(BuildContext context, int solution) {
+    return Text(solution.toString(),
+        style: TextStyle(
+          fontSize: 24.0,
+          fontWeight: FontWeight.bold,
+        ));
+  }
+
   Widget buildMarkerList(BuildContext context) {
-    final availableMarkers = countAvailableMarkers();
+    final availableMarkers = countAvailableMarkers().entries.toList();
+    availableMarkers.sort((a, b) => a.key.index.compareTo(b.key.index));
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -95,7 +104,7 @@ class ChallengeScreen extends StatelessWidget {
       children: List.generate(
         availableMarkers.length,
         (index) {
-          final marker = availableMarkers.entries.toList()[index];
+          final marker = availableMarkers[index];
           return buildMarker(context, marker.key, marker.value);
         },
       ),
@@ -119,6 +128,10 @@ class ChallengeScreen extends StatelessWidget {
               buildSectionTitle(context, 'Use these puzzle pieces'),
               SizedBox(height: 12),
               buildMarkerList(context),
+              SizedBox(height: 24),
+              buildSectionTitle(context, 'Puzzle this number'),
+              SizedBox(height: 12),
+              buildSolution(context, challenge.solution),
               SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
