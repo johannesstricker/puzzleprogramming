@@ -87,4 +87,84 @@ const List<Challenge> CHALLENGES = [
         Marker.Digit8,
         Marker.OperatorAdd,
       ]),
+  Challenge(4,
+      name: "Take a step back.",
+      description: "Is the number too large? Try the '-' sign.",
+      solution: 99,
+      availableMarkers: [
+        Marker.Digit1,
+        Marker.Digit0,
+        Marker.Digit0,
+        Marker.OperatorSubtract,
+        Marker.Digit1
+      ]),
+  Challenge(5,
+      name: "Bring it on!",
+      description: "Use everything that you've learned so far to solve this.",
+      solution: 51,
+      availableMarkers: [
+        Marker.Digit7,
+        Marker.OperatorAdd,
+        Marker.Digit4,
+        Marker.Digit9,
+        Marker.OperatorSubtract,
+        Marker.Digit5
+      ]),
+  Challenge(6,
+      name: "Practice makes perfect.",
+      description:
+          "Let's try another one. Did you notice that there's more than a single solution?",
+      solution: 30,
+      availableMarkers: [
+        Marker.Digit3,
+        Marker.Digit0,
+        Marker.OperatorSubtract,
+        Marker.Digit8,
+        Marker.OperatorAdd,
+        Marker.Digit2,
+        Marker.OperatorAdd,
+        Marker.Digit6
+      ]),
+  Challenge(7,
+      name: "Try something new!",
+      description:
+          "If Tom and Jerry both have three apples...how many apples are there?",
+      solution: 9,
+      availableMarkers: [
+        Marker.Digit3,
+        Marker.OperatorMultiply,
+        Marker.Digit3
+      ]),
+  Challenge(8,
+      name: "More apples!",
+      description:
+          "I can't get enough. Again, there's more than one way to victory.",
+      solution: 126,
+      availableMarkers: [
+        Marker.Digit9,
+        Marker.OperatorMultiply,
+        Marker.Digit7,
+        Marker.Digit2
+      ]),
+  Challenge(9,
+      name: "Turn the power off!",
+      description: "Make things disappear, wizard!",
+      solution: 0,
+      availableMarkers: [
+        Marker.Digit9,
+        Marker.Digit9,
+        Marker.OperatorMultiply,
+        Marker.Digit0
+      ]),
+  Challenge(10,
+      name: "An optical illusion",
+      description: "Sometimes, thing's are not as they seem.",
+      solution: 7,
+      availableMarkers: [
+        Marker.Digit7,
+        Marker.OperatorMultiply,
+        Marker.Digit1,
+        Marker.OperatorAdd,
+        Marker.Digit0
+      ]),
 ];
