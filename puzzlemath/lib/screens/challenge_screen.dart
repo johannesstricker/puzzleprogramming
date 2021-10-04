@@ -3,6 +3,7 @@ import 'package:puzzlemath/screens/camera_screen.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
+import 'package:puzzlemath/widgets/generic_button.dart';
 
 class ChallengeScreenArguments {
   final Challenge challenge;
@@ -135,13 +136,9 @@ class ChallengeScreen extends StatelessWidget {
               SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: Button.Primary(
+                  'Ready',
                   onPressed: () => navigateToCameraScreen(context),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                    child: Text('Ready'),
-                  ),
                 ),
               ),
             ],
