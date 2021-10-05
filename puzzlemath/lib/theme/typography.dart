@@ -11,7 +11,7 @@ final TextRegularS = GoogleFonts.rubik(
 );
 
 final TextMediumS = TextRegularS.copyWith(
-  fontWeight: FontWeight.w500,
+  fontWeight: FontWeight.w600,
 );
 
 final TextRegularM = TextRegularS.copyWith(
@@ -20,7 +20,7 @@ final TextRegularM = TextRegularS.copyWith(
 );
 
 final TextMediumM = TextRegularM.copyWith(
-  fontWeight: FontWeight.w500,
+  fontWeight: FontWeight.w600,
 );
 
 final TextHeading1 = GoogleFonts.bangers(

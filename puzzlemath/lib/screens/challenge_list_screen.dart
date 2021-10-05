@@ -85,7 +85,7 @@ class _CarrousselState extends State<Carroussel> {
           ),
         );
       },
-      child: ChallengeListItem(widget.challenges[index]),
+      child: ChallengeListItem(widget.challenges[index], index: index + 1),
     );
   }
 }
@@ -96,11 +96,6 @@ class ChallengeListScreen extends StatelessWidget {
   final int progress;
 
   ChallengeListScreen({this.progress = 0});
-
-  Widget buildChallengeItem(List<Challenge> challenges, int index) {
-    final Challenge challenge = challenges[index];
-    return ChallengeListItem(challenge);
-  }
 
   Widget buildBody(BuildContext context) {
     return BlocBuilder<ChallengesBloc, ChallengesState>(

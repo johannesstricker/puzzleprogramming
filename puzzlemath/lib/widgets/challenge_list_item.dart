@@ -5,9 +5,21 @@ import 'package:puzzlemath/widgets/button.dart';
 import 'package:puzzlemath/theme/theme.dart';
 
 class ChallengeListItem extends StatelessWidget {
+  final int index;
   final Challenge challenge;
 
-  ChallengeListItem(this.challenge);
+  ChallengeListItem(this.challenge, {required this.index});
+
+  Widget buildAnchor() {
+    return Text(
+      index.toString().padLeft(2, '0'),
+      style: TextRegularS.copyWith(
+        color: challenge.state == ChallengeState.Unlocked
+            ? ColorPrimarySurface
+            : ColorNeutral60,
+      ),
+    );
+  }
 
   Widget buildTitle() {
     return Stack(
@@ -56,8 +68,10 @@ class ChallengeListItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          buildTitle(),
+          buildAnchor(),
           SizedBox(height: 12),
+          buildTitle(),
+          SizedBox(height: 20),
           buildDescription(),
           Spacer(flex: 1),
           Button(
