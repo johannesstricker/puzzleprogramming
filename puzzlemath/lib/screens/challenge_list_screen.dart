@@ -41,10 +41,7 @@ class ChallengeListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Puzzle Programming'),
-        centerTitle: true,
-      ),
+      appBar: null,
       body: buildBody(context),
     );
   }

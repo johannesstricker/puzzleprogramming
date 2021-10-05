@@ -5,6 +5,8 @@ import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
+import 'package:puzzlemath/widgets/app_bar.dart';
+import 'package:puzzlemath/widgets/button.dart';
 import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
@@ -158,9 +160,9 @@ class _CameraScreenState extends State<CameraScreen> {
         : null;
     return Opacity(
       opacity: opacity,
-      child: FloatingActionButton(
+      child: Button.Primary(
         onPressed: onPressed,
-        child: Icon(Icons.camera),
+        icon: Icons.camera,
       ),
     );
   }
@@ -170,10 +172,8 @@ class _CameraScreenState extends State<CameraScreen> {
     return BlocProvider<CameraBloc>(
       create: (context) => _cameraBloc,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('Take a picture'),
-          centerTitle: true,
-        ),
+        extendBodyBehindAppBar: true,
+        appBar: PuzzleAppBar(),
         floatingActionButton: buildFloatingActionButton(context),
         body: Container(
           height: double.infinity,
