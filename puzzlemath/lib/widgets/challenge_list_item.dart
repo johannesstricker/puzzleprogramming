@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/challenge_screen.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
+import 'package:puzzlemath/widgets/button.dart';
+import 'package:puzzlemath/theme/theme.dart';
 
 class ChallengeListItem extends StatelessWidget {
   final Challenge challenge;
@@ -17,41 +19,38 @@ class ChallengeListItem extends StatelessWidget {
   }
 
   Text buildTitle() {
-    return Text(challenge.name,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: challenge.state == ChallengeState.Locked
-              ? Colors.black26
-              : Colors.black,
-        ));
+    return Text(
+      challenge.name,
+      style: TextHeading1,
+    );
   }
 
   Text buildDescription() {
-    return Text('Lorem ipsum dolor sit amit.',
-        style: TextStyle(
-          color: challenge.state == ChallengeState.Locked
-              ? Colors.black26
-              : Colors.black54,
-        ));
+    return Text(
+      challenge.description,
+      style: TextRegularM.copyWith(
+        color: ColorNeutral60,
+      ),
+    );
   }
 
-  Widget buildRow() {
+  Widget buildRow(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildTitle(),
-              SizedBox(height: 4),
-              buildDescription(),
-            ],
+          buildTitle(),
+          SizedBox(height: 4),
+          buildDescription(),
+          Spacer(flex: 1),
+          Button.Primary(
+            text: 'Continue',
+            icon: challenge.state == ChallengeState.Locked ? Icons.lock : null,
+            enabled: challenge.state != ChallengeState.Locked,
+            onPressed: () => navigateToChallenge(context),
           ),
-          buildIcon(),
         ],
       ),
     );
@@ -70,12 +69,7 @@ class ChallengeListItem extends StatelessWidget {
     return Container(
       child: Material(
         color: Colors.white,
-        child: challenge.state == ChallengeState.Locked
-            ? buildRow()
-            : InkWell(
-                onTap: () => navigateToChallenge(context),
-                child: buildRow(),
-              ),
+        child: buildRow(context),
       ),
     );
   }

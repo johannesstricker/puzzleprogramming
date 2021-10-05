@@ -17,7 +17,7 @@ class Carroussel extends StatefulWidget {
 class _CarrousselState extends State<Carroussel> {
   late PageController controller;
   int currentPage = 2;
-  final double viewportFraction = 0.85;
+  final double viewportFraction = 0.88;
 
   @override
   initState() {
@@ -58,15 +58,14 @@ class _CarrousselState extends State<Carroussel> {
         double value = 1.0;
         if (controller.position.haveDimensions) {
           double tempValue = controller.page! - index;
-          value = (1 - (tempValue.abs() * (1.0 - viewportFraction)))
-              .clamp(0.0, 1.0);
+          value = (1 - (tempValue.abs() * 0.3)).clamp(0.0, 1.0);
         }
 
         final viewportWidth = MediaQuery.of(context).size.width;
         return Center(
           child: SizedBox(
             width: Curves.easeOut.transform(value) * viewportWidth,
-            height: Curves.easeOut.transform(value) * (viewportWidth * 1.25),
+            height: Curves.easeOut.transform(value) * viewportWidth,
             child: Container(
               margin: const EdgeInsets.all(2.0),
               child: Card(
