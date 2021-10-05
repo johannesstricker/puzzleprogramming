@@ -3,7 +3,7 @@ import 'package:puzzlemath/screens/camera_screen.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
-import 'package:puzzlemath/widgets/generic_button.dart';
+import 'package:puzzlemath/widgets/button.dart';
 
 class ChallengeScreenArguments {
   final Challenge challenge;
