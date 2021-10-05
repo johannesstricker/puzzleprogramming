@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/camera_screen.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
+import 'package:puzzlemath/widgets/app_bar.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
 import 'package:puzzlemath/widgets/button.dart';
 
@@ -137,7 +138,7 @@ class ChallengeScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: Button.Primary(
-                  'Ready',
+                  text: 'Ready',
                   onPressed: () => navigateToCameraScreen(context),
                 ),
               ),
@@ -159,10 +160,8 @@ class ChallengeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Puzzle Programming'),
-        centerTitle: true,
-      ),
+      // appBar: PuzzleAppBar(),
+      appBar: PuzzleAppBar(),
       body: buildMainWidget(context),
     );
   }
