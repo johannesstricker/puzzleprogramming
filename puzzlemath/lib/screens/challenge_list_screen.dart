@@ -16,12 +16,16 @@ class Carroussel extends StatefulWidget {
 
 class _CarrousselState extends State<Carroussel> {
   late PageController controller;
-  int currentPage = 2;
+  int currentPage = 0;
+  int activeChallengeIndex = 0;
   final double viewportFraction = 0.88;
 
   @override
   initState() {
     super.initState();
+    activeChallengeIndex = widget.challenges
+        .indexWhere((challenge) => challenge.state == ChallengeState.Unlocked);
+    currentPage = activeChallengeIndex;
     controller = PageController(
       initialPage: currentPage,
       keepPage: false,

@@ -1,11 +1,13 @@
 import 'dart:ui';
 
-const ColorPrimary = Color(0xFF8C52EB);
-const ColorPrimarySurface = Color(0xFFF5EFFF);
-const ColorPrimaryBorder = Color(0xFFD9C6F9);
-const ColorPrimaryHover = Color(0xFF7545C5);
-const ColorPrimaryPressed = Color(0xFF462976);
-const ColorPrimaryFocus = Color(0xFF8D53EC);
+const ColorPrimary = Color(0xFF6753EC);
+const ColorPrimarySurface = Color(0xFFF2F0FF);
+const ColorPrimaryBorder = Color(0xFFCDC6F9);
+const ColorPrimaryHover = Color(0xFF5645C5);
+const ColorPrimaryPressed = Color(0xFF332976);
+const ColorPrimaryFocus = Color(0xFF6753EC);
+
+const ColorSecondary = Color(0xFFFED500);
 
 const ColorNeutral10 = Color(0xFFFFFFFF);
 const ColorNeutral20 = Color(0xFFF6F9FB);

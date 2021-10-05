@@ -72,6 +72,12 @@ class Button extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
               )),
       padding: _padding(),
+      elevation: MaterialStateProperty.resolveWith((states) {
+        if (states.contains(MaterialState.disabled)) {
+          return 0;
+        }
+        return 2;
+      }),
     );
   }
 
@@ -79,7 +85,7 @@ class Button extends StatelessWidget {
     return _defaultStyle(context).copyWith(
       backgroundColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.disabled)) {
-          return ColorNeutral60;
+          return ColorNeutral30;
         } else if (states.contains(MaterialState.pressed)) {
           return ColorPrimaryPressed;
         } else if (states.contains(MaterialState.hovered)) {
@@ -97,7 +103,7 @@ class Button extends StatelessWidget {
     return _defaultStyle(context).copyWith(
       backgroundColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.disabled)) {
-          return ColorNeutral60;
+          return ColorNeutral10.withAlpha(125);
         } else if (states.contains(MaterialState.pressed)) {
           return ColorNeutral30;
         } else if (states.contains(MaterialState.hovered)) {
@@ -105,9 +111,7 @@ class Button extends StatelessWidget {
         }
         return ColorNeutral10;
       }),
-      foregroundColor: MaterialStateProperty.resolveWith((states) {
-        return ColorNeutral100;
-      }),
+      foregroundColor: MaterialStateProperty.all(ColorPrimary),
     );
   }
 

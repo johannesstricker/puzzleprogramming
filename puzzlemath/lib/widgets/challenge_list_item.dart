@@ -9,19 +9,32 @@ class ChallengeListItem extends StatelessWidget {
 
   ChallengeListItem(this.challenge);
 
-  Icon buildIcon() {
-    if (challenge.state == ChallengeState.Solved) {
-      return Icon(Icons.done, color: Colors.green);
-    } else if (challenge.state == ChallengeState.Unlocked) {
-      return Icon(Icons.lock_open, color: Colors.black54);
-    }
-    return Icon(Icons.lock_outline, color: Colors.black26);
-  }
-
-  Text buildTitle() {
-    return Text(
-      challenge.name,
-      style: TextHeading1,
+  Widget buildTitle() {
+    return Stack(
+      alignment: Alignment.bottomLeft,
+      children: [
+        Transform.translate(
+          offset: Offset(-3.0, 2.0),
+          child: Transform.rotate(
+            angle: -0.05,
+            child: Container(
+              width: 100,
+              height: 15,
+              color: challenge.state == ChallengeState.Locked
+                  ? ColorNeutral40
+                  : ColorSecondary,
+            ),
+          ),
+        ),
+        Text(
+          challenge.name,
+          style: TextHeading1.copyWith(
+            color: challenge.state == ChallengeState.Unlocked
+                ? ColorNeutral10
+                : ColorNeutral100,
+          ),
+        ),
+      ],
     );
   }
 
@@ -29,7 +42,9 @@ class ChallengeListItem extends StatelessWidget {
     return Text(
       challenge.description,
       style: TextRegularM.copyWith(
-        color: ColorNeutral60,
+        color: challenge.state == ChallengeState.Unlocked
+            ? ColorPrimarySurface
+            : ColorNeutral60,
       ),
     );
   }
@@ -42,11 +57,14 @@ class ChallengeListItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           buildTitle(),
-          SizedBox(height: 4),
+          SizedBox(height: 12),
           buildDescription(),
           Spacer(flex: 1),
-          Button.Primary(
+          Button(
             text: 'Continue',
+            variant: challenge.state == ChallengeState.Unlocked
+                ? ButtonVariant.light
+                : ButtonVariant.primary,
             icon: challenge.state == ChallengeState.Locked ? Icons.lock : null,
             enabled: challenge.state != ChallengeState.Locked,
             onPressed: () => navigateToChallenge(context),
@@ -68,7 +86,9 @@ class ChallengeListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Material(
-        color: Colors.white,
+        color: challenge.state == ChallengeState.Unlocked
+            ? ColorPrimary
+            : ColorNeutral10,
         child: buildRow(context),
       ),
     );
