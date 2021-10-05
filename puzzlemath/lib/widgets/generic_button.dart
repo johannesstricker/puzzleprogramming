@@ -9,24 +9,30 @@ class Button extends StatelessWidget {
   final String text;
   final ButtonVariant variant;
   final VoidCallback? onPressed;
+  final bool enabled;
 
   Button(
     this.text, {
     required VoidCallback? this.onPressed,
+    bool this.enabled: true,
     ButtonVariant this.variant: ButtonVariant.primary,
   });
 
   factory Button.Primary(
     String text, {
+    bool enabled: true,
     required VoidCallback? onPressed,
   }) {
-    return Button(text, onPressed: onPressed, variant: ButtonVariant.primary);
+    return Button(text,
+        onPressed: onPressed, enabled: enabled, variant: ButtonVariant.primary);
   }
 
   ButtonStyle _primaryButtonStyle(BuildContext context) {
     return ButtonStyle(
         backgroundColor: MaterialStateProperty.resolveWith((states) {
-      if (states.contains(MaterialState.pressed)) {
+      if (states.contains(MaterialState.disabled)) {
+        return ColorNeutral60;
+      } else if (states.contains(MaterialState.pressed)) {
         return ColorPrimaryPressed;
       } else if (states.contains(MaterialState.hovered)) {
         return ColorPrimaryHover;
@@ -36,6 +42,8 @@ class Button extends StatelessWidget {
       return TextMediumM;
     }), padding: MaterialStateProperty.resolveWith((states) {
       return EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0);
+    }), foregroundColor: MaterialStateProperty.resolveWith((states) {
+      return ColorNeutral10;
     }));
   }
 
@@ -43,7 +51,7 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       child: Text(text),
-      onPressed: onPressed,
+      onPressed: enabled ? onPressed : null,
       style: _primaryButtonStyle(context),
     );
   }
