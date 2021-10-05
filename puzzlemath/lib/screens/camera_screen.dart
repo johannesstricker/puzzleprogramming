@@ -90,9 +90,7 @@ class _CameraScreenState extends State<CameraScreen> {
     _cameraBloc.add(FocusCamera(point));
   }
 
-  // TODO: set focus mode on screen tap
-  //       e.g. await camera.setFocusPoint(cameraId, Point<double>(0.5, 0.5));
-  // TODO: fix aspect ratio of camera image
+  // TODO: fix aspect ratio of camera image (use the camera_awesome package)
   Widget _buildCameraPreview(BuildContext context) {
     final controller = BlocProvider.of<CameraBloc>(context).controller!;
     return Stack(

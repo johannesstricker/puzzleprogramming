@@ -67,6 +67,10 @@ class Button extends StatelessWidget {
       textStyle: MaterialStateProperty.resolveWith((states) {
         return TextMediumM;
       }),
+      shape:
+          MaterialStateProperty.resolveWith((states) => RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              )),
       padding: _padding(),
     );
   }
