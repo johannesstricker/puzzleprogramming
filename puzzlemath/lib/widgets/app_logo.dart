@@ -5,7 +5,7 @@ class AppLogo extends StatelessWidget {
   Widget _buildDecoration(BuildContext context,
       {required double width, required double height}) {
     return Transform.translate(
-      offset: Offset(0, 4),
+      offset: Offset(0, 6),
       child: Transform(
         transform: Matrix4.skew(0.1, -0.03),
         child: Container(
@@ -28,7 +28,7 @@ class AppLogo extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           children: [
             FractionallySizedBox(
-                widthFactor: 1.05,
+                widthFactor: 1.00,
                 heightFactor: 0.55,
                 child: _buildDecoration(context,
                     width: double.infinity, height: double.infinity)),

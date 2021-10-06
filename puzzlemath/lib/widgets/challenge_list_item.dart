@@ -30,7 +30,7 @@ class ChallengeListItem extends StatelessWidget {
           child: Transform.rotate(
             angle: -0.05,
             child: Container(
-              width: 100,
+              width: 40,
               height: 15,
               color: challenge.state == ChallengeState.Locked
                   ? ColorNeutral40
@@ -61,6 +61,13 @@ class ChallengeListItem extends StatelessWidget {
     );
   }
 
+  String? _buttonText() {
+    if (challenge.state == ChallengeState.Locked) {
+      return 'Locked';
+    }
+    return challenge.state == ChallengeState.Solved ? 'Play again' : 'Continue';
+  }
+
   Widget buildRow(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(16),
@@ -75,7 +82,7 @@ class ChallengeListItem extends StatelessWidget {
           buildDescription(),
           Spacer(flex: 1),
           Button(
-            text: 'Continue',
+            text: _buttonText(),
             variant: challenge.state == ChallengeState.Unlocked
                 ? ButtonVariant.light
                 : ButtonVariant.primary,

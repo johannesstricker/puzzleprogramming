@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:puzzlemath/widgets/app_logo.dart';
 import 'package:puzzlemath/widgets/button.dart';
 
 class PuzzleAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
+  final bool showLogo;
   final bool showBackButton;
 
   PuzzleAppBar({
+    this.showLogo: true,
     this.showBackButton: true,
   })  : preferredSize = Size.fromHeight(64.0),
         super();
@@ -20,15 +23,22 @@ class PuzzleAppBar extends StatelessWidget with PreferredSizeWidget {
         bottom: 8.0,
         left: 8.0,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: [
-          showBackButton
-              ? Button.Light(
-                  icon: Icons.navigate_before,
-                  onPressed: () => Navigator.pop(context))
-              : Container(),
+          Center(
+            child: showLogo ? AppLogo() : Container(),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              showBackButton
+                  ? Button.Light(
+                      icon: Icons.navigate_before,
+                      onPressed: () => Navigator.pop(context))
+                  : Container(),
+            ],
+          ),
         ],
       ),
     );

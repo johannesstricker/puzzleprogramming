@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:puzzlemath/screens/camera_screen.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
+import 'package:puzzlemath/theme/theme.dart';
 import 'package:puzzlemath/widgets/app_bar.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
 import 'package:puzzlemath/widgets/button.dart';
@@ -28,18 +29,17 @@ class ChallengeScreen extends StatelessWidget {
   }
 
   Text buildTitle(BuildContext context) {
-    return Text(challenge.name,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20.0,
-        ));
+    return Text(
+      challenge.name,
+      style: TextHeading1,
+    );
   }
 
   Text buildDescription(BuildContext context) {
-    return Text(challenge.description,
-        style: TextStyle(
-          color: Colors.black87,
-        ));
+    return Text(
+      challenge.description,
+      style: TextRegularM.copyWith(color: ColorNeutral70),
+    );
   }
 
   Widget buildMarker(BuildContext context, Marker marker, int count) {
@@ -124,7 +124,7 @@ class ChallengeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               buildTitle(context),
-              SizedBox(height: 12.0),
+              SizedBox(height: 4.0),
               buildDescription(context),
               SizedBox(height: 24),
               buildSectionTitle(context, 'Use these puzzle pieces'),
