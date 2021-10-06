@@ -14,6 +14,13 @@ class ChallengesLoaded extends ChallengesState {
 
   @override
   String toString() => 'ChallengesLoaded';
+
+  double get progress {
+    int solvedCount = challenges
+        .where((challenge) => challenge.state == ChallengeState.Solved)
+        .length;
+    return solvedCount.toDouble() / challenges.length.toDouble();
+  }
 }
 
 class ChallengesError extends ChallengesState {

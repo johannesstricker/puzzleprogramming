@@ -5,7 +5,7 @@ import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/theme/colors.dart';
 import 'package:puzzlemath/theme/typography.dart';
 import 'package:puzzlemath/widgets/challenge_list_item.dart';
-import 'package:puzzlemath/widgets/app_bar.dart';
+import 'package:puzzlemath/widgets/progress_bar.dart';
 
 class Carroussel extends StatefulWidget {
   final List<Challenge> challenges;
@@ -16,6 +16,8 @@ class Carroussel extends StatefulWidget {
   _CarrousselState createState() => new _CarrousselState();
 }
 
+// TODO: using a PageView for this is not correct
+//       this should be using a ListView with PageScrollPhysics
 class _CarrousselState extends State<Carroussel> {
   late PageController controller;
   int currentPage = 0;
@@ -125,6 +127,14 @@ class ChallengeListScreen extends StatelessWidget {
   }
 
   Widget _buildHeading(BuildContext context) {
+    bool hasMadeProgress = false;
+    final state = BlocProvider.of<ChallengesBloc>(context).state;
+    if (state is ChallengesLoaded) {
+      hasMadeProgress = state.progress > 0;
+    }
+    final message = hasMadeProgress
+        ? "you're making progress."
+        : "ready for your first challenge?";
     return _wrapWithPadding(Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +144,7 @@ class ChallengeListScreen extends StatelessWidget {
           style: TextHeadingAlt1,
         ),
         Text(
-          "you're making progress.",
+          message,
           style: TextHeadingAlt2,
         ),
       ],
@@ -179,6 +189,18 @@ class ChallengeListScreen extends StatelessWidget {
         ]));
   }
 
+  Widget _buildProgressBar(BuildContext context) {
+    return BlocBuilder<ChallengesBloc, ChallengesState>(
+      builder: (context, state) {
+        double progress = 0;
+        if (state is ChallengesLoaded) {
+          progress = state.progress;
+        }
+        return _wrapWithPadding(ProgressBar(progress: progress));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,12 +211,14 @@ class ChallengeListScreen extends StatelessWidget {
           children: [
             SizedBox(height: 96.0),
             _buildHeading(context),
+            SizedBox(height: 18.0),
+            _buildProgressBar(context),
             SizedBox(height: 32.0),
             _buildSectionTitle(context, 'Latest Achievement'),
             SizedBox(height: 8.0),
             _buildAchievement(context, 'Multiplication Master',
                 'Multiply three numbers at once.'),
-            SizedBox(height: 24.0),
+            SizedBox(height: 32.0),
             _buildSectionTitle(context, 'Challenges'),
             SizedBox(height: 8.0),
             Container(
