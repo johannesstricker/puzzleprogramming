@@ -23,7 +23,7 @@ class _CarrousselState extends State<Carroussel> {
   late PageController controller;
   int currentPage = 0;
   int activeChallengeIndex = 0;
-  final double viewportFraction = 0.88;
+  final double viewportFraction = 0.85;
 
   @override
   initState() {
@@ -67,27 +67,32 @@ class _CarrousselState extends State<Carroussel> {
         double value = 1.0;
         if (controller.position.haveDimensions) {
           double tempValue = controller.page! - index;
-          value = (1 - (tempValue.abs() * 0.3)).clamp(0.0, 1.0);
+          value = (1 - (tempValue.abs() * 0.2)).clamp(0.0, 1.0);
         }
 
         final viewportWidth = MediaQuery.of(context).size.width;
-        return Center(
-          child: Container(
-            width: Curves.easeOut.transform(value) * viewportWidth,
-            height: Curves.easeOut.transform(value) * viewportWidth,
-            padding:
-                EdgeInsets.only(left: 2.0, top: 2.0, right: 2.0, bottom: 30),
-            child: Card(
-              clipBehavior: Clip.hardEdge,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          return Center(
+            child: Transform.scale(
+              scale: Curves.easeOut.transform(value),
+              child: Container(
+                width: viewportWidth,
+                height: constraints.maxHeight,
+                padding: EdgeInsets.only(bottom: 30),
+                child: Card(
+                  clipBehavior: Clip.hardEdge,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  ),
+                  elevation: Curves.easeOut.transform(value) * 12,
+                  shadowColor: ColorNeutral20,
+                  child: child,
+                ),
               ),
-              elevation: Curves.easeOut.transform(value) * 12,
-              shadowColor: ColorNeutral20,
-              child: child,
             ),
-          ),
-        );
+          );
+        });
       },
       child: ChallengeListItem(widget.challenges[index], index: index + 1),
     );
@@ -210,18 +215,18 @@ class ChallengeListScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 64.0),
-            Center(child: AppLogo()),
-            SizedBox(height: 48.0),
-            _buildHeading(context),
-            SizedBox(height: 18.0),
-            _buildProgressBar(context),
             SizedBox(height: 32.0),
+            Center(child: AppLogo()),
+            SizedBox(height: 24.0),
+            _buildHeading(context),
+            SizedBox(height: 8.0),
+            _buildProgressBar(context),
+            SizedBox(height: 12.0),
             _buildSectionTitle(context, 'Latest Achievement'),
             SizedBox(height: 8.0),
             _buildAchievement(context, 'Multiplication Master',
                 'Multiply three numbers at once.'),
-            SizedBox(height: 32.0),
+            SizedBox(height: 24.0),
             _buildSectionTitle(context, 'Challenges'),
             SizedBox(height: 8.0),
             Container(

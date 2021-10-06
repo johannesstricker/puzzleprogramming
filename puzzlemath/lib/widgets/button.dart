@@ -65,7 +65,7 @@ class Button extends StatelessWidget {
     return ButtonStyle(
       minimumSize: MaterialStateProperty.resolveWith((states) => Size.zero),
       textStyle: MaterialStateProperty.resolveWith((states) {
-        return TextMediumM;
+        return TextRegularM;
       }),
       shape:
           MaterialStateProperty.resolveWith((states) => RoundedRectangleBorder(
@@ -112,6 +112,7 @@ class Button extends StatelessWidget {
         return ColorNeutral10;
       }),
       foregroundColor: MaterialStateProperty.all(ColorPrimary),
+      textStyle: MaterialStateProperty.all(TextMediumM),
     );
   }
 
@@ -128,7 +129,7 @@ class Button extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         iconWidget,
-        SizedBox(width: 8),
+        SizedBox(width: 4),
         Text(text!),
       ],
     );

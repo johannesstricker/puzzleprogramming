@@ -68,6 +68,13 @@ class ChallengeListItem extends StatelessWidget {
     return challenge.state == ChallengeState.Solved ? 'Play again' : 'Continue';
   }
 
+  IconData? _buttonIcon() {
+    if (challenge.state == ChallengeState.Unlocked) {
+      return null;
+    }
+    return challenge.state == ChallengeState.Locked ? Icons.lock : Icons.replay;
+  }
+
   Widget buildRow(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(16),
@@ -86,7 +93,7 @@ class ChallengeListItem extends StatelessWidget {
             variant: challenge.state == ChallengeState.Unlocked
                 ? ButtonVariant.light
                 : ButtonVariant.primary,
-            icon: challenge.state == ChallengeState.Locked ? Icons.lock : null,
+            icon: _buttonIcon(),
             enabled: challenge.state != ChallengeState.Locked,
             onPressed: () => navigateToChallenge(context),
           ),
