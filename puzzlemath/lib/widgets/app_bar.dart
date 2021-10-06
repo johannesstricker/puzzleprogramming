@@ -4,9 +4,11 @@ import 'package:puzzlemath/widgets/button.dart';
 class PuzzleAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
+  final bool showBackButton;
 
-  PuzzleAppBar()
-      : preferredSize = Size.fromHeight(64.0),
+  PuzzleAppBar({
+    this.showBackButton: true,
+  })  : preferredSize = Size.fromHeight(64.0),
         super();
 
   @override
@@ -22,9 +24,11 @@ class PuzzleAppBar extends StatelessWidget with PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Button.Light(
-              icon: Icons.navigate_before,
-              onPressed: () => Navigator.pop(context)),
+          showBackButton
+              ? Button.Light(
+                  icon: Icons.navigate_before,
+                  onPressed: () => Navigator.pop(context))
+              : Container(),
         ],
       ),
     );

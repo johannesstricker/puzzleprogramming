@@ -33,3 +33,14 @@ final TextHeading1 = GoogleFonts.bangers(
 final TextHeading2 = TextHeading1.copyWith(
   fontSize: 24,
 );
+
+final TextHeadingAlt1 = GoogleFonts.rubik(
+  textStyle: const TextStyle(
+    color: ColorNeutral100,
+    fontSize: 30,
+  ),
+);
+
+final TextHeadingAlt2 = TextHeadingAlt1.copyWith(
+  fontSize: 20,
+);
