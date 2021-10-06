@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/screens/challenge_list_screen.dart';
+import 'package:puzzlemath/widgets/app_bar.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
+import 'package:puzzlemath/widgets/button.dart';
+import 'package:puzzlemath/theme/theme.dart';
 
 class SolutionScreenArguments {
   final int proposedSolution;
@@ -36,42 +39,31 @@ class SolutionScreen extends StatelessWidget {
   }
 
   Text buildTitle(BuildContext context) {
-    return Text(challenge.name,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20.0,
-        ));
+    return Text(
+      challenge.name,
+      style: TextHeading1,
+    );
   }
 
   Text buildDescription(BuildContext context) {
-    return Text(challenge.description,
-        style: TextStyle(
-          color: Colors.black87,
-        ));
+    return Text(
+      challenge.description,
+      style: TextRegularM.copyWith(color: ColorNeutral70),
+    );
   }
 
   Widget buildSuccessButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
+      child: Button.Primary(
+        text: 'Continue',
+        icon: Icons.check,
         onPressed: () {
           Navigator.pushNamed(
             context,
             ChallengeListScreen.routeName,
           );
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.check),
-              SizedBox(width: 4),
-              Text('Continue'),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -79,22 +71,12 @@ class SolutionScreen extends StatelessWidget {
   Widget buildRetryButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
+      child: Button.Primary(
+        text: 'Try again',
+        icon: Icons.replay,
         onPressed: () {
           Navigator.pop(context);
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(Icons.refresh),
-              SizedBox(width: 4),
-              Text('Try again'),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -119,25 +101,12 @@ class SolutionScreen extends StatelessWidget {
   }
 
   Widget buildSolutionWidget() {
-    final backgroundColor = isCorrect
-        ? Color.fromRGBO(0, 155, 0, 0.1)
-        : Color.fromRGBO(155, 0, 0, 0.1);
     final foregroundColor = isCorrect ? Colors.green : Colors.red;
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(3.0),
-        border: Border.all(width: 2, color: foregroundColor),
-      ),
-      child: Text(
-        proposedSolution.toString(),
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 42.0,
-          fontWeight: FontWeight.bold,
-          color: foregroundColor,
-        ),
+    return Text(
+      proposedSolution.toString(),
+      style: TextHeading1.copyWith(
+        color: foregroundColor,
+        fontSize: 48.0,
       ),
     );
   }
@@ -153,15 +122,13 @@ class SolutionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               buildTitle(context),
-              SizedBox(height: 8),
+              SizedBox(height: 4.0),
               buildDescription(context),
               SizedBox(height: 24),
               buildSectionTitle('Used puzzle pieces'),
-              SizedBox(height: 8),
               buildMarkerList(context),
               SizedBox(height: 24),
               buildSectionTitle('Your solution'),
-              SizedBox(height: 8),
               buildSolutionWidget(),
               SizedBox(height: 24),
               isCorrect
@@ -180,19 +147,23 @@ class SolutionScreen extends StatelessWidget {
     final Color textColor = used == available ? Colors.green : Colors.red;
     return Container(
       padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
-      decoration: BoxDecoration(
-        // color: Color.fromRGBO(0, 0, 0, 0.05),
-        color: Color.fromRGBO(0, 155, 0, 0.1),
-        borderRadius: BorderRadius.circular(3.0),
-        border: Border.all(width: 2, color: textColor),
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          PuzzlePiece(marker),
-          SizedBox(width: 8.0),
-          Text('$used/$available',
+          PuzzlePiece(marker, width: 32, height: 32),
+          SizedBox(width: 4.0),
+          Padding(
+            padding: EdgeInsets.only(top: 1.0),
+            child: Text('\u2715',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 10.0,
+                )),
+          ),
+          SizedBox(width: 2.0),
+          Text(used.toString(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.0,
@@ -211,8 +182,8 @@ class SolutionScreen extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
-      crossAxisSpacing: 8.0,
-      mainAxisSpacing: 8.0,
+      crossAxisSpacing: 4.0,
+      mainAxisSpacing: 4.0,
       childAspectRatio: 1.33,
       children: List.generate(
         allMarkers.length,
@@ -228,21 +199,16 @@ class SolutionScreen extends StatelessWidget {
   }
 
   Text buildSectionTitle(String text) {
-    return Text(text,
-        style: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold,
-        ));
+    return Text(
+      text,
+      style: TextMediumM.copyWith(color: ColorPrimary),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Container(),
-        title: Text('Puzzle Programming'),
-        centerTitle: true,
-      ),
+      appBar: PuzzleAppBar(showBackButton: false),
       body: buildMainWidget(context),
     );
   }

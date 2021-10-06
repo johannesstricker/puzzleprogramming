@@ -45,15 +45,11 @@ class ChallengeScreen extends StatelessWidget {
   Widget buildMarker(BuildContext context, Marker marker, int count) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
-      decoration: BoxDecoration(
-        color: Color.fromRGBO(0, 0, 0, 0.05),
-        borderRadius: BorderRadius.circular(3.0),
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          PuzzlePiece(marker),
+          PuzzlePiece(marker, width: 32, height: 32),
           SizedBox(width: 4.0),
           Padding(
             padding: EdgeInsets.only(top: 1.0),
@@ -64,7 +60,7 @@ class ChallengeScreen extends StatelessWidget {
                   fontSize: 10.0,
                 )),
           ),
-          SizedBox(width: 4.0),
+          SizedBox(width: 2.0),
           Text(count.toString(),
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -78,19 +74,19 @@ class ChallengeScreen extends StatelessWidget {
   }
 
   Text buildSectionTitle(BuildContext context, String text) {
-    return Text(text,
-        style: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold,
-        ));
+    return Text(
+      text,
+      style: TextMediumM.copyWith(color: ColorPrimary),
+    );
   }
 
   Text buildSolution(BuildContext context, int solution) {
-    return Text(solution.toString(),
-        style: TextStyle(
-          fontSize: 24.0,
-          fontWeight: FontWeight.bold,
-        ));
+    return Text(
+      solution.toString(),
+      style: TextHeading1.copyWith(
+        fontSize: 48.0,
+      ),
+    );
   }
 
   Widget buildMarkerList(BuildContext context) {
@@ -100,8 +96,8 @@ class ChallengeScreen extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
-      crossAxisSpacing: 8.0,
-      mainAxisSpacing: 8.0,
+      crossAxisSpacing: 4.0,
+      mainAxisSpacing: 4.0,
       childAspectRatio: 1.33,
       children: List.generate(
         availableMarkers.length,
@@ -128,11 +124,9 @@ class ChallengeScreen extends StatelessWidget {
               buildDescription(context),
               SizedBox(height: 24),
               buildSectionTitle(context, 'Use these puzzle pieces'),
-              SizedBox(height: 12),
               buildMarkerList(context),
               SizedBox(height: 24),
               buildSectionTitle(context, 'Puzzle this number'),
-              SizedBox(height: 12),
               buildSolution(context, challenge.solution),
               SizedBox(height: 24),
               SizedBox(

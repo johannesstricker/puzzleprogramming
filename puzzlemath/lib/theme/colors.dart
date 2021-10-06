@@ -9,6 +9,9 @@ const ColorPrimaryFocus = Color(0xFF6753EC);
 
 const ColorSecondary = Color(0xFFFED500);
 
+const ColorDigit = Color(0xFF2190F6);
+const ColorOperator = Color(0xFFFB4566);
+
 const ColorNeutral10 = Color(0xFFFFFFFF);
 const ColorNeutral20 = Color(0xFFF6F9FB);
 const ColorNeutral30 = Color(0xFFDEE2E5);
