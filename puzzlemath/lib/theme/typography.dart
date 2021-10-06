@@ -27,6 +27,7 @@ final TextHeading1 = GoogleFonts.bangers(
   textStyle: const TextStyle(
     color: ColorNeutral100,
     fontSize: 30,
+    letterSpacing: 1.5,
   ),
 );
 

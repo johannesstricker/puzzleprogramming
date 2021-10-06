@@ -4,6 +4,7 @@ import 'package:puzzlemath/blocs/challenges/challenges.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/theme/colors.dart';
 import 'package:puzzlemath/theme/typography.dart';
+import 'package:puzzlemath/widgets/app_logo.dart';
 import 'package:puzzlemath/widgets/challenge_list_item.dart';
 import 'package:puzzlemath/widgets/progress_bar.dart';
 
@@ -209,7 +210,9 @@ class ChallengeListScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 96.0),
+            SizedBox(height: 64.0),
+            Center(child: AppLogo()),
+            SizedBox(height: 48.0),
             _buildHeading(context),
             SizedBox(height: 18.0),
             _buildProgressBar(context),
