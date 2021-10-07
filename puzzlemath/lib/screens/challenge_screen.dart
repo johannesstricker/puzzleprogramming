@@ -80,15 +80,6 @@ class ChallengeScreen extends StatelessWidget {
     );
   }
 
-  Text buildSolution(BuildContext context, int solution) {
-    return Text(
-      solution.toString(),
-      style: TextHeading1.copyWith(
-        fontSize: 48.0,
-      ),
-    );
-  }
-
   Widget buildMarkerList(BuildContext context) {
     final availableMarkers = countAvailableMarkers().entries.toList();
     availableMarkers.sort((a, b) => a.key.index.compareTo(b.key.index));
@@ -110,36 +101,45 @@ class ChallengeScreen extends StatelessWidget {
   }
 
   Widget buildMainWidget(BuildContext context) {
-    return Container(
-      height: double.infinity,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildTitle(context),
-              SizedBox(height: 4.0),
-              buildDescription(context),
-              SizedBox(height: 24),
-              buildSectionTitle(context, 'Use these puzzle pieces'),
-              buildMarkerList(context),
-              SizedBox(height: 24),
-              buildSectionTitle(context, 'Puzzle this number'),
-              buildSolution(context, challenge.solution),
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: Button.Primary(
-                  text: 'Ready',
-                  onPressed: () => navigateToCameraScreen(context),
+    return Stack(
+      children: [
+        Container(
+          height: double.infinity,
+          child: Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    buildTitle(context),
+                    SizedBox(height: 4.0),
+                    buildDescription(context),
+                    SizedBox(height: 24),
+                    buildSectionTitle(context, 'Use these puzzle pieces'),
+                    buildMarkerList(context),
+                    SizedBox(height: 24),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
-      ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Button.Primary(
+                text: 'Ready',
+                onPressed: () => navigateToCameraScreen(context),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
