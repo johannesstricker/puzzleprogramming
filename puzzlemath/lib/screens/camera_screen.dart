@@ -8,6 +8,7 @@ import 'package:puzzlemath/screens/solution_screen.dart';
 import 'package:puzzlemath/widgets/app_bar.dart';
 import 'package:puzzlemath/widgets/button.dart';
 import 'package:puzzlemath/widgets/detection_preview.dart';
+import 'package:puzzlemath/widgets/equation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
 
@@ -32,7 +33,7 @@ class _CameraScreenState extends State<CameraScreen> {
   final CameraBloc _cameraBloc = CameraBloc(10);
   StreamSubscription<CameraState>? _cameraStreamSubscription;
 
-  bool _isButtonEnabled = false;
+  bool _isSolved = false;
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
 
@@ -78,8 +79,9 @@ class _CameraScreenState extends State<CameraScreen> {
       detectedObjects = sortedObjects;
       _proposedSolution = proposedSolution;
       _usedMarkers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
-      _isButtonEnabled = proposedSolution != null;
     });
+
+    if (proposedSolution == widget.challenge.solution) {}
   }
 
   void _onScreenTap(TapDownDetails tapDetails, BoxConstraints constraints) {
@@ -90,8 +92,21 @@ class _CameraScreenState extends State<CameraScreen> {
     _cameraBloc.add(FocusCamera(point));
   }
 
+  // BoxDecoration _buildGradientDecoration(
+  //     {begin: FractionalOffset(0.0, 0.0), end: FractionalOffset(0.0, 1.0)}) {}
+
   // TODO: fix aspect ratio of camera image (use the camera_awesome package)
   Widget _buildCameraPreview(BuildContext context) {
+    _attempt(context);
+
+    final List<Marker> detectedMarkers =
+        widget.challenge.availableMarkers.asMap().entries.map((entry) {
+      final index = entry.key;
+      final detectedMarker = index < detectedObjects.length
+          ? createMarker(detectedObjects[index].id)
+          : Marker.Unknown;
+      return detectedMarker;
+    }).toList();
     final controller = BlocProvider.of<CameraBloc>(context).controller!;
     return Stack(
       children: [
@@ -127,42 +142,47 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
           ),
         ),
+        IgnorePointer(
+          child: Container(
+            height: double.infinity,
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            alignment: Alignment.bottomCenter,
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                return Equation(markers: detectedMarkers, solution: 1337);
+              },
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget buildFloatingActionButton(BuildContext context) {
-    final opacity = _isButtonEnabled ? 1.0 : 0.1;
-    final onPressed = _isButtonEnabled
-        ? () {
-            if (_proposedSolution == null || _usedMarkers == null) {
-              return;
-            }
-            // TODO: push to success or error route
-            bool challengeSolved = widget.challenge
-                .checkSolution(_proposedSolution!, _usedMarkers!);
-            if (challengeSolved) {
-              BlocProvider.of<ChallengesBloc>(context)
-                  .add(SolveChallenge(widget.challenge));
-            }
-            // TODO: don't push
-            Navigator.pushNamed(
-              context,
-              SolutionScreen.routeName,
-              arguments: SolutionScreenArguments(
-                  proposedSolution: _proposedSolution!,
-                  usedMarkers: _usedMarkers!,
-                  challenge: widget.challenge),
-            );
-          }
-        : null;
-    return Opacity(
-      opacity: opacity,
-      child: Button.Primary(
-        onPressed: onPressed,
-        icon: Icons.camera,
-      ),
-    );
+  void _attempt(BuildContext context) {
+    if (_proposedSolution == null || _usedMarkers == null) {
+      return;
+    }
+    // TODO: push to success or error route
+    bool challengeSolved =
+        widget.challenge.checkSolution(_proposedSolution!, _usedMarkers!);
+    if (challengeSolved && !_isSolved) {
+      // TODO: all this logic should live inside a bloc
+      _isSolved = true;
+      Future.microtask(() {
+        BlocProvider.of<ChallengesBloc>(context)
+            .add(SolveChallenge(widget.challenge));
+        // TODO: don't push
+        Navigator.pushNamed(
+          context,
+          SolutionScreen.routeName,
+          arguments: SolutionScreenArguments(
+              proposedSolution: _proposedSolution!,
+              usedMarkers: _usedMarkers!,
+              challenge: widget.challenge),
+        );
+      });
+    }
   }
 
   @override
@@ -172,7 +192,6 @@ class _CameraScreenState extends State<CameraScreen> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: PuzzleAppBar(),
-        floatingActionButton: buildFloatingActionButton(context),
         body: Container(
           height: double.infinity,
           width: double.infinity,

@@ -18,7 +18,10 @@ class PuzzlePiece extends StatelessWidget {
     if (isDigitMarker(this._marker)) {
       return ColorDigit;
     }
-    return ColorOperator;
+    if (isOperatorMarker(this._marker)) {
+      return ColorOperator;
+    }
+    return ColorNeutral40;
   }
 
   String _markerString() {
@@ -44,24 +47,28 @@ class PuzzlePiece extends StatelessWidget {
   }
 
   Widget _text() {
-    return Text(
-      _markerString(),
-      style: TextHeading2.copyWith(color: ColorNeutral10),
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: Text(
+        _markerString(),
+        style: TextHeading2.copyWith(color: ColorNeutral10),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-        angle: degreesToRadians(2),
-        child: Container(
-          width: width,
-          height: height,
-          color: _backgroundColor(),
-          child: Center(
-            child: _text(),
-          ),
-        ));
+      angle: degreesToRadians(2),
+      child: Container(
+        width: width,
+        height: height,
+        color: _backgroundColor(),
+        child: Center(
+          child: _text(),
+        ),
+      ),
+    );
   }
 
   // @override
