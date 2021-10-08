@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'package:camera/camera.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
 import 'package:puzzlemath/widgets/app_bar.dart';
-import 'package:puzzlemath/theme/theme.dart';
 import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:puzzlemath/widgets/equation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,8 +37,6 @@ class _CameraScreenState extends State<CameraScreen> {
   List<Marker>? _usedMarkers;
   int? _proposedSolution;
 
-  ImageBuffer _imageBuffer = ImageBuffer.empty();
-
   double imageWidth = 0;
   double imageHeight = 0;
   List<DetectedObject> detectedObjects = const [];
@@ -47,26 +44,21 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     _cameraBloc.add(InitializeCamera());
-    _cameraStreamSubscription = _cameraBloc.stream.listen((CameraState state) {
-      if (state is CameraCapture) {
-        _onImageReceived(state.image);
-      }
-    });
     super.initState();
   }
 
   @override
   void dispose() {
-    _imageBuffer.free();
     _cameraStreamSubscription?.cancel();
     _cameraBloc.close();
     super.dispose();
   }
 
   // TODO: use old AST for a while when parsing fails to avoid spurious errors
-  void _onImageReceived(CameraImage image) {
-    _imageBuffer.update(image);
-    final objects = PuzzlePlugin.detectObjects(_imageBuffer);
+  // TODO: this should not be part of the state and instead be built in a
+  //       streambuilder or bloc builder
+  void _onImageReceived(ui.Image image) async {
+    final objects = await PuzzlePlugin.detectObjectsAsync(image);
     final sortedObjects = sortObjectListLTR(objects);
     int? proposedSolution;
     try {
@@ -84,37 +76,24 @@ class _CameraScreenState extends State<CameraScreen> {
     if (proposedSolution == widget.challenge.solution) {}
   }
 
-  void _onScreenTap(TapDownDetails tapDetails, BoxConstraints constraints) {
-    final point = Offset(
-      tapDetails.localPosition.dx / constraints.maxWidth,
-      tapDetails.localPosition.dy / constraints.maxHeight,
-    );
-    _cameraBloc.add(FocusCamera(point));
-  }
-
-  // BoxDecoration _buildGradientDecoration(
-  //     {begin: FractionalOffset(0.0, 0.0), end: FractionalOffset(0.0, 1.0)}) {}
-
-  // TODO: fix aspect ratio of camera image (use the camera_awesome package)
-  Widget _buildCameraPreview(BuildContext context) {
-    _attempt(context);
-
+  Widget _buildStack(BuildContext context,
+      {required CameraCapture state, required List<DetectedObject> objects}) {
     final List<Marker> detectedMarkers =
         widget.challenge.availableMarkers.asMap().entries.map((entry) {
       final index = entry.key;
-      final detectedMarker = index < detectedObjects.length
-          ? createMarker(detectedObjects[index].id)
+      final detectedMarker = index < objects.length
+          ? createMarker(objects[index].id)
           : Marker.Unknown;
       return detectedMarker;
     }).toList();
-    final controller = BlocProvider.of<CameraBloc>(context).controller!;
+
     return Stack(
       children: [
         Container(
           width: double.infinity,
           height: double.infinity,
           child: FunctionalCameraPreview(
-            controller,
+            state.image,
             cameraBloc: _cameraBloc,
           ),
         ),
@@ -123,9 +102,9 @@ class _CameraScreenState extends State<CameraScreen> {
             height: double.infinity,
             width: double.infinity,
             child: DetectionPreview(
-              imageWidth: this.imageWidth,
-              imageHeight: this.imageHeight,
-              objects: this.detectedObjects,
+              imageWidth: state.image.width.toDouble(),
+              imageHeight: state.image.height.toDouble(),
+              objects: objects,
             ),
           ),
         ),
@@ -144,6 +123,34 @@ class _CameraScreenState extends State<CameraScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildCameraPreview(BuildContext context, CameraState state) {
+    if (state is CameraCapture) {
+      // _attempt(context);
+
+      final objects =
+          PuzzlePlugin.detectObjectsAsync(state.image).then((objects) {
+        final sortedObjects = sortObjectListLTR(objects);
+        return sortedObjects;
+      });
+
+      return FutureBuilder(
+        future: objects,
+        builder: (BuildContext context,
+            AsyncSnapshot<List<DetectedObject>> snapshot) {
+          if (snapshot.hasData) {
+            return _buildStack(
+              context,
+              objects: snapshot.data!,
+              state: state,
+            );
+          }
+          return Container(color: Colors.black);
+        },
+      );
+    }
+    return Container(color: Colors.black);
   }
 
   void _attempt(BuildContext context) {
@@ -185,7 +192,7 @@ class _CameraScreenState extends State<CameraScreen> {
           child: BlocBuilder<CameraBloc, CameraState>(
               builder: (BuildContext context, CameraState state) {
             if (state is CameraInitialized) {
-              return _buildCameraPreview(context);
+              return _buildCameraPreview(context, state);
             }
             return Container();
           }),

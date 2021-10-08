@@ -27,7 +27,7 @@ using namespace puzzle;
 // }
 
 std::vector<DetectedObject> puzzle::detectObjects32BGRA(unsigned char* imageBytes, int imageWidth, int imageHeight, int bytesPerRow) {
-  cv::Mat sourceImage(imageHeight, imageWidth, CV_8UC4, imageBytes, bytesPerRow);
+  cv::Mat sourceImage(imageHeight, imageWidth, CV_8UC4, imageBytes);
   return detectObjects(sourceImage);
 }
 

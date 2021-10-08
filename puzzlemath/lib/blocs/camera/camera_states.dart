@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'dart:ui' as ui;
 
 abstract class CameraState {}
 
@@ -13,10 +14,10 @@ class CameraInitialized extends CameraState {
 }
 
 class CameraCapture extends CameraInitialized {
-  final CameraImage image;
+  final ui.Image image;
 
   CameraCapture(this.image);
 
   @override
-  String toString() => 'CameraBusy';
+  String toString() => 'CameraCapture';
 }

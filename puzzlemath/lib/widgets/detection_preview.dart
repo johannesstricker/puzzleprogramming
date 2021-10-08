@@ -17,18 +17,26 @@ class DetectionPreviewPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double scaleX = size.width / imageWidth;
     double scaleY = size.height / imageHeight;
-    objects.forEach((obj) => paintDetectedObject(canvas, obj, scaleX, scaleY));
+    double scale = scaleX > scaleY ? scaleX : scaleY;
+
+    Offset offset = Offset(
+      (imageWidth * scale - size.width) / 2,
+      (imageHeight * scale - size.height) / 2,
+    );
+
+    objects.forEach((obj) => paintDetectedObject(canvas, obj, scale, offset));
   }
 
   void paintDetectedObject(
-      Canvas canvas, DetectedObject object, double scaleX, double scaleY) {
+      Canvas canvas, DetectedObject object, double scale, Offset offset) {
     // TODO: scale to full size of puzzle piece instead of only the size of aruco code
     final points = [
-      Offset(object.topLeft.x * scaleX, object.topLeft.y * scaleY),
-      Offset(object.topRight.x * scaleX, object.topRight.y * scaleY),
-      Offset(object.bottomRight.x * scaleX, object.bottomRight.y * scaleY),
-      Offset(object.bottomLeft.x * scaleX, object.bottomLeft.y * scaleY),
-      Offset(object.topLeft.x * scaleX, object.topLeft.y * scaleY)
+      Offset(object.topLeft.x * scale, object.topLeft.y * scale) - offset,
+      Offset(object.topRight.x * scale, object.topRight.y * scale) - offset,
+      Offset(object.bottomRight.x * scale, object.bottomRight.y * scale) -
+          offset,
+      Offset(object.bottomLeft.x * scale, object.bottomLeft.y * scale) - offset,
+      Offset(object.topLeft.x * scale, object.topLeft.y * scale) - offset
     ];
     final paint = Paint()
       ..color = ColorSecondary.withOpacity(0.5)

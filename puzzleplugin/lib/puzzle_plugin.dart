@@ -1,7 +1,10 @@
 import 'dart:ffi';
+import 'dart:ui' as ui;
 import 'package:ffi/ffi.dart';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 
 class NativeCoordinate extends Struct {
   @Double()
@@ -76,31 +79,55 @@ class ImageBuffer {
     );
   }
 
+  void _ensureAllocated(int size) {
+    if (_bufferSize < size) {
+      calloc.free(data);
+      data = calloc<Uint8>(size);
+      _bufferSize = size;
+    }
+  }
+
   void update(CameraImage image) {
     final plane = image.planes[0];
     final bytes = plane.bytes;
+
+    debugPrint('calling update');
 
     width = plane.width ?? 0;
     height = plane.height ?? 0;
     bytesPerRow = plane.bytesPerRow;
 
-    if (_bufferSize < bytes.length) {
-      calloc.free(data);
-      data = calloc<Uint8>(bytes.length);
-      _bufferSize = bytes.length;
-    }
+    _ensureAllocated(bytes.length);
     final bufferBytes = data.asTypedList(bytes.length);
     bufferBytes.setAll(0, bytes);
   }
 
+  bool empty() {
+    return _bufferSize == 0;
+  }
+
   void free() {
-    if (data != nullptr) {
+    if (_bufferSize > 0) {
+      _bufferSize = 0;
       calloc.free(data);
     }
   }
+
+  Uint8List asTypedList() {
+    return data.asTypedList(_bufferSize);
+  }
+}
+
+Pointer<Uint8> _byteDataToPointer(ByteData bytes) {
+  Pointer<Uint8> data = calloc<Uint8>(bytes.buffer.lengthInBytes);
+  final bufferBytes = data.asTypedList(bytes.buffer.lengthInBytes);
+  bufferBytes.setAll(0, bytes.buffer.asUint8List());
+  return data;
 }
 
 class PuzzlePlugin {
+  // TODO: implement an image crop to aspect ratio function
+
   static List<DetectedObject> detectObjects(ImageBuffer image) {
     // TODO: implement for Android
     final objects = _PuzzleLib().detectObjects32BGRA(
@@ -110,6 +137,23 @@ class PuzzlePlugin {
       (i) => objects.data[i].clone(),
     );
     _freeDetectedObjects(objects.data);
+    return output;
+  }
+
+  static Future<List<DetectedObject>> detectObjectsAsync(ui.Image image) async {
+    final bytes = await image.toByteData();
+    if (bytes == null) {
+      return [];
+    }
+    final pointer = _byteDataToPointer(bytes);
+    final objects =
+        _PuzzleLib().detectObjects32BGRA(pointer, image.width, image.height, 0);
+    final List<DetectedObject> output = List<DetectedObject>.generate(
+      objects.size,
+      (i) => objects.data[i].clone(),
+    );
+    _freeDetectedObjects(objects.data);
+    calloc.free(pointer);
     return output;
   }
 

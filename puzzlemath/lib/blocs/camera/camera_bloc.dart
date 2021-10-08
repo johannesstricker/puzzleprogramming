@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/blocs/camera/camera_events.dart';
 import 'package:puzzlemath/blocs/camera/camera_states.dart';
 import 'package:camera/camera.dart';
@@ -13,11 +15,11 @@ Future<CameraController> _getCameraController() async {
       enableAudio: false, imageFormatGroup: ImageFormatGroup.bgra8888);
 }
 
-// TODO: maybe switch to cameraawesome package (https://pub.dev/packages/camerawesome)
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
   CameraController? controller;
   final num _throttle;
   num _busySince = 0;
+  final ImageBuffer _byteBuffer = ImageBuffer.empty();
 
   CameraBloc(this._throttle) : super(CameraUninitialized());
 
@@ -47,13 +49,30 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     }
   }
 
+  Future<ui.Image> _convertImage(CameraImage image) {
+    Completer<ui.Image> result = new Completer();
+
+    _byteBuffer.update(image);
+    ui.decodeImageFromPixels(
+      _byteBuffer.asTypedList(),
+      _byteBuffer.width,
+      _byteBuffer.height,
+      ui.PixelFormat.bgra8888,
+      result.complete,
+    );
+    return result.future;
+  }
+
   Stream<CameraState> _mapTakePictureToState(TakePicture event) async* {
     if (state is CameraInitialized) {
       final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
       final timePassed = currentMilliseconds - _busySince;
+
       if (timePassed > _throttle) {
         _busySince = currentMilliseconds;
-        yield CameraCapture(event.image);
+
+        final image = await _convertImage(event.image);
+        yield CameraCapture(image);
       }
     }
   }
@@ -68,6 +87,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
 
   @override
   Future<void> close() async {
+    _byteBuffer.free();
     await controller?.dispose();
     return super.close();
   }
