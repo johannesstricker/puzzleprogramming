@@ -6,7 +6,7 @@ import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/screens/solution_screen.dart';
 import 'package:puzzlemath/widgets/app_bar.dart';
-import 'package:puzzlemath/widgets/button.dart';
+import 'package:puzzlemath/theme/theme.dart';
 import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:puzzlemath/widgets/equation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,7 +41,6 @@ class _CameraScreenState extends State<CameraScreen> {
 
   double imageWidth = 0;
   double imageHeight = 0;
-  Color color = Colors.greenAccent;
   List<DetectedObject> detectedObjects = const [];
 
   @override
@@ -137,7 +136,6 @@ class _CameraScreenState extends State<CameraScreen> {
                   painter: DetectionPreview(
                       imageWidth: this.imageWidth,
                       imageHeight: this.imageHeight,
-                      color: this.color,
                       objects: this.detectedObjects)),
             ),
           ),

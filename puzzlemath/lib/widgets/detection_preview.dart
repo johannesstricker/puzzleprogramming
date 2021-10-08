@@ -1,17 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
+import 'package:puzzlemath/theme/colors.dart';
 
 class DetectionPreview extends CustomPainter {
   DetectionPreview(
       {required this.imageWidth,
       required this.imageHeight,
-      required this.color,
       this.objects = const []});
 
   double imageWidth;
   double imageHeight;
-  Color color;
   List<DetectedObject> objects;
 
   @override
@@ -32,8 +31,8 @@ class DetectionPreview extends CustomPainter {
       Offset(object.topLeft.x * scaleX, object.topLeft.y * scaleY)
     ];
     final paint = Paint()
-      ..color = color.withOpacity(0.5)
-      ..strokeWidth = 2
+      ..color = ColorSecondary.withOpacity(0.5)
+      ..strokeWidth = 4
       ..strokeJoin = StrokeJoin.round
       ..strokeCap = StrokeCap.square;
     canvas.drawPoints(PointMode.polygon, points, paint);
