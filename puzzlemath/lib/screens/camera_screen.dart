@@ -11,6 +11,7 @@ import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:puzzlemath/widgets/equation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
+import 'package:puzzlemath/widgets/functional_camera_preview.dart';
 
 class CameraScreenArguments {
   final Challenge challenge;
@@ -112,31 +113,19 @@ class _CameraScreenState extends State<CameraScreen> {
         Container(
           width: double.infinity,
           height: double.infinity,
-          child: AspectRatio(
-            aspectRatio: 1.0 / controller.value.aspectRatio,
-            child: CameraPreview(
-              controller,
-              child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                return GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTapDown: (details) => _onScreenTap(details, constraints),
-                );
-              }),
-            ),
+          child: FunctionalCameraPreview(
+            controller,
+            cameraBloc: _cameraBloc,
           ),
         ),
         IgnorePointer(
           child: Container(
             height: double.infinity,
             width: double.infinity,
-            child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: CustomPaint(
-                  painter: DetectionPreview(
-                      imageWidth: this.imageWidth,
-                      imageHeight: this.imageHeight,
-                      objects: this.detectedObjects)),
+            child: DetectionPreview(
+              imageWidth: this.imageWidth,
+              imageHeight: this.imageHeight,
+              objects: this.detectedObjects,
             ),
           ),
         ),

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/theme/colors.dart';
 
-class DetectionPreview extends CustomPainter {
-  DetectionPreview(
+class DetectionPreviewPainter extends CustomPainter {
+  DetectionPreviewPainter(
       {required this.imageWidth,
       required this.imageHeight,
       this.objects = const []});
@@ -39,5 +39,26 @@ class DetectionPreview extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(DetectionPreview oldDelegate) => true;
+  bool shouldRepaint(DetectionPreviewPainter oldDelegate) => true;
+}
+
+class DetectionPreview extends StatelessWidget {
+  final double imageWidth, imageHeight;
+  final List<DetectedObject> objects;
+
+  DetectionPreview(
+      {required this.imageWidth,
+      required this.imageHeight,
+      required this.objects});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: DetectionPreviewPainter(
+        imageWidth: imageWidth,
+        imageHeight: imageHeight,
+        objects: objects,
+      ),
+    );
+  }
 }

@@ -5,6 +5,8 @@ import 'package:puzzlemath/blocs/camera/camera_events.dart';
 import 'package:puzzlemath/blocs/camera/camera_states.dart';
 import 'package:camera/camera.dart';
 
+// TODO: handle lifecycle changes
+//       see: https://github.com/flutter/plugins/tree/master/packages/camera/camera#handling-lifecycle-states
 Future<CameraController> _getCameraController() async {
   final cameras = await availableCameras();
   return CameraController(cameras.first, ResolutionPreset.medium,
