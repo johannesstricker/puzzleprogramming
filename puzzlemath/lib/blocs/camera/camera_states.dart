@@ -13,6 +13,15 @@ class CameraInitialized extends CameraState {
   String toString() => 'CameraInitialized';
 }
 
+class CameraError extends CameraState {
+  final String error;
+
+  CameraError(this.error);
+
+  @override
+  String toString() => 'CameraError';
+}
+
 class CameraCapture extends CameraInitialized {
   final ui.Image image;
 

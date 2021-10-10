@@ -7,7 +7,7 @@ import 'package:puzzlemath/blocs/camera/camera_events.dart';
 import 'package:puzzlemath/blocs/camera/camera_states.dart';
 import 'package:camera/camera.dart';
 
-// TODO: handle lifecycle changes
+// TODO: handle lifecycle changes?
 //       see: https://github.com/flutter/plugins/tree/master/packages/camera/camera#handling-lifecycle-states
 Future<CameraController> _getCameraController() async {
   final cameras = await availableCameras();
@@ -42,8 +42,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
       yield CameraInitialized();
       controller!.startImageStream((image) => add(TakePicture(image)));
     } on CameraException catch (error) {
-      // TODO: add CameraError state
-      debugPrint(error.description);
+      yield CameraError(error.toString());
     } catch (error) {
       debugPrint(error.toString());
     }

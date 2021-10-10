@@ -126,8 +126,6 @@ Pointer<Uint8> _byteDataToPointer(ByteData bytes) {
 }
 
 class PuzzlePlugin {
-  // TODO: implement an image crop to aspect ratio function
-
   static List<DetectedObject> detectObjects(ImageBuffer image) {
     // TODO: implement for Android
     final objects = _PuzzleLib().detectObjects32BGRA(

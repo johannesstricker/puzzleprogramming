@@ -191,6 +191,9 @@ class _CameraScreenState extends State<CameraScreen> {
           width: double.infinity,
           child: BlocBuilder<CameraBloc, CameraState>(
               builder: (BuildContext context, CameraState state) {
+            if (state is CameraError) {
+              return Center(child: Text(state.error));
+            }
             if (state is CameraInitialized) {
               return _buildCameraPreview(context, state);
             }

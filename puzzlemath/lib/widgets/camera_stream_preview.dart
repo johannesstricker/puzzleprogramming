@@ -21,7 +21,6 @@ class CameraStreamPreview extends StatelessWidget {
     return RawImage(
       image: image,
       fit: fit,
-      // TODO: align center and make sure that the detection preview stays aligned
       alignment: Alignment.center,
     );
   }
