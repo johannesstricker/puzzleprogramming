@@ -91,8 +91,6 @@ class ImageBuffer {
     final plane = image.planes[0];
     final bytes = plane.bytes;
 
-    debugPrint('calling update');
-
     width = plane.width ?? 0;
     height = plane.height ?? 0;
     bytesPerRow = plane.bytesPerRow;
@@ -106,6 +104,7 @@ class ImageBuffer {
     return _bufferSize == 0;
   }
 
+  // TODO: this can sometimes cause a "buffer beeing freed was not allocated" error
   void free() {
     if (_bufferSize > 0) {
       _bufferSize = 0;

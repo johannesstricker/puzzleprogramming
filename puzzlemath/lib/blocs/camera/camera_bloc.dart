@@ -17,18 +17,21 @@ Future<CameraController> _getCameraController() async {
 
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
   CameraController? controller;
-  final num _throttle;
-  num _busySince = 0;
+  final num? _millisecondsPerFrame;
+  num _frameStartTime = 0;
   final ImageBuffer _byteBuffer = ImageBuffer.empty();
 
-  CameraBloc(this._throttle) : super(CameraUninitialized());
+  CameraBloc({framesPerSecond = null})
+      : _millisecondsPerFrame =
+            framesPerSecond == null ? null : 1000.0 / framesPerSecond,
+        super(CameraUninitialized());
 
   @override
   Stream<CameraState> mapEventToState(CameraEvent event) async* {
     if (event is InitializeCamera) {
       yield* _mapInitializeCameraToState();
-    } else if (event is TakePicture) {
-      yield* _mapTakePictureToState(event);
+    } else if (event is StreamPicture) {
+      yield* _mapStreamPictureToState(event);
     } else if (event is FocusCamera) {
       yield* _mapFocusCameraToState(event);
     }
@@ -40,7 +43,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
       controller = await _getCameraController();
       await controller!.initialize();
       yield CameraInitialized();
-      controller!.startImageStream((image) => add(TakePicture(image)));
+      controller!.startImageStream((image) => add(StreamPicture(image)));
     } on CameraException catch (error) {
       yield CameraError(error.toString());
     } catch (error) {
@@ -62,14 +65,20 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     return result.future;
   }
 
-  Stream<CameraState> _mapTakePictureToState(TakePicture event) async* {
+  bool _hasFrameExpired() {
+    final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
+    final timePassedInFrame = currentMilliseconds - _frameStartTime;
+    if (_millisecondsPerFrame == null ||
+        timePassedInFrame > _millisecondsPerFrame!) {
+      _frameStartTime = currentMilliseconds;
+      return true;
+    }
+    return false;
+  }
+
+  Stream<CameraState> _mapStreamPictureToState(StreamPicture event) async* {
     if (state is CameraInitialized) {
-      final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
-      final timePassed = currentMilliseconds - _busySince;
-
-      if (timePassed > _throttle) {
-        _busySince = currentMilliseconds;
-
+      if (_hasFrameExpired()) {
         final image = await _convertImage(event.image);
         yield CameraCapture(image);
       }

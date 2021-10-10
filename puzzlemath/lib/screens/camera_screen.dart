@@ -30,7 +30,7 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  final CameraBloc _cameraBloc = CameraBloc(10);
+  final _cameraBloc = CameraBloc(framesPerSecond: 30);
   StreamSubscription<CameraState>? _cameraStreamSubscription;
 
   bool _isSolved = false;

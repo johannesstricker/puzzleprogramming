@@ -8,13 +8,13 @@ class InitializeCamera extends CameraEvent {
   String toString() => 'InitializeCamera';
 }
 
-class TakePicture extends CameraEvent {
+class StreamPicture extends CameraEvent {
   final CameraImage image;
 
-  TakePicture(this.image);
+  StreamPicture(this.image);
 
   @override
-  String toString() => 'TakePicture';
+  String toString() => 'StreamPicture';
 }
 
 class FocusCamera extends CameraEvent {
