@@ -104,31 +104,30 @@ class ChallengeScreen extends StatelessWidget {
     return Stack(
       children: [
         Container(
+          width: double.infinity,
           height: double.infinity,
-          child: Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    buildTitle(context),
-                    SizedBox(height: 4.0),
-                    buildDescription(context),
-                    SizedBox(height: 24),
-                    buildSectionTitle(context, 'Use these puzzle pieces'),
-                    buildMarkerList(context),
-                    SizedBox(height: 24),
-                  ],
-                ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildTitle(context),
+                  SizedBox(height: 4),
+                  buildDescription(context),
+                  SizedBox(height: 24),
+                  buildSectionTitle(context, 'Use these puzzle pieces'),
+                  buildMarkerList(context),
+                  SizedBox(height: 24),
+                ],
               ),
             ),
           ),
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: SizedBox(
+          child: Container(
             width: double.infinity,
             child: Padding(
               padding: EdgeInsets.all(16),
