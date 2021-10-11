@@ -117,6 +117,7 @@ class ImageBuffer {
   }
 }
 
+// TODO: can we avoid unnecessary memory allocations here? create a view maybe?
 Pointer<Uint8> _byteDataToPointer(ByteData bytes) {
   Pointer<Uint8> data = calloc<Uint8>(bytes.buffer.lengthInBytes);
   final bufferBytes = data.asTypedList(bytes.buffer.lengthInBytes);
