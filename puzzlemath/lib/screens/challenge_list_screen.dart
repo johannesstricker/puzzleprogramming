@@ -9,9 +9,13 @@ import 'package:puzzlemath/widgets/challenge_list_item.dart';
 import 'package:puzzlemath/widgets/progress_bar.dart';
 
 class Carroussel extends StatefulWidget {
+  final int currentPage;
   final List<Challenge> challenges;
 
-  Carroussel(this.challenges);
+  Carroussel(
+    this.challenges, {
+    this.currentPage = 0,
+  });
 
   @override
   _CarrousselState createState() => new _CarrousselState();
@@ -28,14 +32,18 @@ class _CarrousselState extends State<Carroussel> {
   @override
   initState() {
     super.initState();
-    activeChallengeIndex = widget.challenges
-        .indexWhere((challenge) => challenge.state == ChallengeState.Unlocked);
-    currentPage = activeChallengeIndex;
+    currentPage = widget.currentPage;
     controller = PageController(
       initialPage: currentPage,
       keepPage: false,
       viewportFraction: viewportFraction,
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant Carroussel oldWidget) {
+    controller.jumpToPage(widget.currentPage);
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -110,9 +118,9 @@ class ChallengeList extends StatelessWidget {
         if (state is ChallengesError) {
           return Center(child: Text('An error occured.'));
         }
-        final List<Challenge> challenges =
-            (state as ChallengesLoaded).challenges;
-        return Carroussel(challenges);
+        final int currentPage = (state as ChallengesLoaded).nextChallengeIndex;
+        final List<Challenge> challenges = state.challenges;
+        return Carroussel(challenges, currentPage: currentPage);
       },
     );
   }
@@ -232,6 +240,18 @@ class ChallengeListScreen extends StatelessWidget {
             Container(
               height: 400,
               child: ChallengeList(),
+            ),
+            Center(
+              child: TextButton(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Reset your progress',
+                      style: TextRegularM.copyWith(color: ColorNeutral60)),
+                ),
+                onPressed: () {
+                  BlocProvider.of<ChallengesBloc>(context).add(ResetProgress());
+                },
+              ),
             ),
           ],
         ),

@@ -15,3 +15,8 @@ class SolveChallenge extends ChallengesEvent {
   @override
   String toString() => 'SolveChallenge';
 }
+
+class ResetProgress extends ChallengesEvent {
+  @override
+  String toString() => 'ResetProgress';
+}

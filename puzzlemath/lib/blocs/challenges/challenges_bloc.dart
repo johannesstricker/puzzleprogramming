@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import './challenges_events.dart';
 import './challenges_states.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
@@ -10,27 +11,22 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
   late final ChallengeRepository _repository;
 
   ChallengesBloc() : super(ChallengesLoading()) {
+    on<LoadChallenges>(_onLoadChallenges);
+    on<SolveChallenge>(_onSolveChallenge);
+    on<ResetProgress>(_onResetProgress);
     add(LoadChallenges());
   }
 
-  @override
-  Stream<ChallengesState> mapEventToState(ChallengesEvent event) async* {
-    if (event is LoadChallenges) {
-      yield* _mapLoadChallengesToState();
-    } else if (event is SolveChallenge) {
-      yield* _mapSolveChallengeToState(event);
-    }
-  }
-
-  Stream<ChallengesState> _mapLoadChallengesToState() async* {
+  void _onLoadChallenges(
+      LoadChallenges event, Emitter<ChallengesState> emit) async {
     final databaseConnection = await Database.instance.connection;
     _repository = ChallengeRepository(databaseConnection);
     List<Challenge> challenges = await _repository.load();
-    yield ChallengesLoaded(challenges: challenges);
+    emit(ChallengesLoaded(challenges: challenges));
   }
 
-  Stream<ChallengesState> _mapSolveChallengeToState(
-      SolveChallenge event) async* {
+  void _onSolveChallenge(
+      SolveChallenge event, Emitter<ChallengesState> emit) async {
     if (state is ChallengesLoaded) {
       final unlockedChallengeIndex =
           (state as ChallengesLoaded).challenges.indexOf(event.challenge) + 1;
@@ -46,7 +42,14 @@ class ChallengesBloc extends Bloc<ChallengesEvent, ChallengesState> {
         return challenge;
       }).toList();
       await _repository.saveAll(updatedChallenges);
-      yield ChallengesLoaded(challenges: updatedChallenges);
+      emit(ChallengesLoaded(challenges: updatedChallenges));
     }
+  }
+
+  void _onResetProgress(
+      ResetProgress event, Emitter<ChallengesState> emit) async {
+    await _repository.reset();
+    List<Challenge> challenges = await _repository.load();
+    emit(ChallengesLoaded(challenges: challenges));
   }
 }

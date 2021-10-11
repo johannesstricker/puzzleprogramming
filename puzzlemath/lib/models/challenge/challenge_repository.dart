@@ -1,3 +1,4 @@
+import 'package:puzzlemath/blocs/challenges/challenges_events.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:sqflite/sqflite.dart';
@@ -39,6 +40,10 @@ class ChallengeRepository {
       return challenge
           .copyWithState(challengeStates[challenge.id] ?? challenge.state);
     }).toList();
+  }
+
+  Future<void> reset() async {
+    await connection.delete(TABLE_NAME);
   }
 }
 

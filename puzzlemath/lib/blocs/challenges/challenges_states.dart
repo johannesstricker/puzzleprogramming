@@ -21,6 +21,11 @@ class ChallengesLoaded extends ChallengesState {
         .length;
     return solvedCount.toDouble() / challenges.length.toDouble();
   }
+
+  int get nextChallengeIndex {
+    return challenges
+        .indexWhere((challenge) => challenge.state == ChallengeState.Unlocked);
+  }
 }
 
 class ChallengesError extends ChallengesState {
