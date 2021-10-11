@@ -5,6 +5,7 @@ import 'screens/camera_screen.dart';
 import 'screens/challenge_list_screen.dart';
 import 'screens/challenge_screen.dart';
 import 'screens/solution_screen.dart';
+import 'config/navigation.dart';
 
 void main() {
   runApp(PuzzleApp());
@@ -44,6 +45,7 @@ class _PuzzleAppState extends State<PuzzleApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'PuzzleMath',
+      navigatorKey: NavigatorKey,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

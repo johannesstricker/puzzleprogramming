@@ -38,7 +38,7 @@ class Challenge extends Equatable {
     );
   }
 
-  bool checkSolution(int proposedSolution, List<Marker> usedMarkers) {
+  bool checkSolution(int? proposedSolution, List<Marker> usedMarkers) {
     Function eq = const UnorderedIterableEquality().equals;
     return eq(availableMarkers, usedMarkers) && proposedSolution == solution;
   }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
-import 'package:puzzlemath/screens/solution_screen.dart';
 import 'package:puzzlemath/widgets/app_bar.dart';
 import 'package:puzzlemath/widgets/detection_preview.dart';
 import 'package:puzzlemath/widgets/equation.dart';
@@ -31,62 +30,35 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
   final _cameraBloc = CameraBloc(framesPerSecond: 30);
+  late ChallengeBloc _challengeBloc;
   StreamSubscription<CameraState>? _cameraStreamSubscription;
-
-  bool _isSolved = false;
-  List<Marker>? _usedMarkers;
-  int? _proposedSolution;
-
-  double imageWidth = 0;
-  double imageHeight = 0;
-  List<DetectedObject> detectedObjects = const [];
 
   @override
   void initState() {
+    _challengeBloc = ChallengeBloc(
+      challenge: widget.challenge,
+      // TODO: not sure if this gets the right bloc???
+      challengesBloc: BlocProvider.of<ChallengesBloc>(context),
+    );
     _cameraBloc.add(InitializeCamera());
+    _cameraBloc.stream.listen((CameraState state) {
+      if (state is CameraCapture) {
+        _challengeBloc.add(ImageReceived(state.image));
+      }
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _cameraStreamSubscription?.cancel();
+    _challengeBloc.close();
     _cameraBloc.close();
     super.dispose();
   }
 
-  // TODO: use old AST for a while when parsing fails to avoid spurious errors
-  // TODO: this should not be part of the state and instead be built in a
-  //       streambuilder or bloc builder
-  void _onImageReceived(ui.Image image) async {
-    final objects = await PuzzlePlugin.detectObjectsAsync(image);
-    final sortedObjects = sortObjectListLTR(objects);
-    int? proposedSolution;
-    try {
-      proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
-    } catch (error) {}
-
-    setState(() {
-      imageWidth = image.width.toDouble();
-      imageHeight = image.height.toDouble();
-      detectedObjects = sortedObjects;
-      _proposedSolution = proposedSolution;
-      _usedMarkers = sortedObjects.map((obj) => createMarker(obj.id)).toList();
-    });
-
-    if (proposedSolution == widget.challenge.solution) {}
-  }
-
   Widget _buildStack(BuildContext context,
       {required CameraCapture state, required List<DetectedObject> objects}) {
-    final List<Marker> detectedMarkers =
-        widget.challenge.availableMarkers.asMap().entries.map((entry) {
-      final index = entry.key;
-      final detectedMarker = index < objects.length
-          ? createMarker(objects[index].id)
-          : Marker.Unknown;
-      return detectedMarker;
-    }).toList();
-
     return Stack(
       children: [
         Container(
@@ -101,10 +73,18 @@ class _CameraScreenState extends State<CameraScreen> {
           child: Container(
             height: double.infinity,
             width: double.infinity,
-            child: DetectionPreview(
-              imageWidth: state.image.width.toDouble(),
-              imageHeight: state.image.height.toDouble(),
-              objects: objects,
+            child: BlocBuilder<ChallengeBloc, ChallengeBlocState>(
+              builder:
+                  (BuildContext context, ChallengeBlocState challengeState) {
+                if (challengeState is ChallengeAttempted) {
+                  return DetectionPreview(
+                    imageWidth: state.image.width.toDouble(),
+                    imageHeight: state.image.height.toDouble(),
+                    objects: challengeState.detectedObjects,
+                  );
+                }
+                return Container();
+              },
             ),
           ),
         ),
@@ -114,9 +94,21 @@ class _CameraScreenState extends State<CameraScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(16),
             alignment: Alignment.bottomCenter,
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                return Equation(markers: detectedMarkers, solution: 1337);
+            child: BlocBuilder<ChallengeBloc, ChallengeBlocState>(
+              builder:
+                  (BuildContext context, ChallengeBlocState challengeState) {
+                if (challengeState is ChallengeAttempted) {
+                  return LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return Equation(
+                          markers: challengeState.getUsedMarkersPadded(
+                              widget.challenge.availableMarkers.length),
+                          solution: widget.challenge.solution);
+                    },
+                  );
+                }
+                return Container();
               },
             ),
           ),
@@ -153,36 +145,13 @@ class _CameraScreenState extends State<CameraScreen> {
     return Container(color: Colors.black);
   }
 
-  void _attempt(BuildContext context) {
-    if (_proposedSolution == null || _usedMarkers == null) {
-      return;
-    }
-    // TODO: push to success or error route
-    bool challengeSolved =
-        widget.challenge.checkSolution(_proposedSolution!, _usedMarkers!);
-    if (challengeSolved && !_isSolved) {
-      // TODO: all this logic should live inside a bloc
-      _isSolved = true;
-      Future.microtask(() {
-        BlocProvider.of<ChallengesBloc>(context)
-            .add(SolveChallenge(widget.challenge));
-        // TODO: don't push
-        Navigator.pushNamed(
-          context,
-          SolutionScreen.routeName,
-          arguments: SolutionScreenArguments(
-              proposedSolution: _proposedSolution!,
-              usedMarkers: _usedMarkers!,
-              challenge: widget.challenge),
-        );
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CameraBloc>(
-      create: (context) => _cameraBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CameraBloc>(create: (context) => _cameraBloc),
+        BlocProvider<ChallengeBloc>(create: (context) => _challengeBloc),
+      ],
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: PuzzleAppBar(),

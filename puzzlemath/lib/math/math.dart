@@ -28,6 +28,32 @@ enum Marker {
   Unknown,
 }
 
+String markerToString(Marker marker) {
+  if (isDigitMarker(marker)) {
+    return marker.index.toString();
+  }
+  switch (marker) {
+    case Marker.OperatorAdd:
+      return '+';
+    case Marker.OperatorDivide:
+      return '/';
+    case Marker.OperatorMultiply:
+      return '*';
+    case Marker.OperatorSubtract:
+      return '-';
+    case Marker.Start:
+      return 'S';
+    case Marker.End:
+      return 'E';
+    case Marker.LeftParenthesis:
+      return '(';
+    case Marker.RightParenthesis:
+      return ')';
+    default:
+      return '?';
+  }
+}
+
 List<Marker> stringToMarkers(String input) {
   const Map<String, Marker> mapping = {
     '0': Marker.Digit0,

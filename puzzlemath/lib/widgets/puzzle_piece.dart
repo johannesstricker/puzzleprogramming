@@ -24,33 +24,11 @@ class PuzzlePiece extends StatelessWidget {
     return ColorNeutral40;
   }
 
-  String _markerString() {
-    if (isDigitMarker(this._marker)) {
-      return this._marker.index.toString();
-    }
-    switch (this._marker) {
-      case Marker.OperatorAdd:
-        return '+';
-      case Marker.OperatorDivide:
-        return '/';
-      case Marker.OperatorMultiply:
-        return '*';
-      case Marker.OperatorSubtract:
-        return '-';
-      case Marker.Start:
-        return 'S';
-      case Marker.End:
-        return 'E';
-      default:
-        return '?';
-    }
-  }
-
   Widget _text() {
     return FittedBox(
       fit: BoxFit.contain,
       child: Text(
-        _markerString(),
+        markerToString(_marker),
         style: TextHeading2.copyWith(color: ColorNeutral10),
       ),
     );

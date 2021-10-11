@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
@@ -17,35 +18,34 @@ Future<CameraController> _getCameraController() async {
 
 class CameraBloc extends Bloc<CameraEvent, CameraState> {
   CameraController? controller;
-  final num? _millisecondsPerFrame;
-  num _frameStartTime = 0;
+  final Duration _durationPerFrame;
   final ImageBuffer _byteBuffer = ImageBuffer.empty();
 
-  CameraBloc({framesPerSecond = null})
-      : _millisecondsPerFrame =
-            framesPerSecond == null ? null : 1000.0 / framesPerSecond,
-        super(CameraUninitialized());
-
-  @override
-  Stream<CameraState> mapEventToState(CameraEvent event) async* {
-    if (event is InitializeCamera) {
-      yield* _mapInitializeCameraToState();
-    } else if (event is StreamPicture) {
-      yield* _mapStreamPictureToState(event);
-    } else if (event is FocusCamera) {
-      yield* _mapFocusCameraToState(event);
-    }
+  CameraBloc({int framesPerSecond = 30})
+      : _durationPerFrame =
+            Duration(milliseconds: (1000.0 / framesPerSecond).round()),
+        super(CameraUninitialized()) {
+    on<InitializeCamera>(_onInitializeCamera);
+    on<StreamPicture>(_onStreamPicture);
+    on<FocusCamera>(_onFocusCamera);
   }
 
-  Stream<CameraState> _mapInitializeCameraToState() async* {
+  // TODO: if the framesPerSecond are too high, the stream will start to lag behind
+  EventTransformer<ImageReceived> throttle<ImageReceived>(Duration duration) {
+    return (events, mapper) =>
+        events.throttleTime(_durationPerFrame).flatMap(mapper);
+  }
+
+  void _onInitializeCamera(
+      InitializeCamera event, Emitter<CameraState> emit) async {
     try {
       controller?.dispose();
       controller = await _getCameraController();
       await controller!.initialize();
-      yield CameraInitialized();
+      emit(CameraInitialized());
       controller!.startImageStream((image) => add(StreamPicture(image)));
     } on CameraException catch (error) {
-      yield CameraError(error.toString());
+      emit(CameraError(error.toString()));
     } catch (error) {
       debugPrint(error.toString());
     }
@@ -65,27 +65,14 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     return result.future;
   }
 
-  bool _hasFrameExpired() {
-    final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
-    final timePassedInFrame = currentMilliseconds - _frameStartTime;
-    if (_millisecondsPerFrame == null ||
-        timePassedInFrame > _millisecondsPerFrame!) {
-      _frameStartTime = currentMilliseconds;
-      return true;
-    }
-    return false;
-  }
-
-  Stream<CameraState> _mapStreamPictureToState(StreamPicture event) async* {
+  void _onStreamPicture(StreamPicture event, Emitter<CameraState> emit) async {
     if (state is CameraInitialized) {
-      if (_hasFrameExpired()) {
-        final image = await _convertImage(event.image);
-        yield CameraCapture(image);
-      }
+      final image = await _convertImage(event.image);
+      emit(CameraCapture(image));
     }
   }
 
-  Stream<CameraState> _mapFocusCameraToState(FocusCamera event) async* {
+  void _onFocusCamera(FocusCamera event, Emitter<CameraState> emit) async {
     if (state is CameraInitialized) {
       controller?.setExposurePoint(event.point);
       controller?.setFocusPoint(event.point);
