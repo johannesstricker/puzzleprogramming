@@ -4,7 +4,6 @@ import 'package:ffi/ffi.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
 
 class NativeCoordinate extends Struct {
   @Double()

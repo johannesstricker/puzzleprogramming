@@ -12,21 +12,18 @@ class ChallengeStarted extends ChallengeBlocState {
 class ChallengeAttempted extends ChallengeBlocState {
   final Challenge challenge;
   final List<DetectedObject> detectedObjects;
+  final List<Marker> usedMarkers;
 
   ChallengeAttempted({
     required this.detectedObjects,
     required this.challenge,
+    required this.usedMarkers,
   });
-
-  get usedMarkers {
-    return detectedObjects.map((object) => createMarker(object.id)).toList();
-  }
 
   List<Marker> getUsedMarkersPadded(int length) {
     return List<Marker>.generate(length, (index) {
-      final detectedMarker = index < detectedObjects.length
-          ? createMarker(detectedObjects[index].id)
-          : Marker.Unknown;
+      final detectedMarker =
+          index < usedMarkers.length ? usedMarkers[index] : Marker.Unknown;
       return detectedMarker;
     });
   }
@@ -39,7 +36,11 @@ class ChallengeSolved extends ChallengeAttempted {
   ChallengeSolved({
     required Challenge challenge,
     required List<DetectedObject> detectedObjects,
-  }) : super(challenge: challenge, detectedObjects: detectedObjects);
+    required List<Marker> usedMarkers,
+  }) : super(
+            challenge: challenge,
+            detectedObjects: detectedObjects,
+            usedMarkers: usedMarkers);
 
   @override
   String toString() => 'ChallengeSolved';
@@ -49,7 +50,11 @@ class ChallengeFailed extends ChallengeAttempted {
   ChallengeFailed({
     required Challenge challenge,
     required List<DetectedObject> detectedObjects,
-  }) : super(challenge: challenge, detectedObjects: detectedObjects);
+    required List<Marker> usedMarkers,
+  }) : super(
+            challenge: challenge,
+            detectedObjects: detectedObjects,
+            usedMarkers: usedMarkers);
 
   @override
   String toString() => 'ChallengeFailed';

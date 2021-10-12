@@ -28,27 +28,39 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeBlocState> {
 
   void _onImageReceived(
       ImageReceived event, Emitter<ChallengeBlocState> emit) async {
-    if (state is ChallengeFailed || state is ChallengeSolved) {
+    final objects = await PuzzlePlugin.detectObjectsAsync(event.image);
+    final sortedObjects = sortObjectListLTR(objects);
+    final usedMarkers =
+        sortedObjects.map((object) => createMarker(object.id)).toList();
+
+    // once we have solved the challenge we don't change the state again
+    if (state is ChallengeSolved) {
+      emit(ChallengeSolved(
+        challenge: challenge,
+        detectedObjects: sortedObjects,
+        usedMarkers: (state as ChallengeSolved).usedMarkers,
+      ));
       return;
     }
 
-    final objects = await PuzzlePlugin.detectObjectsAsync(event.image);
-    final sortedObjects = sortObjectListLTR(objects);
-
     // TODO: handle case with too many used markers
-    final usedMarker =
-        sortedObjects.map((object) => createMarker(object.id)).toList();
-    if (usedMarker.length != challenge.availableMarkers.length) {
+    if (usedMarkers.length != challenge.availableMarkers.length) {
       emit(ChallengeAttempted(
-          challenge: challenge, detectedObjects: sortedObjects));
+        challenge: challenge,
+        detectedObjects: sortedObjects,
+        usedMarkers: usedMarkers,
+      ));
       return;
     }
 
     try {
       int? proposedSolution = parseAbstractSyntaxTreeFromObjects(sortedObjects);
-      if (challenge.checkSolution(proposedSolution, usedMarker)) {
+      if (challenge.checkSolution(proposedSolution, usedMarkers)) {
         emit(ChallengeSolved(
-            challenge: challenge, detectedObjects: sortedObjects));
+          challenge: challenge,
+          detectedObjects: sortedObjects,
+          usedMarkers: usedMarkers,
+        ));
         await Future.delayed(Duration(seconds: 2));
 
         challengesBloc.add(SolveChallenge(challenge));
@@ -56,19 +68,19 @@ class ChallengeBloc extends Bloc<ChallengeEvent, ChallengeBlocState> {
           SolutionScreen.routeName,
           arguments: SolutionScreenArguments(
             proposedSolution: proposedSolution!,
-            usedMarkers: usedMarker,
+            usedMarkers: usedMarkers,
             challenge: challenge,
           ),
         );
-
         return;
       }
     } catch (error) {
       debugPrint('Error while trying to parse syntax tree.');
     }
-    emit(ChallengeFailed(challenge: challenge, detectedObjects: sortedObjects));
-    await Future.delayed(Duration(seconds: 2));
-    emit(ChallengeAttempted(
-        challenge: challenge, detectedObjects: sortedObjects));
+    emit(ChallengeFailed(
+      challenge: challenge,
+      detectedObjects: sortedObjects,
+      usedMarkers: usedMarkers,
+    ));
   }
 }
