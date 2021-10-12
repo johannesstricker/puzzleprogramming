@@ -28,17 +28,29 @@ class ChallengeScreen extends StatelessWidget {
     return markers;
   }
 
-  Text buildTitle(BuildContext context) {
-    return Text(
-      challenge.name,
-      style: TextHeading1,
+  Widget buildTitle(BuildContext context) {
+    return Hero(
+      tag: '${challenge.id}-title',
+      child: Material(
+        color: Colors.transparent,
+        child: Text(
+          challenge.name,
+          style: TextHeading1,
+        ),
+      ),
     );
   }
 
-  Text buildDescription(BuildContext context) {
-    return Text(
-      challenge.description,
-      style: TextRegularM.copyWith(color: ColorNeutral70),
+  Widget buildDescription(BuildContext context) {
+    return Hero(
+      tag: '${challenge.id}-description',
+      child: Material(
+        color: Colors.transparent,
+        child: Text(
+          challenge.description,
+          style: TextRegularM.copyWith(color: ColorNeutral70),
+        ),
+      ),
     );
   }
 
@@ -131,9 +143,12 @@ class ChallengeScreen extends StatelessWidget {
             width: double.infinity,
             child: Padding(
               padding: EdgeInsets.all(16),
-              child: Button.Primary(
-                text: 'Ready',
-                onPressed: () => navigateToCameraScreen(context),
+              child: Hero(
+                tag: '${challenge.id}-button',
+                child: Button.Primary(
+                  text: 'Ready',
+                  onPressed: () => navigateToCameraScreen(context),
+                ),
               ),
             ),
           ),
