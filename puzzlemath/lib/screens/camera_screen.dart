@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:puzzle_plugin/puzzle_plugin.dart';
 import 'package:puzzlemath/math/math.dart';
@@ -10,6 +9,8 @@ import 'package:puzzlemath/widgets/equation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:puzzlemath/blocs/blocs.dart';
 import 'package:puzzlemath/widgets/functional_camera_preview.dart';
+import 'package:puzzlemath/widgets/animations/animations.dart';
+import 'package:flutter/services.dart';
 
 class CameraScreenArguments {
   final Challenge challenge;
@@ -32,6 +33,8 @@ class _CameraScreenState extends State<CameraScreen> {
   final _cameraBloc = CameraBloc(framesPerSecond: 30);
   late ChallengeBloc _challengeBloc;
   StreamSubscription<CameraState>? _cameraStreamSubscription;
+
+  final _wiggleAnimationKey = GlobalKey<WiggleAnimationState>();
 
   @override
   void initState() {
@@ -57,8 +60,11 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  Widget _buildStack(BuildContext context,
-      {required CameraCapture state, required List<DetectedObject> objects}) {
+  Widget _buildStack(
+    BuildContext context, {
+    required CameraCapture state,
+    required List<DetectedObject> objects,
+  }) {
     return Stack(
       children: [
         Container(
@@ -94,17 +100,30 @@ class _CameraScreenState extends State<CameraScreen> {
             width: double.infinity,
             padding: EdgeInsets.all(16),
             alignment: Alignment.bottomCenter,
-            child: BlocBuilder<ChallengeBloc, ChallengeBlocState>(
+            child: BlocConsumer<ChallengeBloc, ChallengeBlocState>(
+              listenWhen: (previousState, state) {
+                return previousState is! ChallengeFailed &&
+                    state is ChallengeFailed;
+              },
+              listener: (context, state) {
+                _wiggleAnimationKey.currentState?.wiggle();
+                HapticFeedback.vibrate();
+              },
               builder:
                   (BuildContext context, ChallengeBlocState challengeState) {
                 if (challengeState is ChallengeAttempted) {
                   return LayoutBuilder(
                     builder:
                         (BuildContext context, BoxConstraints constraints) {
-                      return Equation(
+                      return WiggleAnimation(
+                        key: _wiggleAnimationKey,
+                        shakeOffset: 8,
+                        child: Equation(
                           markers: challengeState.getUsedMarkersPadded(
                               widget.challenge.availableMarkers.length),
-                          solution: widget.challenge.solution);
+                          solution: widget.challenge.solution,
+                        ),
+                      );
                     },
                   );
                 }
