@@ -4,6 +4,7 @@ import 'package:puzzlemath/screens/challenge_screen.dart';
 import 'package:puzzlemath/models/challenge/challenge.dart';
 import 'package:puzzlemath/widgets/button.dart';
 import 'package:puzzlemath/theme/theme.dart';
+import 'package:puzzlemath/widgets/text_marker.dart';
 
 class ChallengeListItem extends StatelessWidget {
   final int index;
@@ -25,34 +26,21 @@ class ChallengeListItem extends StatelessWidget {
   Widget buildTitle() {
     return Hero(
       tag: '${challenge.id}-title',
-      child: Stack(
-        alignment: Alignment.bottomLeft,
-        children: [
-          Transform.translate(
-            offset: Offset(-3.0, 2.0),
-            child: Transform.rotate(
-              angle: -0.05,
-              child: Container(
-                width: 40,
-                height: 15,
-                color: challenge.state == ChallengeState.Locked
-                    ? ColorNeutral40
-                    : ColorSecondary,
-              ),
+      child: TextMarker(
+        color: challenge.state == ChallengeState.Locked
+            ? ColorNeutral40
+            : ColorSecondary,
+        child: Material(
+          color: Colors.transparent,
+          child: Text(
+            challenge.name,
+            style: TextHeading1.copyWith(
+              color: challenge.state == ChallengeState.Unlocked
+                  ? ColorNeutral10
+                  : ColorNeutral100,
             ),
           ),
-          Material(
-            color: Colors.transparent,
-            child: Text(
-              challenge.name,
-              style: TextHeading1.copyWith(
-                color: challenge.state == ChallengeState.Unlocked
-                    ? ColorNeutral10
-                    : ColorNeutral100,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

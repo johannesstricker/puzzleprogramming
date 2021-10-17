@@ -6,6 +6,7 @@ import 'package:puzzlemath/theme/theme.dart';
 import 'package:puzzlemath/widgets/app_bar.dart';
 import 'package:puzzlemath/widgets/puzzle_piece.dart';
 import 'package:puzzlemath/widgets/button.dart';
+import 'package:puzzlemath/widgets/text_marker.dart';
 
 class ChallengeScreenArguments {
   final Challenge challenge;
@@ -31,11 +32,13 @@ class ChallengeScreen extends StatelessWidget {
   Widget buildTitle(BuildContext context) {
     return Hero(
       tag: '${challenge.id}-title',
-      child: Material(
-        color: Colors.transparent,
-        child: Text(
-          challenge.name,
-          style: TextHeading1,
+      child: TextMarker(
+        child: Material(
+          color: Colors.transparent,
+          child: Text(
+            challenge.name,
+            style: TextHeading1,
+          ),
         ),
       ),
     );
